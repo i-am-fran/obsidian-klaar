@@ -1,0 +1,1058 @@
+/* Klaar styles: use Obsidian theme CSS variables only. */
+
+/* @settings
+name: Klaar
+id: klaar
+settings:
+    -
+        id: klaar-tags-heading
+        title: Tags
+        description: Tag colours are set per tag in Klaar's own settings.
+        type: heading
+        level: 2
+    -
+        id: klaar-tag-tint
+        title: Pill tint
+        description: How strongly a tag's colour fills its pill.
+        type: variable-number-slider
+        default: 16
+        min: 6
+        max: 40
+        step: 1
+        format: '%'
+    -
+        id: klaar-tag-ink
+        title: Text colour strength
+        description: How much of the tag's colour goes into its text (the rest is the normal text colour).
+        type: variable-number-slider
+        default: 70
+        min: 0
+        max: 100
+        step: 5
+        format: '%'
+    -
+        id: klaar-tag-radius
+        title: Pill corner radius
+        type: variable-number-slider
+        default: 999
+        min: 0
+        max: 999
+        step: 1
+        format: px
+    -
+        id: klaar-tag-weight
+        title: Tag font weight
+        type: variable-number-slider
+        default: 500
+        min: 300
+        max: 700
+        step: 100
+    -
+        id: klaar-dates-heading
+        title: Dates
+        description: Label style and the completed date are set in Klaar's own settings. Chips share the pill tint above.
+        type: heading
+        level: 2
+    -
+        id: klaar-overdue-color
+        title: Overdue date
+        description: Chip colour for open tasks scheduled before today.
+        type: variable-themed-color
+        format: hex
+        default-light: '#e5484d'
+        default-dark: '#ff6369'
+    -
+        id: klaar-current-color
+        title: Current date
+        description: Chip colour for open tasks scheduled today, this week, this month...
+        type: variable-themed-color
+        format: hex
+        default-light: '#0090ff'
+        default-dark: '#3b9eff'
+*/
+
+body {
+	--klaar-tag-tint: 16%;
+	--klaar-tag-ink: 70%;
+	--klaar-tag-radius: 999px;
+	--klaar-tag-weight: 500;
+	--klaar-overdue-color: var(--color-red);
+	--klaar-current-color: var(--interactive-accent);
+}
+
+/*
+ * Coloured tags. `.klaar-tag` carries `--klaar-tag-color` (from Klaar's tag settings) and maps it onto Obsidian's
+ * own tag variables, so the theme draws the pill: `.cm-hashtag` spans in the editor, `a.tag` in reading mode,
+ * `.tag` spans in Klaar's rows.
+ */
+.klaar-tag {
+	--tag-color: color-mix(in srgb, var(--klaar-tag-color) var(--klaar-tag-ink), var(--text-normal));
+	--tag-color-hover: var(--tag-color);
+	--tag-background: color-mix(in srgb, var(--klaar-tag-color) var(--klaar-tag-tint), transparent);
+	--tag-background-hover: color-mix(in srgb, var(--klaar-tag-color) calc(var(--klaar-tag-tint) + 8%), transparent);
+	--tag-border-color: transparent;
+	--tag-border-color-hover: transparent;
+	--tag-radius: var(--klaar-tag-radius);
+	--tag-weight: var(--klaar-tag-weight);
+}
+
+/* Editor: the mark sits inside Obsidian's two hashtag spans, so it draws the pill and the spans step back. */
+.markdown-source-view.mod-cm6 .cm-hashtag:has(> .klaar-tag) {
+	padding: 0;
+	border: none;
+	background: none;
+}
+
+.markdown-source-view.mod-cm6 .cm-hashtag > .klaar-tag {
+	padding-block: var(--tag-padding-y);
+	background-color: var(--tag-background);
+	color: var(--tag-color);
+	font-weight: var(--tag-weight);
+}
+
+.markdown-source-view.mod-cm6 .cm-hashtag-begin > .klaar-tag {
+	padding-left: var(--tag-padding-x);
+	border-radius: var(--tag-radius) 0 0 var(--tag-radius);
+}
+
+.markdown-source-view.mod-cm6 .cm-hashtag-end > .klaar-tag {
+	padding-right: var(--tag-padding-x);
+	border-radius: 0 var(--tag-radius) var(--tag-radius) 0;
+}
+
+/* Klaar's own rows don't get the theme's `.tag` look from Obsidian's stylesheet in every context, so draw it here. */
+.klaar-tag-pill {
+	display: inline-block;
+	padding: var(--tag-padding-y) var(--tag-padding-x);
+	border: var(--tag-border-width) solid var(--tag-border-color);
+	border-radius: var(--tag-radius);
+	background-color: var(--tag-background);
+	color: var(--tag-color);
+	font-size: var(--tag-size);
+	font-weight: var(--tag-weight);
+	line-height: 1.2;
+	white-space: nowrap;
+}
+
+.klaar-col-priority .klaar-tag-pill + .klaar-tag-pill,
+.klaar-col-tags .klaar-tag-pill + .klaar-tag-pill {
+	margin-left: var(--size-2-2);
+}
+
+.klaar-suggest-key {
+	margin-left: var(--size-4-2);
+	color: var(--text-muted);
+	font-size: var(--font-smaller);
+}
+
+/* Shared tokens. Nested radii are concentric: inner = outer - padding. */
+.klaar-calendar,
+.klaar-scheduled {
+	--klaar-ease: cubic-bezier(0.2, 0, 0, 1);
+	--klaar-fast: 120ms;
+	--klaar-slide: 200ms;
+}
+
+/* Calendar sidebar */
+.klaar-calendar {
+	padding: var(--size-4-3) var(--size-4-3) var(--size-4-4);
+	font-variant-numeric: tabular-nums;
+}
+
+.klaar-cal-header {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2-3);
+	margin-bottom: var(--size-4-3);
+}
+
+.klaar-cal-spacer {
+	flex: 1;
+}
+
+.klaar-cal-link {
+	cursor: pointer;
+	color: var(--text-normal);
+	text-decoration: none;
+	transition: color var(--klaar-fast) ease-out;
+}
+
+.klaar-cal-link:hover {
+	color: var(--text-accent);
+}
+
+.klaar-cal-month {
+	font-size: var(--font-ui-medium);
+	font-weight: var(--font-semibold);
+}
+
+.klaar-cal-year {
+	font-size: var(--font-ui-medium);
+	color: var(--text-muted);
+}
+
+.klaar-cal-quarter {
+	margin-left: var(--size-2-1);
+	padding: 1px var(--size-4-2);
+	border-radius: var(--radius-s);
+	background: var(--background-modifier-hover);
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	font-weight: var(--font-medium);
+}
+
+.klaar-cal-nav-group {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2-1);
+}
+
+.klaar-cal-today {
+	height: var(--size-4-6);
+	padding: 0 var(--size-4-2);
+	font-size: var(--font-ui-smaller);
+	font-weight: var(--font-medium);
+}
+
+.klaar-cal-today:disabled {
+	opacity: 0;
+	pointer-events: none;
+}
+
+.klaar-cal-grid {
+	display: grid;
+	grid-template-columns: 2.4em repeat(7, 1fr);
+	gap: var(--size-2-1);
+	text-align: center;
+}
+
+.klaar-cal-grid.no-weeks {
+	grid-template-columns: repeat(7, 1fr);
+}
+
+.klaar-cal-head,
+.klaar-cal-weeknum {
+	color: var(--text-faint);
+	font-size: var(--font-ui-smaller);
+}
+
+.klaar-cal-head {
+	padding-bottom: var(--size-2-2);
+	font-weight: var(--font-medium);
+}
+
+/* Week numbers and days share one cell shape. */
+.klaar-cal-day,
+.klaar-cal-weeknum.klaar-cal-link {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 2.1em;
+	border-radius: var(--radius-m);
+	cursor: pointer;
+	transition: background-color var(--klaar-fast) ease-out, color var(--klaar-fast) ease-out, box-shadow var(--klaar-fast) ease-out;
+}
+
+.klaar-cal-weeknum.klaar-cal-link {
+	color: var(--text-faint);
+}
+
+.klaar-cal-day:hover,
+.klaar-cal-weeknum.klaar-cal-link:hover {
+	background: var(--background-modifier-hover);
+}
+
+.klaar-cal-weeknum.klaar-cal-link:hover {
+	color: var(--text-accent);
+}
+
+.klaar-cal-link:focus-visible,
+.klaar-cal-day:focus-visible {
+	outline: 2px solid var(--interactive-accent);
+	outline-offset: -2px;
+	border-radius: var(--radius-s);
+}
+
+.klaar-cal-day.is-static {
+	cursor: default;
+}
+
+.klaar-cal-day.is-static:hover {
+	background: none;
+}
+
+.klaar-cal-day.is-outside {
+	color: var(--text-faint);
+}
+
+.klaar-cal-day.is-today {
+	background: color-mix(in srgb, var(--interactive-accent) 20%, transparent);
+	color: var(--text-accent);
+	font-weight: var(--font-semibold);
+}
+
+.klaar-cal-day.is-today:hover {
+	background: color-mix(in srgb, var(--interactive-accent) 30%, transparent);
+}
+
+.klaar-cal-day.is-open,
+.klaar-cal-weeknum.is-open {
+	box-shadow: inset 0 0 0 1.5px var(--interactive-accent);
+}
+
+.klaar-cal-link.is-open:not(.klaar-cal-weeknum) {
+	text-decoration: underline;
+	text-decoration-color: var(--interactive-accent);
+	text-underline-offset: 3px;
+}
+
+.klaar-cal-day.is-drop-target {
+	background: var(--background-modifier-hover);
+	box-shadow: inset 0 0 0 2px var(--interactive-accent);
+}
+
+.klaar-cal-marks {
+	position: absolute;
+	bottom: 2px;
+	left: 0;
+	right: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 3px;
+	height: 8px;
+	pointer-events: none;
+}
+
+/* Theme accent for all three; the shapes (dot, ring, check) tell them apart. */
+.klaar-cal-note {
+	width: 4px;
+	height: 4px;
+	border-radius: 50%;
+	background: var(--interactive-accent);
+}
+
+.klaar-cal-open {
+	box-sizing: border-box;
+	width: 7px;
+	height: 7px;
+	border: 1.5px solid var(--interactive-accent);
+	border-radius: 50%;
+}
+
+.klaar-cal-done {
+	display: flex;
+	color: var(--interactive-accent);
+}
+
+.klaar-cal-done .svg-icon {
+	width: 9px;
+	height: 9px;
+	stroke-width: 3px;
+}
+
+/* Accordion: header button plus a body that slides open. */
+.klaar-acc > .klaar-acc-head {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+	justify-content: flex-start;
+	width: 100%;
+	height: auto;
+	min-height: 30px;
+	padding: var(--size-2-1) var(--size-4-2);
+	border: 0;
+	border-radius: var(--klaar-inner-radius, var(--radius-s));
+	background: transparent;
+	box-shadow: none;
+	color: var(--text-muted);
+	font-family: inherit;
+	font-size: var(--font-ui-small);
+	font-weight: var(--font-semibold);
+	text-align: left;
+	cursor: pointer;
+	transition: background-color var(--klaar-fast) ease-out, color var(--klaar-fast) ease-out;
+}
+
+.klaar-acc > .klaar-acc-head:hover,
+.klaar-acc > .klaar-acc-head:active {
+	background: var(--background-modifier-hover);
+	box-shadow: none;
+	color: var(--text-normal);
+}
+
+.klaar-acc > .klaar-acc-head:focus-visible {
+	box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
+}
+
+.klaar-acc-chevron {
+	display: inline-flex;
+	flex: none;
+	color: var(--text-faint);
+	transition: transform var(--klaar-slide) var(--klaar-ease);
+}
+
+.klaar-acc-chevron .svg-icon {
+	width: 14px;
+	height: 14px;
+	stroke-width: 2px;
+}
+
+.klaar-acc.is-open > .klaar-acc-head > .klaar-acc-chevron {
+	transform: rotate(90deg);
+}
+
+.klaar-acc-title {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* Optional icon button at the right of a header; shown with the row where there is a pointer. */
+.klaar-acc:has(> .klaar-acc-action) {
+	position: relative;
+}
+
+.klaar-acc:has(> .klaar-acc-action) > .klaar-acc-head {
+	/* Room for the action button so a long title or count never runs under it. */
+	padding-right: calc(var(--size-4-2) + 32px);
+}
+
+.klaar-acc > .klaar-acc-action {
+	position: absolute;
+	top: 0;
+	height: 30px;
+	right: var(--size-4-2);
+	display: flex;
+	align-items: center;
+	color: var(--text-faint);
+	transition: opacity var(--klaar-fast) ease-out, color var(--klaar-fast) ease-out;
+}
+
+.klaar-acc > .klaar-acc-action:hover {
+	color: var(--text-normal);
+}
+
+@media (hover: hover) {
+	.klaar-acc > .klaar-acc-action {
+		opacity: 0;
+	}
+
+	.klaar-acc:hover > .klaar-acc-action,
+	.klaar-acc > .klaar-acc-action:focus-visible {
+		opacity: 1;
+	}
+}
+
+.klaar-acc-count {
+	color: inherit;
+	font-size: var(--font-ui-smaller);
+	font-weight: var(--font-medium);
+	font-variant-numeric: tabular-nums;
+}
+
+.klaar-acc-collapse {
+	display: grid;
+	grid-template-rows: 0fr;
+	transition: grid-template-rows var(--klaar-slide) var(--klaar-ease);
+}
+
+.klaar-acc.is-open > .klaar-acc-collapse {
+	grid-template-rows: 1fr;
+}
+
+.klaar-acc-inner {
+	min-height: 0;
+	overflow: hidden;
+}
+
+/* Closed bodies are hidden once the slide ends, so they also drop out of the tab order. */
+.klaar-acc:not(.is-open) > .klaar-acc-collapse > .klaar-acc-inner {
+	visibility: hidden;
+	transition: visibility 0s linear var(--klaar-slide);
+}
+
+/* Task sections above the text of period notes. The parent sizer sets the readable width. */
+.klaar-scheduled {
+	--klaar-pad: var(--size-4-1);
+	--klaar-radius: var(--radius-l);
+	--klaar-inner-radius: calc(var(--klaar-radius) - var(--klaar-pad));
+	margin: var(--size-4-2) 0 var(--size-4-6);
+}
+
+/*
+ * Some themes (Minimal) keep the editor's sizer full width and narrow each child instead, so the section sizes itself
+ * like the inline title: the theme's own width variables where they exist, else Obsidian's readable line width.
+ * The width falls back to 100%, not auto: the sizer is a flex column, and auto margins on an auto-width item shrink it
+ * to its content.
+ */
+.markdown-source-view.mod-cm6.is-readable-line-width .cm-sizer > .klaar-scheduled {
+	width: var(--line-width, 100%);
+	max-width: var(--max-width, var(--file-line-width));
+	margin-inline: var(--content-margin, auto);
+}
+
+.klaar-section + .klaar-section {
+	margin-top: var(--size-4-2);
+}
+
+/* Section header: a small label, count first ("3 Scheduled for this week"). */
+.klaar-section > .klaar-acc-head {
+	min-height: 28px;
+	color: var(--text-faint);
+	font-size: var(--font-ui-smaller);
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+.klaar-section > .klaar-acc-head:hover {
+	color: var(--text-muted);
+}
+
+.klaar-section > .klaar-acc-head > .klaar-acc-count {
+	order: 1;
+}
+
+.klaar-section > .klaar-acc-head > .klaar-acc-title {
+	order: 2;
+}
+
+.klaar-section.is-overdue > .klaar-acc-head {
+	color: var(--text-error);
+}
+
+/* The section body is the card; note groups sit inside it. */
+.klaar-section > .klaar-acc-collapse > .klaar-acc-inner > .klaar-acc-body {
+	padding: var(--klaar-pad);
+	border-radius: var(--klaar-radius);
+	background: var(--background-secondary);
+}
+
+/* A note group is the subject of its rows: normal case, normal colour. */
+.klaar-note > .klaar-acc-head {
+	color: var(--text-normal);
+}
+
+.klaar-note + .klaar-note {
+	margin-top: var(--size-2-1);
+}
+
+.klaar-task-heading {
+	padding: var(--size-4-1) var(--size-4-2) var(--size-2-1) var(--size-4-8);
+	color: var(--text-muted);
+	font-size: var(--font-ui-small);
+	font-weight: var(--font-semibold);
+}
+
+.klaar-acc-body > .klaar-task-row + .klaar-task-row {
+	margin-top: 1px;
+}
+
+.klaar-acc-body > .klaar-task-row:last-child {
+	margin-bottom: var(--size-4-1);
+}
+
+.klaar-task-row {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--size-4-2);
+	min-height: 28px;
+	padding: var(--size-2-1) var(--size-4-2) var(--size-2-1) var(--size-4-8);
+	border-radius: var(--klaar-inner-radius, var(--radius-s));
+	transition: background-color var(--klaar-fast) ease-out;
+}
+
+.klaar-task-row:hover {
+	background: var(--background-modifier-hover);
+}
+
+/* Centre the checkbox on the first line of text, whatever the theme's line height. */
+.klaar-task-row > .task-list-item-checkbox {
+	flex: none;
+	/* Inputs don't inherit font metrics, so 1lh would measure the wrong line. */
+	font: inherit;
+	margin: calc((1lh - var(--checkbox-size)) / 2) 0 0;
+}
+
+.klaar-task-text {
+	flex: 0 1 auto;
+	min-width: 0;
+	text-wrap: pretty;
+}
+
+/* Inline markdown in Klaar's task text; themes style these only inside rendered notes. */
+.klaar-inline-md code {
+	padding: 0.1em 0.25em;
+	border-radius: var(--code-radius, var(--radius-s));
+	background-color: var(--code-background);
+	color: var(--code-normal);
+	font-family: var(--font-monospace);
+	font-size: var(--code-size);
+}
+
+.klaar-inline-md mark {
+	background-color: var(--text-highlight-bg);
+	color: var(--text-normal);
+}
+
+.klaar-task-row.is-done > .klaar-task-text {
+	color: var(--text-faint);
+	text-decoration: line-through;
+}
+
+.klaar-task-row.is-cancelled > .klaar-task-text {
+	color: var(--text-faint);
+}
+
+.klaar-task-source {
+	flex: none;
+	margin-left: auto;
+	max-width: 40%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	color: var(--text-muted);
+	font-size: var(--font-smaller);
+	text-decoration: none;
+	cursor: pointer;
+	transition: color var(--klaar-fast) ease-out;
+}
+
+.klaar-task-source:hover {
+	color: var(--text-accent);
+	text-decoration: underline;
+}
+
+.klaar-task-text + .klaar-task-move {
+	margin-left: auto;
+}
+
+.klaar-task-row > .klaar-task-move {
+	flex: none;
+	margin: calc((1lh - var(--icon-size)) / 2 - var(--size-2-1)) 0 0;
+	color: var(--text-faint);
+	transition: opacity var(--klaar-fast) ease-out, color var(--klaar-fast) ease-out, scale var(--klaar-fast) ease-out;
+}
+
+.klaar-task-row > .klaar-task-move:hover {
+	color: var(--text-normal);
+}
+
+.klaar-task-row > .klaar-task-move:active {
+	scale: 0.96;
+}
+
+/* Where there is a pointer, the move button appears with the row; touch keeps it visible. */
+@media (hover: hover) {
+	.klaar-task-row > .klaar-task-move {
+		opacity: 0;
+	}
+
+	.klaar-task-row:hover > .klaar-task-move,
+	.klaar-task-row:focus-within > .klaar-task-move {
+		opacity: 1;
+	}
+}
+
+/* A task line opened from a Klaar view: tinted for a moment, then fades. */
+.klaar-flash-line {
+	animation: klaar-flash 2s ease-out forwards;
+}
+
+@keyframes klaar-flash {
+	from {
+		background-color: var(--text-highlight-bg);
+	}
+	to {
+		background-color: transparent;
+	}
+}
+
+.klaar-task-openable {
+	cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.klaar-scheduled *,
+	.klaar-calendar * {
+		transition-duration: 0s !important;
+		transition-delay: 0s !important;
+	}
+
+	.klaar-flash-line {
+		animation: none;
+		background-color: var(--text-highlight-bg);
+	}
+}
+
+/* Bases "Tasks" view: sized and spaced from the native table's variables so it reads like a standard base.
+   Rows run edge to edge like a native table; text is inset to line up with the Bases header ("View", "Sort"...). */
+.klaar-tasks-view,
+.klaar-board-view {
+	--klaar-inset-start: var(--bases-header-padding-start, var(--size-4-2));
+	--klaar-inset-end: var(--bases-header-padding-end, var(--size-4-2));
+}
+
+.klaar-tasks-view {
+	font-size: var(--bases-table-font-size, var(--font-ui-small));
+}
+
+.klaar-bases-empty {
+	color: var(--text-muted);
+	padding: var(--size-4-2) var(--klaar-inset-end) var(--size-4-2) var(--klaar-inset-start);
+}
+
+.klaar-toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--size-4-2);
+	padding: var(--size-4-2) var(--klaar-inset-end) var(--size-4-2) var(--klaar-inset-start);
+	font-size: var(--font-ui-small);
+}
+
+.klaar-toolbar input {
+	font-size: var(--font-ui-small);
+	height: var(--input-height);
+}
+
+.klaar-search {
+	flex: 1 1 12em;
+}
+
+.klaar-toolbar-count {
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+.klaar-toolbar-button {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--size-4-1);
+	font-size: var(--font-ui-small);
+	height: var(--input-height);
+}
+
+.klaar-toolbar-button-icon {
+	display: flex;
+}
+
+.klaar-toolbar-button-icon svg {
+	width: var(--icon-s);
+	height: var(--icon-s);
+}
+
+.klaar-new-task-input {
+	width: 100%;
+}
+
+.klaar-table-body {
+	overflow-x: auto;
+}
+
+.klaar-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.klaar-table th,
+.klaar-table td {
+	height: var(--bases-table-row-height, 30px);
+	padding: 0 var(--size-4-2);
+	text-align: left;
+	vertical-align: middle;
+	border-bottom: 1px solid var(--bases-table-border-color, var(--background-modifier-border));
+}
+
+.klaar-table thead th {
+	color: var(--bases-table-header-color, var(--text-muted));
+	font-weight: var(--bases-table-header-weight, var(--font-normal));
+	white-space: nowrap;
+}
+
+.klaar-table th:first-child,
+.klaar-table td:first-child {
+	padding-inline-start: var(--klaar-inset-start);
+}
+
+.klaar-table th:last-child,
+.klaar-table td:last-child {
+	padding-inline-end: var(--klaar-inset-end);
+}
+
+/* The first group sits right under the column headers; later groups get the native gap above them. */
+.klaar-table-group th {
+	height: auto;
+	padding-top: calc(var(--bases-table-group-gap, 10px) * 2);
+	padding-bottom: var(--size-4-1);
+	font-size: var(--bases-group-heading-value-size, var(--font-smaller));
+	color: var(--bases-group-heading-value-color, var(--text-normal));
+	font-weight: var(--bases-group-heading-value-weight, var(--font-semibold));
+}
+
+.klaar-table thead + tbody .klaar-table-group th {
+	padding-top: var(--bases-table-group-gap, 10px);
+}
+
+.klaar-table-row:hover {
+	background: var(--bases-table-row-background-hover, var(--background-modifier-hover));
+}
+
+.klaar-col-check,
+.klaar-col-move {
+	width: 1%;
+}
+
+/* The checkbox (always the first column) belongs to the task text, so it sits closer to it than other columns do. */
+.klaar-table thead th:first-child,
+.klaar-table td.klaar-col-check {
+	padding-inline-end: var(--size-4-1);
+}
+
+.klaar-table thead th:nth-child(2),
+.klaar-table td.klaar-col-check + td {
+	padding-inline-start: var(--size-4-1);
+}
+
+.klaar-col-check .task-list-item-checkbox {
+	margin: 0;
+	vertical-align: middle;
+}
+
+.klaar-col-task {
+	min-width: 12em;
+}
+
+.klaar-col-date,
+.klaar-col-priority,
+.klaar-col-tags {
+	white-space: nowrap;
+}
+
+.klaar-col-tags,
+.klaar-col-heading {
+	color: var(--text-muted);
+}
+
+/* Bases "Task board" view: columns and cards spaced like the native Kanban view, with its defaults as fallbacks.
+   Like the native board, the view itself has no padding: the board brings its own. */
+.bases-view[data-view-type='klaar-board'] {
+	--bases-view-padding: 0;
+	--bases-embed-padding: 0;
+	--bases-embed-border-width: 0;
+	--bases-embed-height: 500px;
+}
+
+.workspace-leaf-content[data-type='markdown'] .block-language-base .bases-view[data-view-type='klaar-board'],
+.workspace-leaf-content[data-type='markdown'] .bases-embed .bases-view[data-view-type='klaar-board'] {
+	min-height: var(--bases-embed-height, auto);
+}
+
+.klaar-board-view {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	font-size: var(--bases-table-font-size, var(--font-ui-small));
+}
+
+.klaar-board {
+	display: flex;
+	flex: 1 1 auto;
+	align-items: flex-start;
+	gap: var(--bases-kanban-container-gap, var(--size-4-2));
+	padding: var(--bases-kanban-container-padding, var(--size-4-3));
+	/* The sides line up with the toolbar above, like the Tasks view's rows. */
+	padding-inline: var(--klaar-inset-start) var(--klaar-inset-end);
+	overflow-x: auto;
+}
+
+.klaar-board-column {
+	flex: none;
+	display: flex;
+	flex-direction: column;
+	width: var(--klaar-column-width, 280px);
+	background: var(--bases-kanban-column-background, var(--background-primary-alt));
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--bases-kanban-column-radius, var(--radius-m));
+	box-shadow: var(--bases-kanban-column-box-shadow, none);
+	/* Clips the header background to the rounded corners, as the native column does. */
+	overflow: hidden;
+}
+
+/* The accent border plus a 1px inset ring: a 2px drop highlight that follows the rounded edge. */
+.klaar-board-column.is-drop-target {
+	border-color: var(--interactive-accent, var(--color-accent));
+	box-shadow: inset 0 0 0 1px var(--interactive-accent, var(--color-accent));
+}
+
+.klaar-board-column-header {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+	padding: var(--size-4-2) var(--size-4-2) var(--size-4-2) var(--size-4-3);
+	background: var(--bases-kanban-column-header-background, transparent);
+	font-size: var(--font-ui-medium);
+	font-weight: var(--font-semibold, 600);
+}
+
+.klaar-board-column-count {
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	font-weight: var(--font-normal, 400);
+	font-variant-numeric: tabular-nums;
+}
+
+.klaar-board-cards {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-2);
+	min-height: var(--size-4-8, 32px);
+	padding: var(--size-2-1) var(--size-4-2) var(--size-4-2);
+}
+
+.klaar-board-card {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-1);
+	padding: var(--size-4-2);
+	background: var(--bases-kanban-card-background, var(--background-primary));
+	border-radius: var(--bases-kanban-card-radius, var(--radius-m));
+	box-shadow: var(--bases-kanban-card-shadow, var(--shadow-s));
+	cursor: grab;
+}
+
+.klaar-board-card:hover {
+	box-shadow: var(--bases-kanban-card-shadow-hover, var(--shadow-s));
+}
+
+.klaar-board-card-main {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--size-4-2);
+}
+
+.klaar-board-card-main .task-list-item-checkbox {
+	flex: none;
+	margin: calc((1lh - var(--checkbox-size, 15px)) / 2) 0 0;
+}
+
+.klaar-board-card-text {
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+.klaar-board-card.is-done .klaar-board-card-text {
+	color: var(--text-muted);
+	text-decoration: line-through;
+}
+
+.klaar-board-card-meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--size-4-2);
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+}
+
+.klaar-board-card-meta .klaar-task-move {
+	margin-left: auto;
+	color: var(--text-faint);
+}
+
+.klaar-board-card-meta .klaar-task-move:hover {
+	color: var(--text-normal);
+}
+
+/* Settings → Tags: no label column, so the tag field fills the row and the controls after it line up. */
+.klaar-tag-setting .setting-item-info {
+	display: none;
+}
+
+.klaar-tag-setting .setting-item-control {
+	justify-content: flex-start;
+}
+
+.klaar-tag-setting .setting-item-control input[type='text'] {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.klaar-tag-setting .setting-item-control select {
+	width: 11em;
+}
+
+/* Date chips: schedule links (`>[[KEY]]`) and the done stamp, in live preview, reading mode and Bases. */
+.klaar-chip {
+	--klaar-chip-color: var(--text-muted);
+	display: inline-flex;
+	align-items: center;
+	gap: var(--size-2-1);
+	padding: var(--tag-padding-y) var(--tag-padding-x);
+	border-radius: var(--klaar-tag-radius);
+	background-color: color-mix(in srgb, var(--klaar-chip-color) var(--klaar-tag-tint), transparent);
+	color: color-mix(in srgb, var(--klaar-chip-color) var(--klaar-tag-ink), var(--text-normal));
+	font-size: var(--font-smaller);
+	font-weight: var(--klaar-tag-weight);
+	line-height: 1.2;
+	white-space: nowrap;
+	vertical-align: baseline;
+	cursor: pointer;
+	transition: background-color var(--klaar-fast, 120ms) ease-out;
+}
+
+.klaar-chip:hover {
+	background-color: color-mix(in srgb, var(--klaar-chip-color) calc(var(--klaar-tag-tint) + 8%), transparent);
+}
+
+.klaar-chip.is-overdue {
+	--klaar-chip-color: var(--klaar-overdue-color);
+}
+
+.klaar-chip.is-current {
+	--klaar-chip-color: var(--klaar-current-color);
+}
+
+.klaar-done-muted {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--size-2-1);
+	color: var(--text-faint);
+	font-size: var(--font-smaller);
+	white-space: nowrap;
+}
+
+/* The space before the done stamp is replaced too, so the stamp brings its own gap. */
+.klaar-done-muted,
+.klaar-chip.klaar-done-chip {
+	margin-left: 0.3em;
+}
+
+/* Inline-flex keeps the line's strike-through (done tasks) off the chip and the muted stamp. */
+.klaar-chip,
+.klaar-done-muted {
+	text-decoration: none;
+}
+
+.klaar-done-muted {
+	cursor: default;
+}
+
+.klaar-chip-icon {
+	display: inline-flex;
+}
+
+.klaar-chip-icon svg {
+	width: 0.95em;
+	height: 0.95em;
+}
+
+.klaar-board-more {
+	align-self: center;
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+}
