@@ -245,7 +245,8 @@ export function addTag(line: string, tag: string): string {
 	if (tagPattern(tag).test(parts.body)) return line;
 	const head = parts.prefix + parts.stateChar + parts.suffix;
 	const token = `#${tag.replace(/^#/, '')}`;
-	const last = scheduleLinks(parts.body).at(-1);
+	const links = scheduleLinks(parts.body);
+	const last = links[links.length - 1];
 	const body = last
 		? `${parts.body.slice(0, last.index).trimEnd()} ${token} ${parts.body.slice(last.index)}`.trimStart()
 		: `${parts.body.trimEnd()} ${token}`.trimStart();

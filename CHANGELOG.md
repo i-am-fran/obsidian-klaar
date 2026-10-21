@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026.10.16
+
+- With reduced motion on, date chips no longer fade on hover, like the rest of Klaar.
+- Coloured tags in the editor are drawn as one piece by the theme.
+- Release files come with GitHub build provenance attestations, so you can check they were built from this repository.
+
 ## 2026.10.15
 
 - Period notes are now called journal notes: the setting is "Journal notes folder" and the calendar asks "Create journal note?". Nothing changes in your vault or settings.

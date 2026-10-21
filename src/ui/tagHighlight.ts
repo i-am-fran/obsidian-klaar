@@ -1,5 +1,5 @@
 import { RangeSetBuilder, type Extension } from '@codemirror/state';
-import { Decoration, type DecorationSet, type EditorView, ViewPlugin, type ViewUpdate } from '@codemirror/view';
+import { Decoration, type DecorationSet, EditorView, ViewPlugin, type ViewUpdate } from '@codemirror/view';
 import { type App, Keymap, type MarkdownPostProcessor } from 'obsidian';
 import { ruleFor, type TagRule } from '../core/tagRules';
 import { type InlineNode, linkKind, parseInline } from '../core/inlineMarkdown';
@@ -35,9 +35,9 @@ function buildDecorations(view: EditorView, rules: TagRule[]): DecorationSet {
 }
 
 /**
- * Editor (source and live preview): colours the tags listed in settings. Obsidian's `.cm-hashtag-begin` (`#`) and
- * `.cm-hashtag-end` (name) spans end up around this mark, so styles.css draws the pill on the mark inside them.
- * Code blocks have no `.cm-hashtag` spans, so tags there stay plain.
+ * Editor (source and live preview): colours the tags listed in settings. As an outer decoration the mark wraps
+ * Obsidian's `.cm-hashtag-begin` (`#`) and `.cm-hashtag-end` (name) spans in one piece, so the tag variables it sets
+ * reach them and the theme draws the pill. Code blocks have no `.cm-hashtag` spans, so tags there stay plain.
  */
 export function tagHighlightExtension(getRules: () => TagRule[]): Extension {
 	return ViewPlugin.fromClass(
@@ -50,7 +50,10 @@ export function tagHighlightExtension(getRules: () => TagRule[]): Extension {
 				if (update.docChanged || update.viewportChanged) this.decorations = buildDecorations(update.view, getRules());
 			}
 		},
-		{ decorations: (v) => v.decorations },
+		{
+			provide: (p) =>
+				EditorView.outerDecorations.of((view) => view.plugin(p)?.decorations ?? Decoration.none),
+		},
 	);
 }
 

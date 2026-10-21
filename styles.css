@@ -82,7 +82,7 @@ body {
 
 /*
  * Coloured tags. `.klaar-tag` carries `--klaar-tag-color` (from Klaar's tag settings) and maps it onto Obsidian's
- * own tag variables, so the theme draws the pill: `.cm-hashtag` spans in the editor, `a.tag` in reading mode,
+ * own tag variables, so the theme draws the pill: `.cm-hashtag` spans inside the mark in the editor, `a.tag` in reading mode,
  * `.tag` spans in Klaar's rows.
  */
 .klaar-tag {
@@ -94,30 +94,6 @@ body {
 	--tag-border-color-hover: transparent;
 	--tag-radius: var(--klaar-tag-radius);
 	--tag-weight: var(--klaar-tag-weight);
-}
-
-/* Editor: the mark sits inside Obsidian's two hashtag spans, so it draws the pill and the spans step back. */
-.markdown-source-view.mod-cm6 .cm-hashtag:has(> .klaar-tag) {
-	padding: 0;
-	border: none;
-	background: none;
-}
-
-.markdown-source-view.mod-cm6 .cm-hashtag > .klaar-tag {
-	padding-block: var(--tag-padding-y);
-	background-color: var(--tag-background);
-	color: var(--tag-color);
-	font-weight: var(--tag-weight);
-}
-
-.markdown-source-view.mod-cm6 .cm-hashtag-begin > .klaar-tag {
-	padding-left: var(--tag-padding-x);
-	border-radius: var(--tag-radius) 0 0 var(--tag-radius);
-}
-
-.markdown-source-view.mod-cm6 .cm-hashtag-end > .klaar-tag {
-	padding-right: var(--tag-padding-x);
-	border-radius: 0 var(--tag-radius) var(--tag-radius) 0;
 }
 
 /* Klaar's own rows don't get the theme's `.tag` look from Obsidian's stylesheet in every context, so draw it here. */
@@ -302,7 +278,7 @@ body {
 }
 
 .klaar-cal-link.is-open:not(.klaar-cal-weeknum) {
-	text-decoration: underline;
+	text-decoration-line: underline;
 	text-decoration-color: var(--interactive-accent);
 	text-underline-offset: 3px;
 }
@@ -411,11 +387,11 @@ body {
 }
 
 /* Optional icon button at the right of a header; shown with the row where there is a pointer. */
-.klaar-acc:has(> .klaar-acc-action) {
+.klaar-acc.has-action {
 	position: relative;
 }
 
-.klaar-acc:has(> .klaar-acc-action) > .klaar-acc-head {
+.klaar-acc.has-action > .klaar-acc-head {
 	/* Room for the action button so a long title or count never runs under it. */
 	padding-right: calc(var(--size-4-2) + 32px);
 }
@@ -675,10 +651,12 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.klaar-scheduled *,
-	.klaar-calendar * {
-		transition-duration: 0s !important;
-		transition-delay: 0s !important;
+	/* Every Klaar transition runs on these, the date chips' included. */
+	body,
+	.klaar-calendar,
+	.klaar-scheduled {
+		--klaar-fast: 0s;
+		--klaar-slide: 0s;
 	}
 
 	.klaar-flash-line {

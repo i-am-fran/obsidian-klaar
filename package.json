@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-klaar",
-	"version": "2026.10.15",
+	"version": "2026.10.16",
 	"description": "Klaar: Tasks and journal notes for Obsidian",
 	"main": "main.js",
 	"type": "module",

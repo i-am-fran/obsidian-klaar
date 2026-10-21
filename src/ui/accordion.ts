@@ -28,6 +28,7 @@ export function renderAccordion(parent: HTMLElement, opts: AccordionOptions): { 
 
 	if (opts.action) {
 		const { icon, label, onClick } = opts.action;
+		root.addClass('has-action');
 		const btn = root.createEl('button', { cls: 'klaar-acc-action clickable-icon', attr: { 'aria-label': label } });
 		setIcon(btn, icon);
 		btn.addEventListener('click', onClick);
