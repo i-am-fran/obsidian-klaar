@@ -70,7 +70,7 @@ export class KlaarSettingTab extends PluginSettingTab {
 				type: 'group',
 				items: [
 					{
-						name: 'Period notes folder',
+						name: 'Journal notes folder',
 						desc: 'Folder holding day, week, month, quarter and year notes.',
 						control: { type: 'folder', key: 'periodFolder', placeholder: DEFAULT_SETTINGS.periodFolder, includeRoot: true },
 					},

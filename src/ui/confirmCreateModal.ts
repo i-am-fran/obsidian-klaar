@@ -8,7 +8,7 @@ class ConfirmCreateModal extends Modal {
 	}
 
 	onOpen(): void {
-		this.setTitle('Create period note?');
+		this.setTitle('Create journal note?');
 		this.contentEl.createEl('p', { text: `${this.path} doesn't exist yet.` });
 		new Setting(this.contentEl)
 			.addButton((b) => b.setButtonText('Cancel').onClick(() => this.close()))

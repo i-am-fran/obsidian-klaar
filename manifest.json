@@ -1,9 +1,9 @@
 {
 	"id": "klaar",
 	"name": "Klaar",
-	"version": "2026.10.14",
+	"version": "2026.10.15",
 	"minAppVersion": "1.13.0",
-	"description": "(Beta) Tasks and periodic notes: schedule tasks with >[[date]] and see them in their day, week, month, quarter and year notes.",
+	"description": "(Beta) Tasks and journal notes: schedule tasks with >[[date]] and see them in their day, week, month, quarter and year notes.",
 	"author": "i-am-fran-dot-com",
 	"authorUrl": "https://github.com/i-am-fran",
 	"isDesktopOnly": false

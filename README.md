@@ -1,6 +1,6 @@
 # Klaar (beta)
 
-Tasks and periodic notes for Obsidian. Your tasks stay plain Markdown checkboxes in your own notes: type `>` to schedule one, and it shows up in that day's, week's, month's or year's note.
+Tasks and journal notes for Obsidian. Your tasks stay plain Markdown checkboxes in your own notes: type `>` to schedule one, and it shows up in that day's, week's, month's or year's note.
 
 [![A short tour of Klaar: click to watch the video](assets/video/klaar-tour.jpg)](assets/video/klaar-tour.mp4)
 
@@ -19,7 +19,7 @@ Requires Obsidian 1.13.0 or newer.
 <img src="assets/screenshots/today-note.png" alt="Today's note with Klaar: tasks scheduled for today, this week and overdue, grouped by project, and the calendar in the sidebar">
 
 - **Schedule with `>`.** On a task line, type `>` and pick Today, Tomorrow, a weekday, a week, a month, a quarter or a year. Klaar writes a link like `>[[2026-10-23]]` or `>[[2026-W43]]`. "Move task to…" does the same from the command palette or right-click menu.
-- **Period notes show what's due.** Day, week, month, quarter and year notes list the tasks scheduled for them, plus the ones from the period above and below, and Overdue on today's note. Tick a task there and its source note updates. Nothing is written into the note.
+- **Journal notes show what's due.** Day, week, month, quarter and year notes list the tasks scheduled for them, plus the ones from the period above and below, and Overdue on today's note. Tick a task there and its source note updates. Nothing is written into the note.
 - **Calendar.** A sidebar month view with week numbers. Click a day or week to open its note, drag a task onto a day to reschedule it.
 - **Tags and priority.** `#p1`, `#p2`, `#p3` and `#bugs` (or your own tags) become coloured pills. Commands cycle priority and toggle in progress.
 - **Date chips.** `>[[2026-10-23]]` reads as `Fri 23 Oct`, `Today` or `Week 43`, red when overdue.
@@ -43,11 +43,11 @@ Requires Obsidian 1.13.0 or newer.
 | `- [<] text` | someday |
 | `- [-] text` | cancelled |
 
-Schedule keys: `2026-10-19` (day), `2026-W43` (ISO week, Monday start), `2026-10` (month), `2026-Q4` (quarter), `2026` (year). A task written in a period note without a `>` link belongs to that note's period. Any other marker, such as `[!]`, isn't a Klaar task and is left alone.
+Schedule keys: `2026-10-19` (day), `2026-W43` (ISO week, Monday start), `2026-10` (month), `2026-Q4` (quarter), `2026` (year). A task written in a journal note without a `>` link belongs to that note's period. Any other marker, such as `[!]`, isn't a Klaar task and is left alone.
 
 ## Settings
 
-Period notes folder (default `Daily`), which period types are on (quarterly is off by default), the completed date stamp, the `[/]`, `[>]` and `[<]` markers, tag colours and roles, and how date chips look.
+Journal notes folder (default `Daily`), which period types are on (quarterly is off by default), the completed date stamp, the `[/]`, `[>]` and `[<]` markers, tag colours and roles, and how date chips look.
 
 ## Support
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026.10.15
+
+- Period notes are now called journal notes: the setting is "Journal notes folder" and the calendar asks "Create journal note?". Nothing changes in your vault or settings.
+
 ## 2026.10.14
 
 First public release (beta). Requires Obsidian 1.13.0 or newer.
