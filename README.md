@@ -1,52 +1,90 @@
 # Klaar
 
-Tasks and journal notes for Obsidian. Your tasks stay plain Markdown checkboxes in your own notes: type `>` to schedule one, and it shows up in that day's, week's, month's or year's note.
+Klaar is a small task manager that lives in your Obsidian journal notes. You write tasks as normal checkboxes, wherever you are, and send them to a day, a week, a month or a year.
+
+The name is Dutch. Klaar means clear, and it's also what you say when something is done or ready. That's pretty much what I want from a task list.
 
 [![A short tour of Klaar: click to watch the video](assets/video/klaar-tour.jpg)](assets/video/klaar-tour.mp4)
 
-## Install
+## Why I made it
 
-Requires Obsidian 1.13.0 or newer.
+I tried a lot of task managers. Most of them do far more than I need, and I end up managing the tool instead of my work. I wanted something simple that does the few things I care about, and stays out of the way for everything else.
 
-- **BRAT:** add `i-am-fran/obsidian-klaar` in the BRAT plugin and enable Klaar.
-- **Manual:** copy `main.js`, `manifest.json` and `styles.css` from the [latest release](https://github.com/i-am-fran/obsidian-klaar/releases) into `<vault>/.obsidian/plugins/klaar/`, then enable Klaar in Settings → Community plugins. To check the files were built from this repository: `gh attestation verify main.js --repo i-am-fran/obsidian-klaar`.
+What I needed was a way to plan my days, just enough. Not a project management system, just a clear view of what's on today and what's coming up.
 
-Klaar reads the Markdown files in your vault, on your device, to find tasks. It makes no network requests. Found a bug? Please [report it](https://github.com/i-am-fran/obsidian-klaar/issues).
+I also like planning on different horizons. Some things belong to this year, some to this month, most to this week. In Klaar, tasks cascade: the week note shows what you planned for the month around it and for each day inside it. So when I plan my week, the bigger stuff is right there, and nothing gets lost between notes.
 
-## What it does
+It had to fit into Obsidian without cluttering it. Klaar doesn't write anything into your journal notes. It shows the lists when you open a note, and the file itself stays exactly as you wrote it.
+
+It had to be quick. Assigning a task takes a second: type `>` at the end of the line and pick a day or a week. Rescheduling is the same, or you drag the task onto a day in the calendar.
+
+And I wanted to customise things using what Obsidian already gives you. Klaar uses plain checkbox markers like `[/]` for in progress and ordinary tags like `#p1` for priority. You choose the tags and their colours.
+
+## How I work with it
+
+I plan week first.
+
+On Monday I open the week note and decide what the week is really about. During the week, tasks come up everywhere: in meeting notes, in project notes, in a random idea. I write them down right there and send them to the week with `>`.
+
+As the days go by, I pull tasks from the week into specific days. The bigger, vaguer things sit in the month or year note, and because they show up in the week note too, I see them every time I plan.
+
+Each morning, today's note shows what's due today, what's still open this week, and anything overdue. Tick a task there and it's ticked in the note where you wrote it.
 
 <img src="assets/screenshots/today-note.png" alt="Today's note with Klaar: tasks scheduled for today, this week and overdue, grouped by project, and the calendar in the sidebar">
-
-- **Schedule with `>`.** On a task line, type `>` and pick Today, Tomorrow, a weekday, a week, a month, a quarter or a year. Klaar writes a link like `>[[2026-10-23]]` or `>[[2026-W43]]`. "Move task to…" does the same from the command palette or right-click menu.
-- **Journal notes show what's due.** Day, week, month, quarter and year notes list the tasks scheduled for them, plus the ones from the period above and below, and Overdue on today's note. Tick a task there and its source note updates. Nothing is written into the note.
-- **Calendar.** A sidebar month view with week numbers. Click a day or week to open its note, drag a task onto a day to reschedule it.
-- **Tags and priority.** `#p1`, `#p2`, `#p3` and `#bugs` (or your own tags) become coloured pills. Commands cycle priority and toggle in progress.
-- **Date chips.** `>[[2026-10-23]]` reads as `Fri 23 Oct`, `Today` or `Week 43`, red when overdue.
-- **Bases views.** "Klaar Table" and "Klaar Board" show the tasks of any base. Drag a card to Done, In progress, a priority or a date column and Klaar rewrites just that line.
 
 <p>
   <img src="assets/screenshots/schedule-picker.png" alt="Typing > on a task line opens the date picker with Today, Tomorrow and the next weekdays" width="49%">
   <img src="assets/screenshots/schedule-chips.png" alt="Scheduled tasks shown as date chips: Sat 24 Oct, Week 43, Week 44, Nov 2026, Tomorrow" width="49%">
 </p>
 
+## The idea behind it
+
+Klaar is minimal on purpose. Your tasks stay plain Markdown checkboxes in your own notes. If you stop using Klaar tomorrow, nothing breaks. You'll just see a few links like `>[[2026-W43]]` at the end of some lines.
+
+I also wanted it to feel like part of Obsidian rather than an app inside an app. Journal notes are just notes. The calendar is a simple sidebar. And when you want a table or a board of your tasks, Klaar plugs into Bases with two views, Klaar Table and Klaar Board, instead of inventing its own query language. Drag a card to another column and Klaar changes only that task's line.
+
 <img src="assets/screenshots/board.png" alt="The Klaar Board view with To do, In progress and Done columns, next to the calendar">
 
-## Task syntax
+## Themes
 
-| Line | Meaning |
+Klaar works with the default Obsidian theme and with Minimal. I'll test and add support for more themes over time. If something looks off in yours, please [let me know](https://github.com/i-am-fran/obsidian-klaar/issues).
+
+## Getting started
+
+You need Obsidian 1.13.0 or newer.
+
+The easiest way to install it is with BRAT: add `i-am-fran/obsidian-klaar` in the BRAT plugin, then turn on Klaar.
+
+You can also install it by hand. Download `main.js`, `manifest.json` and `styles.css` from the [latest release](https://github.com/i-am-fran/obsidian-klaar/releases), put them in `<vault>/.obsidian/plugins/klaar/`, and turn on Klaar in Settings → Community plugins. If you want to check the files were built from this repository, run `gh attestation verify main.js --repo i-am-fran/obsidian-klaar`.
+
+### The basics
+
+Write a task as you normally would, `- [ ] Call the plumber`, and type `>` at the end. Pick Today, Tomorrow, a weekday, a week, a month, a quarter or a year. Klaar adds a link like `>[[2026-10-23]]` and shows it as a small chip, such as `Fri 23 Oct`, `Today` or `Week 43`. It turns red when the task is overdue. You can also use "Move task to…" from the command palette or the right-click menu.
+
+A task you write straight into a journal note, without a `>` link, belongs to that note's day, week or month.
+
+Besides open and done, Klaar understands a few extra markers:
+
+| You write | It means |
 |---|---|
-| `- [ ] text` | open |
-| `- [x] text` | done (Klaar can add ` (@done [[YYYY-MM-DD]])`) |
-| `- [/] text` | in progress |
-| `- [>] text` | next |
-| `- [<] text` | someday |
-| `- [-] text` | cancelled |
+| `- [ ]` | to do |
+| `- [x]` | done |
+| `- [/]` | in progress |
+| `- [>]` | next |
+| `- [<]` | someday |
+| `- [-]` | cancelled |
 
-Schedule keys: `2026-10-19` (day), `2026-W43` (ISO week, Monday start), `2026-10` (month), `2026-Q4` (quarter), `2026` (year). A task written in a journal note without a `>` link belongs to that note's period. Any other marker, such as `[!]`, isn't a Klaar task and is left alone.
+Anything else, like `[!]`, isn't a Klaar task and is left alone.
+
+If you're curious about the link format: days are `2026-10-19`, weeks are `2026-W43` (ISO weeks, starting on Monday), months are `2026-10`, quarters are `2026-Q4` and years are `2026`.
 
 ## Settings
 
-Journal notes folder (default `Daily`), which period types are on (quarterly is off by default), the completed date stamp, the `[/]`, `[>]` and `[<]` markers, tag colours and roles, and how date chips look.
+You can choose the folder for your journal notes (`Daily` by default) and which ones you use: daily, weekly, monthly, quarterly and yearly. Quarterly is off to start with. You can also add a completed date when you tick a task, turn the extra markers on or off, pick your own tags and colours, and change how the date chips look.
+
+## Privacy and bugs
+
+Klaar only reads the Markdown files in your vault, on your device. It never connects to the internet. If you find a bug, please [open an issue](https://github.com/i-am-fran/obsidian-klaar/issues).
 
 ## Support
 
