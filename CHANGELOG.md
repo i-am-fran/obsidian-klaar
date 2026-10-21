@@ -5,6 +5,7 @@
 - With reduced motion on, date chips no longer fade on hover, like the rest of Klaar.
 - Coloured tags in the editor are drawn as one piece by the theme.
 - Release files come with GitHub build provenance attestations, so you can check they were built from this repository.
+- Klaar is out of beta.
 
 ## 2026.10.15
 

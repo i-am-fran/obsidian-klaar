@@ -1,20 +1,17 @@
-# Klaar (beta)
+# Klaar
 
 Tasks and journal notes for Obsidian. Your tasks stay plain Markdown checkboxes in your own notes: type `>` to schedule one, and it shows up in that day's, week's, month's or year's note.
 
 [![A short tour of Klaar: click to watch the video](assets/video/klaar-tour.jpg)](assets/video/klaar-tour.mp4)
 
-> [!WARNING]
-> Klaar is in beta, so things may still change and you may hit bugs. It only edits the task lines you act on, but keep a backup of your vault and please [report problems](https://github.com/i-am-fran/obsidian-klaar/issues).
-
 ## Install
 
 Requires Obsidian 1.13.0 or newer.
 
-- **BRAT (recommended during beta):** add `i-am-fran/obsidian-klaar` in the BRAT plugin and enable Klaar.
+- **BRAT:** add `i-am-fran/obsidian-klaar` in the BRAT plugin and enable Klaar.
 - **Manual:** copy `main.js`, `manifest.json` and `styles.css` from the [latest release](https://github.com/i-am-fran/obsidian-klaar/releases) into `<vault>/.obsidian/plugins/klaar/`, then enable Klaar in Settings → Community plugins. To check the files were built from this repository: `gh attestation verify main.js --repo i-am-fran/obsidian-klaar`.
 
-Klaar reads the Markdown files in your vault, on your device, to find tasks. It makes no network requests.
+Klaar reads the Markdown files in your vault, on your device, to find tasks. It makes no network requests. Found a bug? Please [report it](https://github.com/i-am-fran/obsidian-klaar/issues).
 
 ## What it does
 
