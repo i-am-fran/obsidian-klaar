@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2026.10.20
 
 - Tag columns no longer need typing: a board's Configure view now lists your tags from Settings → Tags (those with the Tag role), each with a switch. Turn one on to give it a column. Tags you typed into the old list need switching on again.
 
