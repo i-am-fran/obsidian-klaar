@@ -1,12 +1,13 @@
 import { describe, expect, test } from 'vitest';
 import { ALL_PERIODS } from '../../src/core/periods';
 import { DEFAULT_TAG_RULES, type TagRule } from '../../src/core/tagRules';
+import { ALL_MARKERS } from '../../src/core/taskLine';
 import { boardColumns, DEFAULT_BOARD_STATE, dropAction, readBoardState, rewriteForColumn, visibleCards } from '../../src/core/taskBoard';
 import type { BoardBy } from '../../src/core/taskBoard';
 import type { TaskRef } from '../../src/core/tasks';
 
 function task(text: string, scheduleKey: string | null, extra: Partial<TaskRef> = {}): TaskRef {
-	return { path: 'Other.md', line: 0, raw: `- [ ] ${text}`, checked: false, cancelled: false, someday: false, next: false, text, scheduleKey, explicit: true, doneDate: null, inProgress: false, priority: 0, status: null, tags: [], heading: null, subtask: false, ...extra };
+	return { path: 'Other.md', line: 0, raw: `- [ ] ${text}`, checked: false, cancelled: false, someday: false, next: false, text, scheduleKey, explicit: true, doneDate: null, inProgress: false, priority: 0, tags: [], heading: null, subtask: false, ...extra };
 }
 
 const today = '2026-10-21';
@@ -19,12 +20,17 @@ describe('readBoardState', () => {
 	test('empty gives defaults', () => expect(readBoardState(() => undefined)).toEqual(DEFAULT_BOARD_STATE));
 	test('reads saved values', () => {
 		const saved: Record<string, unknown> = { klaarBoardBy: 'date', klaarShowDone: false, klaarColumnWidth: 320 };
-		expect(readBoardState(k => saved[k])).toEqual({ by: 'date', showDone: false, columnWidth: 320 });
+		expect(readBoardState(k => saved[k])).toEqual({ by: 'date', showDone: false, columnWidth: 320, tagColumns: [] });
 	});
 	test('bad values fall back or clamp', () => {
 		const bad: Record<string, unknown> = { klaarBoardBy: 'x', klaarShowDone: 'no', klaarColumnWidth: 'wide' };
 		expect(readBoardState(k => bad[k])).toEqual(DEFAULT_BOARD_STATE);
 		expect(readBoardState(k => (k === 'klaarColumnWidth' ? -5 : undefined)).columnWidth).toBe(200);
+	});
+	test('tag columns: strings only, trimmed, no #, blanks or repeats', () => {
+		const saved: Record<string, unknown> = { klaarTagColumns: [' #Waiting', 'blocked', '', 'waiting', 3, '#'] };
+		expect(readBoardState(k => saved[k]).tagColumns).toEqual(['Waiting', 'blocked']);
+		expect(readBoardState(k => (k === 'klaarTagColumns' ? 'waiting' : undefined)).tagColumns).toEqual([]);
 	});
 	test('column width is clamped to 200-480', () => {
 		expect(readBoardState(k => (k === 'klaarColumnWidth' ? 100 : undefined)).columnWidth).toBe(200);
@@ -100,44 +106,57 @@ describe('boardColumns by date', () => {
 	});
 });
 
-describe('boardColumns with status tags', () => {
-	const withStatus: TagRule[] = [...rules, { tag: 'waiting', color: '#0090ff', role: 'status' }, { tag: 'blocked', color: '#000000', role: 'status' }];
-	const tasks = [task('a', null), task('w', null, { status: 'waiting' }), task('nw', null, { next: true, status: 'waiting' }), task('b', null, { status: 'blocked' }), task('dw', null, { checked: true, status: 'waiting' })];
-	const status = boardColumns(tasks, 'status', today, withStatus, true, false);
+describe('boardColumns with tag columns', () => {
+	const tagColumns = ['Waiting', 'blocked'];
+	const tasks = [
+		task('a', null),
+		task('w', null, { tags: ['#waiting'] }),
+		task('both', null, { tags: ['#blocked', '#Waiting'] }),
+		task('nw', null, { next: true, tags: ['#waiting'] }),
+		task('pw', null, { inProgress: true, tags: ['#waiting'] }),
+		task('b', null, { tags: ['#blocked'] }),
+		task('dw', null, { checked: true, tags: ['#waiting'] }),
+		task('sw', null, { someday: true, tags: ['#waiting'] }),
+	];
+	const status = boardColumns(tasks, 'status', today, rules, true, false, ALL_MARKERS, tagColumns);
 	const col = (id: string) => status.find(c => c.id === id)?.tasks.map(t => t.text);
-	test('a column each, after In progress, in settings order', () => {
-		expect(status.map(c => c.id)).toEqual(['todo', 'next', 'in-progress', 'status:waiting', 'status:blocked', 'someday', 'done']);
+	test('a column each, after In progress, titled as typed', () => {
+		expect(status.map(c => c.id)).toEqual(['todo', 'next', 'in-progress', 'tag:waiting', 'tag:blocked', 'someday', 'done']);
 		expect(status.map(c => c.label)).toEqual(['To do', 'Next', 'In progress', 'Waiting', 'Blocked', 'Someday', 'Done']);
 	});
-	test('status tasks leave To do and Next; done ones stay in Done', () => {
+	test('the first listed tag wins, over To do, Next and In progress', () => {
+		expect(col('tag:waiting')).toEqual(['w', 'both', 'nw', 'pw']);
+		expect(col('tag:blocked')).toEqual(['b']);
 		expect(col('todo')).toEqual(['a']);
 		expect(col('next')).toEqual([]);
-		expect(col('status:waiting')).toEqual(['w', 'nw']);
-		expect(col('status:blocked')).toEqual(['b']);
-		expect(col('done')).toEqual(['dw']);
+		expect(col('in-progress')).toEqual([]);
 	});
-	test('a status whose rule is gone falls back to To do', () => {
-		expect(boardColumns([task('w', null, { status: 'waiting' })], 'status', today, rules, true, false).find(c => c.id === 'todo')?.tasks.length).toBe(1);
+	test('done and someday tasks stay in their own columns', () => {
+		expect(col('done')).toEqual(['dw']);
+		expect(col('someday')).toEqual(['sw']);
+	});
+	test('no tag columns without a list, or on other boards', () => {
+		expect(ids(tasks, 'status')).toEqual(['todo', 'next', 'in-progress', 'someday', 'done']);
+		expect(boardColumns(tasks, 'priority', today, rules, true, false, ALL_MARKERS, tagColumns).some(c => c.id.startsWith('tag:'))).toBe(false);
 	});
 });
 
-describe('rewriteForColumn with status tags', () => {
-	const withStatus: TagRule[] = [...rules, { tag: 'waiting', color: '#0090ff', role: 'status' }, { tag: 'blocked', color: '#000000', role: 'status' }];
-	const ctx = { today, rules: withStatus, stampDone: true, useMarker: true };
+describe('rewriteForColumn with tag columns', () => {
+	const ctx = { today, rules, stampDone: true, useMarker: true, tagColumns: ['Waiting', 'blocked'] };
 	const rw = (line: string, id: Parameters<typeof rewriteForColumn>[2]) => rewriteForColumn(line, 'status', id, ctx);
-	test('adds the tag and clears other statuses and markers', () => {
-		expect(rw('- [ ] A', 'status:waiting')).toBe('- [ ] A #waiting');
-		expect(rw('- [/] A #in-progress #blocked', 'status:waiting')).toBe('- [ ] A #waiting');
-		expect(rw('- [>] A', 'status:waiting')).toBe('- [ ] A #waiting');
-		expect(rw('- [x] A (@done [[2026-10-01]])', 'status:waiting')).toBe('- [ ] A #waiting');
+	test('adds the tag as typed, dropping other column tags, markers and in-progress', () => {
+		expect(rw('- [ ] A', 'tag:waiting')).toBe('- [ ] A #Waiting');
+		expect(rw('- [/] A #in-progress #blocked', 'tag:waiting')).toBe('- [ ] A #Waiting');
+		expect(rw('- [>] A >[[2026-10-23]]', 'tag:blocked')).toBe('- [ ] A #blocked >[[2026-10-23]]');
+		expect(rw('- [x] A (@done [[2026-10-01]])', 'tag:waiting')).toBe('- [ ] A #Waiting');
 	});
-	test('other columns drop the status tag', () => {
-		expect(rw('- [ ] A #waiting', 'todo')).toBe('- [ ] A');
+	test('other status columns drop the column tags', () => {
+		expect(rw('- [ ] A #waiting #bugs', 'todo')).toBe('- [ ] A #bugs');
 		expect(rw('- [ ] A #waiting', 'next')).toBe('- [>] A');
 		expect(rw('- [ ] A #waiting', 'in-progress')).toBe('- [/] A');
 		expect(rw('- [ ] A #waiting', 'done')).toBe('- [x] A (@done [[2026-10-21]])');
 	});
-	test('an unknown status column leaves the line alone', () => expect(rw('- [ ] A', 'status:gone')).toBe('- [ ] A'));
+	test('an unknown tag column leaves the line alone', () => expect(rw('- [ ] A #waiting', 'tag:gone')).toBe('- [ ] A #waiting'));
 });
 
 describe('dropAction', () => {

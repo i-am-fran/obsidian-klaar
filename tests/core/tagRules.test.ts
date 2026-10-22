@@ -1,9 +1,16 @@
 import { describe, expect, test } from 'vitest';
-import { DEFAULT_TAG_RULES, canMarkInProgress, defaultRole, kindOf, setStatusTag, statusColumns, cyclePriorityTag, meaningOf, priorityLevels, ruleFor, setInProgress, setPriorityTag, toggleInProgress, type TagRule } from '../../src/core/tagRules';
+import { DEFAULT_TAG_RULES, canMarkInProgress, normaliseTagRules, cyclePriorityTag, meaningOf, priorityLevels, ruleFor, setInProgress, setPriorityTag, toggleInProgress, type TagRule } from '../../src/core/tagRules';
 
 const IN_PROGRESS: TagRule = { tag: 'in-progress', color: '#30a46c', role: 'in-progress' };
 const rules: TagRule[] = [...DEFAULT_TAG_RULES, IN_PROGRESS];
-const WAITING: TagRule = { tag: 'waiting', color: '#0090ff', role: 'status' };
+
+describe('normaliseTagRules', () => {
+	test('an old status role reads as a label; the rest are kept', () => {
+		const saved = [{ tag: 'waiting', color: '#0090ff', role: 'status' }, ...rules] as TagRule[];
+		expect(normaliseTagRules(saved)).toEqual([{ tag: 'waiting', color: '#0090ff', role: 'label' }, ...rules]);
+	});
+	test('returns copies', () => expect(normaliseTagRules(rules)[0]).not.toBe(rules[0]));
+});
 
 describe('ruleFor', () => {
 	test('matches with or without #, ignoring case', () => {
@@ -15,56 +22,9 @@ describe('ruleFor', () => {
 
 describe('meaningOf', () => {
 	test('highest priority wins; in progress from its role', () => {
-		expect(meaningOf(['#p3', '#p1'], rules)).toEqual({ priority: 3, inProgress: false, status: null });
-		expect(meaningOf(['#p2', '#in-progress'], rules)).toEqual({ priority: 2, inProgress: true, status: null });
-		expect(meaningOf(['#bugs', '#work'], rules)).toEqual({ priority: 0, inProgress: false, status: null });
-	});
-	test('a status tag names its column, in lower case', () => {
-		expect(meaningOf(['#Waiting'], [...rules, WAITING])).toEqual({ priority: 0, inProgress: false, status: 'waiting' });
-	});
-	test('with two status tags, the one listed first in settings wins', () => {
-		expect(meaningOf(['#in-progress', '#waiting'], [WAITING, ...rules])).toEqual({ priority: 0, inProgress: false, status: 'waiting' });
-		expect(meaningOf(['#waiting', '#in-progress'], [...rules, WAITING])).toEqual({ priority: 0, inProgress: true, status: null });
-	});
-});
-
-describe('tag kinds', () => {
-	test('kindOf groups roles', () => {
-		expect(kindOf('label')).toBe('label');
-		expect(kindOf('priority-low')).toBe('priority');
-		expect(kindOf('in-progress')).toBe('status');
-		expect(kindOf('status')).toBe('status');
-	});
-	test('defaultRole picks the first option', () => {
-		expect(defaultRole('label')).toBe('label');
-		expect(defaultRole('priority')).toBe('priority-high');
-		expect(defaultRole('status')).toBe('status');
-	});
-});
-
-describe('statusColumns', () => {
-	test('own-column status rules in settings order, skipping blanks and repeats', () => {
-		const blocked: TagRule = { tag: 'blocked', color: '#000000', role: 'status' };
-		const list = [blocked, ...rules, WAITING, { ...WAITING, tag: 'WAITING' }, { ...WAITING, tag: '' }];
-		expect(statusColumns(list).map((r) => r.tag)).toEqual(['blocked', 'waiting']);
-	});
-});
-
-describe('setStatusTag', () => {
-	const withStatus = [...rules, WAITING, { tag: 'blocked', color: '#000000', role: 'status' } as TagRule];
-	test('swaps one status tag for another', () => expect(setStatusTag('- [ ] A #blocked >[[2026-10-23]]', 'waiting', withStatus)).toBe('- [ ] A #waiting >[[2026-10-23]]'));
-	test('null clears them', () => expect(setStatusTag('- [ ] A #waiting #bugs', null, withStatus)).toBe('- [ ] A #bugs'));
-	test('keeps a tag already there', () => expect(setStatusTag('- [ ] A #Waiting', 'waiting', withStatus)).toBe('- [ ] A #Waiting'));
-});
-
-describe('setInProgress with a status tag', () => {
-	const withStatus = [...rules, WAITING];
-	test('drops the status tag', () => {
-		expect(setInProgress('- [ ] A #waiting', true, withStatus, false)).toBe('- [ ] A #in-progress');
-		expect(setInProgress('- [ ] A #waiting', true, withStatus, true)).toBe('- [/] A');
-	});
-	test('[/] with a status tag is not in progress, so marking it is not a no-op', () => {
-		expect(setInProgress('- [/] A #waiting', true, withStatus, true)).toBe('- [/] A');
+		expect(meaningOf(['#p3', '#p1'], rules)).toEqual({ priority: 3, inProgress: false });
+		expect(meaningOf(['#p2', '#in-progress'], rules)).toEqual({ priority: 2, inProgress: true });
+		expect(meaningOf(['#bugs', '#work'], rules)).toEqual({ priority: 0, inProgress: false });
 	});
 });
 

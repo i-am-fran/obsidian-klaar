@@ -2,7 +2,7 @@ import type { Extension } from '@codemirror/state';
 import { Editor, EditorChange, Plugin, WorkspaceLeaf, debounce } from 'obsidian';
 import { DEFAULT_SETTINGS, KlaarSettings, KlaarSettingTab } from './settings';
 import { TaskIndex } from './obsidian/taskIndex';
-import { DEFAULT_TAG_RULES, canMarkInProgress, cyclePriorityTag, toggleInProgress } from './core/tagRules';
+import { DEFAULT_TAG_RULES, canMarkInProgress, cyclePriorityTag, normaliseTagRules, toggleInProgress } from './core/tagRules';
 import { markersOf, parseTaskLine, setSchedule, toggleNext, toggleSomeday } from './core/taskLine';
 import { flashLineExtension } from './ui/flashLine';
 import { DateSuggest } from './ui/dateSuggest';
@@ -162,7 +162,7 @@ export default class KlaarPlugin extends Plugin {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, data, {
 			periods: { ...DEFAULT_SETTINGS.periods, ...data?.periods },
 			sectionOpen: { ...data?.sectionOpen },
-			tags: (data?.tags ?? DEFAULT_TAG_RULES).map((r) => ({ ...r })),
+			tags: normaliseTagRules(data?.tags ?? DEFAULT_TAG_RULES),
 		});
 	}
 

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Tag columns are now chosen per board: on a Klaar Board with Columns set to Status, list tags under **Tag columns** in the view menu (for example `waiting`, `blocked`). Each gets its own column after In progress, so one board can show Waiting while another doesn't. Drop a card on a tag column to add the tag; drop it anywhere else to remove it.
+- Settings → Tags is back to a single dropdown per tag. Tags you had set to Status → Own column are now plain tags: add them as tag columns on the boards where you want them.
 - In a day note, completed tasks now sit in a "Done" group at the bottom of "Scheduled for today", closed to start, so what's left to do stays at the top. Open it to look back on the day; Klaar remembers whether you keep it open. The section count now shows only open tasks.
 
 ## 2026.10.18
