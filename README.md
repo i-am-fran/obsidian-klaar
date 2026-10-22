@@ -8,7 +8,11 @@ Tasks and journal notes for Obsidian. Your tasks stay plain Markdown checkboxes 
 
 Requires Obsidian 1.13.0 or newer.
 
-- **BRAT:** add `i-am-fran/obsidian-klaar` in the BRAT plugin and enable Klaar.
+Klaar is in Obsidian's community plugin directory: open Settings → Community plugins → Browse, search for **Klaar**, then install and enable it. Or [open it on obsidian.md](https://obsidian.md/plugins?id=klaar).
+
+Other ways to install:
+
+- **BRAT:** add `i-am-fran/obsidian-klaar` in the BRAT plugin to follow every release as soon as it's published.
 - **Manual:** copy `main.js`, `manifest.json` and `styles.css` from the [latest release](https://github.com/i-am-fran/obsidian-klaar/releases) into `<vault>/.obsidian/plugins/klaar/`, then enable Klaar in Settings → Community plugins. To check the files were built from this repository: `gh attestation verify main.js --repo i-am-fran/obsidian-klaar`.
 
 Klaar reads the Markdown files in your vault, on your device, to find tasks. It makes no network requests. Found a bug? Please [report it](https://github.com/i-am-fran/obsidian-klaar/issues).
