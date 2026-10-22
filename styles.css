@@ -722,6 +722,20 @@ body {
 	height: var(--icon-s);
 }
 
+/* On mobile the bar stays on one line: the New task button shows its icon only and the Today button is hidden. */
+.is-mobile .klaar-toolbar {
+	flex-wrap: nowrap;
+}
+
+.is-mobile .klaar-search {
+	min-width: 0;
+}
+
+.is-mobile .klaar-toolbar-button-text,
+.is-mobile .klaar-desktop-only {
+	display: none;
+}
+
 .klaar-new-task-input {
 	width: 100%;
 }

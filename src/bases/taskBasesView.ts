@@ -54,7 +54,7 @@ export abstract class TaskBasesView extends BasesView {
 		toolbar.addButton('plus', 'New task', "New task in today's note", () => void this.addTask());
 		toolbar.addButton('calendar', 'Today', "Open today's note", (e) => {
 			void openPeriodNote(this.app, this.deps.getSettings(), todayIso(), e.metaKey || e.ctrlKey);
-		});
+		}, true);
 	}
 
 	/** Asks for a task and adds it to today's note. The base may not include that note, so a notice says where it went. */

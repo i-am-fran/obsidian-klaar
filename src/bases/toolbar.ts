@@ -39,11 +39,15 @@ export class TaskToolbar {
 		this.countEl.setText(shown < total ? `${shown} of ${total}` : total === 1 ? '1 task' : `${total} tasks`);
 	}
 
-	/** A theme-styled button with an icon and short text; `tooltip` says more and must contain `text`. */
-	addButton(icon: string, text: string, tooltip: string, onClick: (evt: MouseEvent) => void): void {
-		const button = this.el.createEl('button', { cls: 'klaar-toolbar-button', attr: { 'aria-label': tooltip } });
+	/**
+	 * A theme-styled button with an icon and short text; `tooltip` says more and must contain `text`. On mobile the
+	 * text is hidden (the tooltip still names the button), and `desktopOnly` hides the whole button.
+	 */
+	addButton(icon: string, text: string, tooltip: string, onClick: (evt: MouseEvent) => void, desktopOnly = false): void {
+		const cls = desktopOnly ? 'klaar-toolbar-button klaar-desktop-only' : 'klaar-toolbar-button';
+		const button = this.el.createEl('button', { cls, attr: { 'aria-label': tooltip } });
 		setIcon(button.createSpan({ cls: 'klaar-toolbar-button-icon' }), icon);
-		button.createSpan({ text });
+		button.createSpan({ cls: 'klaar-toolbar-button-text', text });
 		button.addEventListener('click', onClick);
 	}
 

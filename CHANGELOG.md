@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- On mobile, the toolbar in the Tasks and Board views now stays on one line: the New task button shows just its icon and the Today button is hidden.
+
 ## 2026.10.17
 
 - In your journal notes, the arrow next to a note's name now opens and closes its tasks. Click the note's name to open the note itself (Cmd/Ctrl-click opens it in a new tab).
