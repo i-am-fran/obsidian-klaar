@@ -1,10 +1,16 @@
 # Klaar
 
-Klaar is a small task manager that lives in your Obsidian journal notes. You write tasks as normal checkboxes, wherever you are, and send them to a day, a week, a month or a year.
+Klaar is a small task manager that lives in your Obsidian journal notes. You write tasks as normal checkboxes, and assign them to a day, a week, a month or a year.
 
-The name is Dutch. Klaar means clear, and it's also what you say when something is done or ready. That's pretty much what I want from a task list.
+In Dutch, *Klaar* means clear, and it's also what you say when something is done or ready.
 
 [![A short tour of Klaar: click to watch the video](assets/video/klaar-tour.jpg)](assets/video/klaar-tour.mp4)
+
+Klaar is minimal on purpose. Your tasks stay plain Markdown checkboxes in your own notes. If you stop using Klaar tomorrow, nothing breaks. You'll just see a few links like `>[[2026-W43]]` at the end of some lines.
+
+It feels like part of Obsidian rather than an app inside an app. Journal notes are just notes and the calendar is a simple sidebar. When you want a table or a board of your tasks, Klaar plugs into Bases with two views, Klaar Table and Klaar Board, instead of inventing its own query language. 
+
+<img src="assets/screenshots/board.png" alt="The Klaar Board view with To do, In progress and Done columns, next to the calendar">
 
 ## Why I made it
 
@@ -37,13 +43,7 @@ Each morning, today's note shows what's due today, what's still open this week, 
   <img src="assets/screenshots/schedule-chips.png" alt="Scheduled tasks shown as date chips: Sat 24 Oct, Week 43, Week 44, Nov 2026, Tomorrow" width="49%">
 </p>
 
-## The idea behind it
 
-Klaar is minimal on purpose. Your tasks stay plain Markdown checkboxes in your own notes. If you stop using Klaar tomorrow, nothing breaks. You'll just see a few links like `>[[2026-W43]]` at the end of some lines.
-
-I also wanted it to feel like part of Obsidian rather than an app inside an app. Journal notes are just notes. The calendar is a simple sidebar. And when you want a table or a board of your tasks, Klaar plugs into Bases with two views, Klaar Table and Klaar Board, instead of inventing its own query language. Drag a card to another column and Klaar changes only that task's line.
-
-<img src="assets/screenshots/board.png" alt="The Klaar Board view with To do, In progress and Done columns, next to the calendar">
 
 ## Themes
 
