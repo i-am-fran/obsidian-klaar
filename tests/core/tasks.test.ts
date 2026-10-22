@@ -27,6 +27,11 @@ describe('extractTasks', () => {
 		expect(extractTasks('x.md', lines, [0, 1], null, [], withTag, false).map(x => x.inProgress)).toEqual([false, true]);
 		expect(extractTasks('x.md', lines, [0, 1], null, [], DEFAULT_TAG_RULES, true).map(x => x.inProgress)).toEqual([true, false]);
 	});
+	test('a status tag sets status and wins over [/]', () => {
+		const rules = [...withTag, { tag: 'waiting', color: '#0090ff', role: 'status' as const }];
+		const t = extractTasks('x.md', ['- [/] A #Waiting', '- [ ] B'], [0, 1], null, [], rules, true);
+		expect(t.map(x => [x.status, x.inProgress])).toEqual([['waiting', false], [null, false]]);
+	});
 	test('lines with other markers are not tasks', () => {
 		expect(extractTasks('x.md', ['- [!] A', '- [?] B', '- [ ] C'], [0, 1, 2], null).map(x => x.text)).toEqual(['C']);
 	});

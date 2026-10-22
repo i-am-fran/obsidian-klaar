@@ -2,7 +2,7 @@ import type { IsoDate } from './dates';
 import { periodOf } from './periods';
 import type { EnabledPeriods } from './periods';
 import { isOpen, isOverdue, taskPeriod } from './query';
-import { canMarkInProgress, priorityLevels, setInProgress, setPriorityTag } from './tagRules';
+import { canMarkInProgress, priorityLevels, setInProgress, setPriorityTag, setStatusTag, statusColumns } from './tagRules';
 import type { TagRule } from './tagRules';
 import { ALL_MARKERS, parseTaskLine, reopenTask, setChecked, setOpenMarker, setSchedule } from './taskLine';
 import type { MarkerSettings, Priority } from './taskLine';
@@ -10,7 +10,9 @@ import { matchesWhen } from './taskTable';
 import type { TaskRef } from './tasks';
 
 export type BoardBy = 'status' | 'priority' | 'date';
-export type ColumnId = 'todo' | 'next' | 'in-progress' | 'someday' | 'done' | 'high' | 'medium' | 'low' | 'none' | 'overdue' | 'today' | 'this-week' | 'later' | 'undated';
+type FixedColumnId = 'todo' | 'next' | 'in-progress' | 'someday' | 'done' | 'high' | 'medium' | 'low' | 'none' | 'overdue' | 'today' | 'this-week' | 'later' | 'undated';
+/** A fixed column, or `status:<tag>` for a status tag's own column (tag in lower case). */
+export type ColumnId = FixedColumnId | `status:${string}`;
 
 export interface BoardColumn {
 	id: ColumnId;
@@ -37,13 +39,13 @@ const BOARD_BYS: BoardBy[] = ['status', 'priority', 'date'];
 const MIN_WIDTH = 200;
 const MAX_WIDTH = 480;
 
-const LABELS: Record<ColumnId, string> = {
+const LABELS: Record<FixedColumnId, string> = {
 	'todo': 'To do', 'next': 'Next', 'in-progress': 'In progress', 'someday': 'Someday', 'done': 'Done',
 	'high': 'High', 'medium': 'Medium', 'low': 'Low', 'none': 'No priority',
 	'overdue': 'Overdue', 'today': 'Today', 'this-week': 'This week', 'later': 'Later', 'undated': 'Undated',
 };
 
-const PRIORITY_IDS: Partial<Record<Priority, ColumnId>> = { 3: 'high', 2: 'medium', 1: 'low' };
+const PRIORITY_IDS: Partial<Record<Priority, FixedColumnId>> = { 3: 'high', 2: 'medium', 1: 'low' };
 const PRIORITY_OF_ID: Partial<Record<ColumnId, Priority>> = { high: 3, medium: 2, low: 1, none: 0 };
 
 /** Reads saved board choices; anything unusable falls back to the default, and the width is kept within 200-480. */
@@ -59,8 +61,16 @@ export function readBoardState(get: (key: string) => unknown): BoardState {
 	};
 }
 
-function column(id: ColumnId, tasks: TaskRef[]): BoardColumn {
+const STATUS_PREFIX = 'status:';
+
+function column(id: FixedColumnId, tasks: TaskRef[]): BoardColumn {
 	return { id, label: LABELS[id], tasks };
+}
+
+/** A status tag's column, titled with the tag as listed in settings, first letter capitalised. */
+function statusColumn(tag: string, tasks: TaskRef[]): BoardColumn {
+	const key = tag.toLowerCase();
+	return { id: `${STATUS_PREFIX}${key}`, label: tag.charAt(0).toUpperCase() + tag.slice(1), tasks: tasks.filter(t => isOpen(t) && t.status === key) };
 }
 
 function dateBucket(t: TaskRef, today: IsoDate): ColumnId {
@@ -72,18 +82,21 @@ function dateBucket(t: TaskRef, today: IsoDate): ColumnId {
 
 /**
  * The board's columns in display order, empty ones included so they can take drops. Cancelled tasks never show, and
- * someday tasks only in their own column. `useMarker`: `[/]` means in progress; `markers`: whether `[>]` and `[<]` are in use.
+ * someday tasks only in their own column. Status tags get a column each, after In progress, in settings order. `useMarker`: `[/]` means in progress; `markers`: whether `[>]` and `[<]` are in use.
  */
 export function boardColumns(tasks: TaskRef[], by: BoardBy, today: IsoDate, rules: TagRule[], showDone: boolean, useMarker: boolean, markers: MarkerSettings = ALL_MARKERS): BoardColumn[] {
 	switch (by) {
 		case 'status': {
 			const hasInProgress = canMarkInProgress(rules, useMarker);
-			// A task both next and tagged in progress goes under In progress: work already started.
+			const statuses = statusColumns(rules);
+			const hasStatus = (t: TaskRef) => t.status !== null && statuses.some(r => r.tag.toLowerCase() === t.status);
+			// A task both next and in progress (or in a status column) goes there: its status says more than [>].
 			const inProgress = (t: TaskRef) => hasInProgress && t.inProgress;
-			const next = (t: TaskRef) => markers.next && t.next && !inProgress(t);
-			const columns = [column('todo', tasks.filter(t => isOpen(t) && !inProgress(t) && !next(t)))];
+			const next = (t: TaskRef) => markers.next && t.next && !inProgress(t) && !hasStatus(t);
+			const columns = [column('todo', tasks.filter(t => isOpen(t) && !inProgress(t) && !next(t) && !hasStatus(t)))];
 			if (markers.next) columns.push(column('next', tasks.filter(t => isOpen(t) && next(t))));
 			if (hasInProgress) columns.push(column('in-progress', tasks.filter(t => isOpen(t) && inProgress(t))));
+			for (const rule of statuses) columns.push(statusColumn(rule.tag, tasks));
 			if (markers.someday) columns.push(column('someday', tasks.filter(t => t.someday)));
 			if (showDone) columns.push(column('done', tasks.filter(t => t.checked)));
 			return columns;
@@ -98,7 +111,7 @@ export function boardColumns(tasks: TaskRef[], by: BoardBy, today: IsoDate, rule
 		}
 		case 'date': {
 			const open = tasks.filter(isOpen);
-			const ids: ColumnId[] = ['overdue', 'today', 'this-week', 'later', 'undated'];
+			const ids: FixedColumnId[] = ['overdue', 'today', 'this-week', 'later', 'undated'];
 			return ids.map(id => column(id, open.filter(t => dateBucket(t, today) === id)));
 		}
 	}
@@ -136,17 +149,23 @@ export function rewriteForColumn(line: string, by: BoardBy, id: ColumnId, ctx: {
 		if (id === 'undated') return setSchedule(line, null);
 		return line;
 	}
+	// Every status column but In progress clears the in-progress marker and tags and any status tag first.
+	const clear = (l: string) => setStatusTag(setInProgress(l, false, rules, useMarker), null, rules);
+	if (id.startsWith(STATUS_PREFIX)) {
+		const rule = statusColumns(rules).find(r => r.tag.toLowerCase() === id.slice(STATUS_PREFIX.length));
+		return rule ? setOpenMarker(setStatusTag(clear(reopenTask(line)), rule.tag, rules), ' ') : line;
+	}
 	switch (id) {
 		case 'done': {
-			const cleared = setInProgress(line, false, rules, useMarker);
+			const cleared = clear(line);
 			return parseTaskLine(cleared)?.checked ? cleared : setChecked(cleared, true, today, stampDone);
 		}
 		case 'todo':
-			return setOpenMarker(setInProgress(reopenTask(line), false, rules, useMarker), ' ');
+			return setOpenMarker(clear(reopenTask(line)), ' ');
 		case 'next':
-			return setOpenMarker(setInProgress(reopenTask(line), false, rules, useMarker), '>');
+			return setOpenMarker(clear(reopenTask(line)), '>');
 		case 'someday':
-			return setOpenMarker(setInProgress(reopenTask(line), false, rules, useMarker), '<');
+			return setOpenMarker(clear(reopenTask(line)), '<');
 		case 'in-progress':
 			return setInProgress(line, true, rules, useMarker);
 		default:

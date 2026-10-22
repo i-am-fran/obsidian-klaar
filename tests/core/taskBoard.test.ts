@@ -6,7 +6,7 @@ import type { BoardBy } from '../../src/core/taskBoard';
 import type { TaskRef } from '../../src/core/tasks';
 
 function task(text: string, scheduleKey: string | null, extra: Partial<TaskRef> = {}): TaskRef {
-	return { path: 'Other.md', line: 0, raw: `- [ ] ${text}`, checked: false, cancelled: false, someday: false, next: false, text, scheduleKey, explicit: true, doneDate: null, inProgress: false, priority: 0, tags: [], heading: null, subtask: false, ...extra };
+	return { path: 'Other.md', line: 0, raw: `- [ ] ${text}`, checked: false, cancelled: false, someday: false, next: false, text, scheduleKey, explicit: true, doneDate: null, inProgress: false, priority: 0, status: null, tags: [], heading: null, subtask: false, ...extra };
 }
 
 const today = '2026-10-21';
@@ -98,6 +98,46 @@ describe('boardColumns by date', () => {
 		expect(texts(tasks, 'date', 'later')).toEqual(['later']);
 		expect(texts(tasks, 'date', 'undated')).toEqual(['none']);
 	});
+});
+
+describe('boardColumns with status tags', () => {
+	const withStatus: TagRule[] = [...rules, { tag: 'waiting', color: '#0090ff', role: 'status' }, { tag: 'blocked', color: '#000000', role: 'status' }];
+	const tasks = [task('a', null), task('w', null, { status: 'waiting' }), task('nw', null, { next: true, status: 'waiting' }), task('b', null, { status: 'blocked' }), task('dw', null, { checked: true, status: 'waiting' })];
+	const status = boardColumns(tasks, 'status', today, withStatus, true, false);
+	const col = (id: string) => status.find(c => c.id === id)?.tasks.map(t => t.text);
+	test('a column each, after In progress, in settings order', () => {
+		expect(status.map(c => c.id)).toEqual(['todo', 'next', 'in-progress', 'status:waiting', 'status:blocked', 'someday', 'done']);
+		expect(status.map(c => c.label)).toEqual(['To do', 'Next', 'In progress', 'Waiting', 'Blocked', 'Someday', 'Done']);
+	});
+	test('status tasks leave To do and Next; done ones stay in Done', () => {
+		expect(col('todo')).toEqual(['a']);
+		expect(col('next')).toEqual([]);
+		expect(col('status:waiting')).toEqual(['w', 'nw']);
+		expect(col('status:blocked')).toEqual(['b']);
+		expect(col('done')).toEqual(['dw']);
+	});
+	test('a status whose rule is gone falls back to To do', () => {
+		expect(boardColumns([task('w', null, { status: 'waiting' })], 'status', today, rules, true, false).find(c => c.id === 'todo')?.tasks.length).toBe(1);
+	});
+});
+
+describe('rewriteForColumn with status tags', () => {
+	const withStatus: TagRule[] = [...rules, { tag: 'waiting', color: '#0090ff', role: 'status' }, { tag: 'blocked', color: '#000000', role: 'status' }];
+	const ctx = { today, rules: withStatus, stampDone: true, useMarker: true };
+	const rw = (line: string, id: Parameters<typeof rewriteForColumn>[2]) => rewriteForColumn(line, 'status', id, ctx);
+	test('adds the tag and clears other statuses and markers', () => {
+		expect(rw('- [ ] A', 'status:waiting')).toBe('- [ ] A #waiting');
+		expect(rw('- [/] A #in-progress #blocked', 'status:waiting')).toBe('- [ ] A #waiting');
+		expect(rw('- [>] A', 'status:waiting')).toBe('- [ ] A #waiting');
+		expect(rw('- [x] A (@done [[2026-10-01]])', 'status:waiting')).toBe('- [ ] A #waiting');
+	});
+	test('other columns drop the status tag', () => {
+		expect(rw('- [ ] A #waiting', 'todo')).toBe('- [ ] A');
+		expect(rw('- [ ] A #waiting', 'next')).toBe('- [>] A');
+		expect(rw('- [ ] A #waiting', 'in-progress')).toBe('- [/] A');
+		expect(rw('- [ ] A #waiting', 'done')).toBe('- [x] A (@done [[2026-10-21]])');
+	});
+	test('an unknown status column leaves the line alone', () => expect(rw('- [ ] A', 'status:gone')).toBe('- [ ] A'));
 });
 
 describe('dropAction', () => {

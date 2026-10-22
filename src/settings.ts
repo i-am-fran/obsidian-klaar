@@ -2,7 +2,7 @@ import { App, Notice, PluginSettingTab, type Setting, type SettingDefinitionItem
 import { cleanFolder } from './core/periodPaths';
 import type { EnabledPeriods, PeriodKind } from './core/periods';
 import type { DateLabelStyle } from './core/dateLabels';
-import { DEFAULT_TAG_RULES, ROLE_LABELS, canMarkInProgress, type TagRole, type TagRule } from './core/tagRules';
+import { DEFAULT_TAG_RULES, KIND_LABELS, ROLE_OPTIONS, canMarkInProgress, defaultRole, kindOf, type TagKind, type TagRole, type TagRule } from './core/tagRules';
 import type KlaarPlugin from './main';
 
 export interface KlaarSettings {
@@ -20,7 +20,7 @@ export interface KlaarSettings {
 	nextMarker: boolean;
 	/** `[<]` is a task parked for someday; off, Klaar ignores `[<]` lines. */
 	somedayMarker: boolean;
-	/** Tags with a colour and a meaning (priority, in progress or just a label). */
+	/** Tags with a colour and a meaning (priority, a status, or just a label). */
 	tags: TagRule[];
 	/** How schedule chips read: `Fri 23 Oct` or the raw key. */
 	dateLabels: DateLabelStyle;
@@ -81,7 +81,7 @@ export class KlaarSettingTab extends PluginSettingTab {
 					},
 					{
 						name: 'Mark in progress with [/]',
-						desc: 'A [/] task is in progress, and marking a task in progress writes [/]. Turn off to use a tag with the in progress role instead.',
+						desc: 'A [/] task is in progress, and marking a task in progress writes [/]. Turn off to use a status tag set to in progress instead.',
 						control: { type: 'toggle', key: 'slashInProgress' },
 					},
 					{
@@ -126,7 +126,7 @@ export class KlaarSettingTab extends PluginSettingTab {
 	}
 
 	/**
-	 * Tags: one row per tag (name, role, colour) with Obsidian's own add and delete buttons, then what tags do. The
+	 * Tags: one row per tag (name, type, level or column, colour) with Obsidian's own add and delete buttons, then what tags do. The
 	 * explanation is its own row because a list has no description of its own.
 	 */
 	private tagSection(): SettingDefinitionItem[] {
@@ -158,7 +158,7 @@ export class KlaarSettingTab extends PluginSettingTab {
 			list,
 			{
 				type: 'group',
-				items: [{ name: 'Coloured tags', desc: 'Tags listed above are coloured everywhere. A role makes the tag set a task\'s priority or mark it in progress.' }],
+				items: [{ name: 'Coloured tags', desc: 'Tags listed above are coloured everywhere. A priority tag sets a task\'s priority. A status tag gets its own column on the status board, or marks the task in progress.' }],
 			},
 		];
 	}
@@ -177,19 +177,33 @@ export class KlaarSettingTab extends PluginSettingTab {
 			)
 			.addDropdown((dropdown) =>
 				dropdown
-					.addOptions(ROLE_LABELS)
+					.addOptions(KIND_LABELS)
+					.setValue(kindOf(rule.role))
+					.onChange(async (value) => {
+						rule.role = defaultRole(value as TagKind);
+						await this.plugin.saveTagSettings();
+						// Shows or swaps the second picker.
+						this.update();
+					}),
+			);
+		const options = ROLE_OPTIONS[kindOf(rule.role)];
+		if (Object.keys(options).length > 0) {
+			setting.addDropdown((dropdown) =>
+				dropdown
+					.addOptions(options)
 					.setValue(rule.role)
 					.onChange(async (value) => {
 						rule.role = value as TagRole;
 						await this.plugin.saveTagSettings();
 					}),
-			)
-			.addColorPicker((picker) =>
-				picker.setValue(rule.color).onChange(async (value) => {
-					rule.color = value;
-					await this.plugin.saveTagSettings();
-				}),
 			);
+		}
+		setting.addColorPicker((picker) =>
+			picker.setValue(rule.color).onChange(async (value) => {
+				rule.color = value;
+				await this.plugin.saveTagSettings();
+			}),
+		);
 	}
 
 	getControlValue(key: string): unknown {
@@ -207,7 +221,7 @@ export class KlaarSettingTab extends PluginSettingTab {
 
 		if (TAG_KEYS.has(key)) {
 			await this.plugin.saveTagSettings();
-			if (key === 'slashInProgress' && !canMarkInProgress(settings.tags, settings.slashInProgress)) new Notice('To mark tasks in progress, add a tag below and set its role to in progress.');
+			if (key === 'slashInProgress' && !canMarkInProgress(settings.tags, settings.slashInProgress)) new Notice('To mark tasks in progress, add a status tag below and set it to in progress.');
 		} else if (DISPLAY_KEYS.has(key)) {
 			await this.plugin.saveDisplaySettings();
 		} else {
