@@ -11,6 +11,8 @@ headings:
     label: Working from a note
   - id: period-types
     label: Period types
+  - id: plan-a-week
+    label: Planning a week
 ---
 
 Journal notes are your day, week, month, quarter and year notes. When you open one, Klaar shows the tasks due in it above the note's own text. Tasks cascade: a week note shows the month around it and the days inside it, so the bigger plans are there every time you plan.
@@ -58,3 +60,11 @@ Klaar never writes generated content into a note. It only changes a task line yo
 ### Period types {#period-types}
 
 Daily, weekly, monthly and yearly notes are on by default; quarterly is off. Turn any of them on or off under Settings → Klaar → Period types. A period type that's off disappears from the scheduled sections, the calendar and the date picker. With weekly off, a day note shows "Scheduled this month" instead.
+
+### Planning a week {#plan-a-week}
+
+This is how I use it. On Monday I open the week note and decide what the week is really about. During the week, tasks come up everywhere: in meeting notes, in project notes, in a random idea. I write them down right there and send them to the week with `>`.
+
+As the days go by, I pull tasks from the week into specific days. The bigger, vaguer things sit in the month or year note, and because they show up in the week note too, I see them every time I plan.
+
+Each morning, today's note shows what's due today, what's still open this week and anything overdue. When I want to know what still needs a date, I open a [Klaar Board](#board) by date and drag cards from Undated to Today or This week.

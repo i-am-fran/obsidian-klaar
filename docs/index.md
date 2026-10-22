@@ -10,7 +10,7 @@ sections:
   - id: explore
     label: Explore
 ---
-<p class="lede">A small task manager that lives in your Obsidian journal notes. Write tasks as normal checkboxes and assign them to a day, a week, a month or a year.</p>
+<p class="lede">{{ site.tagline }}</p>
 
 <div class="actions">
   <a class="button button--primary" href="https://obsidian.md/plugins?id=klaar">Install in Obsidian{% include arrow-icon.html %}</a>
@@ -71,5 +71,6 @@ Klaar only reads the Markdown files in your vault, on your device. It never conn
   <li><a class="arrow-card" href="{{ '/docs.html#task-syntax' | relative_url }}"><span class="arrow-card__text"><span class="arrow-card__title">Task syntax</span><span class="arrow-card__desc">Markers, the completed date, tags and priority, commands.</span></span>{% include arrow-icon.html %}</a></li>
   <li><a class="arrow-card" href="{{ '/docs.html#bases-views' | relative_url }}"><span class="arrow-card__text"><span class="arrow-card__title">Bases views</span><span class="arrow-card__desc">Klaar Table and Klaar Board for any base.</span></span>{% include arrow-icon.html %}</a></li>
   <li><a class="arrow-card" href="{{ '/docs.html#settings' | relative_url }}"><span class="arrow-card__text"><span class="arrow-card__title">Settings</span><span class="arrow-card__desc">Folder, period types, markers, tags and Style Settings.</span></span>{% include arrow-icon.html %}</a></li>
+  <li><a class="arrow-card" href="{{ '/docs.html#all-features' | relative_url }}"><span class="arrow-card__text"><span class="arrow-card__title">All features</span><span class="arrow-card__desc">Every feature, including the little ones.</span></span>{% include arrow-icon.html %}</a></li>
   <li><a class="arrow-card" href="{{ site.github_url }}" target="_blank" rel="noopener noreferrer"><span class="arrow-card__text"><span class="arrow-card__title">GitHub</span><span class="arrow-card__desc">Source, releases and issues.</span></span>{% include arrow-icon.html %}</a></li>
 </ul>

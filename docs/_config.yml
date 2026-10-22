@@ -16,6 +16,10 @@ repository: "i-am-fran/obsidian-klaar"
 url: "https://i-am-fran.github.io"
 baseurl: "/obsidian-klaar"
 
+# GitHub Pages turns on the Primer theme by default, whose style.scss can
+# overwrite the template's assets/css/style.css. Turn it off.
+theme: null
+
 markdown: kramdown
 kramdown:
   auto_ids: true
