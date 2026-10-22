@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026.10.17
+
+- In your journal notes, the arrow next to a note's name now opens and closes its tasks. Click the note's name to open the note itself (Cmd/Ctrl-click opens it in a new tab).
+- Click a task's text to jump to that task in its note.
+- The "Move to day" button now sits at the right end of each task and lines up with the first line of text, whatever your theme.
+
 ## 2026.10.16
 
 - If you have reduced motion turned on, date chips no longer fade when you hover over them. The rest of Klaar already worked this way.
