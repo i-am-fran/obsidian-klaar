@@ -25,14 +25,12 @@ export interface BoardState {
 	by: BoardBy;
 	showDone: boolean;
 	columnWidth: number;
-	/** Tags (no `#`) that get a column each on the status board, in order. */
-	tagColumns: string[];
 }
 
 /** Config keys the board saves under; prefixed so they never clash with Bases' own keys. */
-export const BOARD_KEYS = { by: 'klaarBoardBy', showDone: 'klaarShowDone', columnWidth: 'klaarColumnWidth', tagColumns: 'klaarTagColumns' } as const;
+export const BOARD_KEYS = { by: 'klaarBoardBy', showDone: 'klaarShowDone', columnWidth: 'klaarColumnWidth' } as const;
 
-export const DEFAULT_BOARD_STATE: BoardState = { by: 'status', showDone: true, columnWidth: 280, tagColumns: [] };
+export const DEFAULT_BOARD_STATE: BoardState = { by: 'status', showDone: true, columnWidth: 280 };
 
 /** Names for each board kind, for the Columns pickers. */
 export const BOARD_BY_LABELS: Record<BoardBy, string> = { status: 'Status', priority: 'Priority', date: 'Date' };
@@ -50,16 +48,23 @@ const LABELS: Record<FixedColumnId, string> = {
 const PRIORITY_IDS: Partial<Record<Priority, FixedColumnId>> = { 3: 'high', 2: 'medium', 1: 'low' };
 const PRIORITY_OF_ID: Partial<Record<ColumnId, Priority>> = { high: 3, medium: 2, low: 1, none: 0 };
 
-/** Tag column names as typed: strings only, trimmed, without `#`, no blanks or repeats (ignoring case). */
-function cleanTagColumns(value: unknown): string[] {
-	if (!Array.isArray(value)) return [];
+/** Config key for one tag's column switch on a board; per tag, so each view turns its own on. */
+export function tagColumnKey(tag: string): string {
+	return `klaarTagColumn.${tag.toLowerCase()}`;
+}
+
+/** Tags a board can show as columns: those with the plain Tag role, in settings order, as written, no blanks or repeats (ignoring case). */
+export function columnableTags(rules: TagRule[]): string[] {
 	const tags: string[] = [];
-	for (const item of value) {
-		if (typeof item !== 'string') continue;
-		const tag = item.trim().replace(/^#/, '');
-		if (tag !== '' && !tags.some(t => t.toLowerCase() === tag.toLowerCase())) tags.push(tag);
+	for (const r of rules) {
+		if (r.role === 'label' && r.tag !== '' && !tags.some(t => t.toLowerCase() === r.tag.toLowerCase())) tags.push(r.tag);
 	}
 	return tags;
+}
+
+/** The tags whose column switch is on in this view, in settings order. */
+export function enabledTagColumns(get: (key: string) => unknown, rules: TagRule[]): string[] {
+	return columnableTags(rules).filter(tag => get(tagColumnKey(tag)) === true);
 }
 
 /** Reads saved board choices; anything unusable falls back to the default, and the width is kept within 200-480. */
@@ -72,7 +77,6 @@ export function readBoardState(get: (key: string) => unknown): BoardState {
 		by: by ?? d.by,
 		showDone: typeof showDone === 'boolean' ? showDone : d.showDone,
 		columnWidth: typeof width === 'number' && Number.isFinite(width) ? Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, width)) : d.columnWidth,
-		tagColumns: cleanTagColumns(get(BOARD_KEYS.tagColumns)),
 	};
 }
 

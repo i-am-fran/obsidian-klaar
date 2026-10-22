@@ -158,7 +158,7 @@ export class KlaarSettingTab extends PluginSettingTab {
 			list,
 			{
 				type: 'group',
-				items: [{ name: 'Coloured tags', desc: 'Tags listed above are coloured everywhere. A role makes the tag set a task\'s priority or mark it in progress.' }],
+				items: [{ name: 'Coloured tags', desc: 'Tags listed above are coloured everywhere. A role makes the tag set a task\'s priority or mark it in progress. A plain tag can also be a column on a Klaar Board: turn it on in the board\'s Configure view.' }],
 			},
 		];
 	}

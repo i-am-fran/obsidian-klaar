@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest';
 import { ALL_PERIODS } from '../../src/core/periods';
 import { DEFAULT_TAG_RULES, type TagRule } from '../../src/core/tagRules';
 import { ALL_MARKERS } from '../../src/core/taskLine';
-import { boardColumns, DEFAULT_BOARD_STATE, dropAction, readBoardState, rewriteForColumn, visibleCards } from '../../src/core/taskBoard';
+import { boardColumns, columnableTags, DEFAULT_BOARD_STATE, enabledTagColumns, tagColumnKey, dropAction, readBoardState, rewriteForColumn, visibleCards } from '../../src/core/taskBoard';
 import type { BoardBy } from '../../src/core/taskBoard';
 import type { TaskRef } from '../../src/core/tasks';
 
@@ -20,22 +20,36 @@ describe('readBoardState', () => {
 	test('empty gives defaults', () => expect(readBoardState(() => undefined)).toEqual(DEFAULT_BOARD_STATE));
 	test('reads saved values', () => {
 		const saved: Record<string, unknown> = { klaarBoardBy: 'date', klaarShowDone: false, klaarColumnWidth: 320 };
-		expect(readBoardState(k => saved[k])).toEqual({ by: 'date', showDone: false, columnWidth: 320, tagColumns: [] });
+		expect(readBoardState(k => saved[k])).toEqual({ by: 'date', showDone: false, columnWidth: 320 });
 	});
 	test('bad values fall back or clamp', () => {
 		const bad: Record<string, unknown> = { klaarBoardBy: 'x', klaarShowDone: 'no', klaarColumnWidth: 'wide' };
 		expect(readBoardState(k => bad[k])).toEqual(DEFAULT_BOARD_STATE);
 		expect(readBoardState(k => (k === 'klaarColumnWidth' ? -5 : undefined)).columnWidth).toBe(200);
 	});
-	test('tag columns: strings only, trimmed, no #, blanks or repeats', () => {
-		const saved: Record<string, unknown> = { klaarTagColumns: [' #Waiting', 'blocked', '', 'waiting', 3, '#'] };
-		expect(readBoardState(k => saved[k]).tagColumns).toEqual(['Waiting', 'blocked']);
-		expect(readBoardState(k => (k === 'klaarTagColumns' ? 'waiting' : undefined)).tagColumns).toEqual([]);
-	});
 	test('column width is clamped to 200-480', () => {
 		expect(readBoardState(k => (k === 'klaarColumnWidth' ? 100 : undefined)).columnWidth).toBe(200);
 		expect(readBoardState(k => (k === 'klaarColumnWidth' ? 900 : undefined)).columnWidth).toBe(480);
 		expect(readBoardState(k => (k === 'klaarColumnWidth' ? NaN : undefined)).columnWidth).toBe(280);
+	});
+});
+
+describe('tag column switches', () => {
+	const withTags: TagRule[] = [
+		...rules,
+		{ tag: 'Waiting', color: '#0090ff', role: 'label' },
+		{ tag: '', color: '#000000', role: 'label' },
+		{ tag: 'blocked', color: '#000000', role: 'label' },
+		{ tag: 'waiting', color: '#000000', role: 'label' },
+	];
+	test('only plain tags can be columns, in settings order, as written, no blanks or repeats', () => {
+		expect(columnableTags(withTags)).toEqual(['bugs', 'Waiting', 'blocked']);
+	});
+	test('a switch key per tag, ignoring case', () => expect(tagColumnKey('Waiting')).toBe('klaarTagColumn.waiting'));
+	test('only switches that are on, in settings order', () => {
+		const saved: Record<string, unknown> = { 'klaarTagColumn.blocked': true, 'klaarTagColumn.waiting': true, 'klaarTagColumn.bugs': 'yes', 'klaarTagColumn.p1': true };
+		expect(enabledTagColumns(k => saved[k], withTags)).toEqual(['Waiting', 'blocked']);
+		expect(enabledTagColumns(() => undefined, withTags)).toEqual([]);
 	});
 });
 

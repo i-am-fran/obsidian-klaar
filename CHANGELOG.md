@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Tag columns no longer need typing: a board's Configure view now lists your tags from Settings → Tags (those with the Tag role), each with a switch. Turn one on to give it a column. Tags you typed into the old list need switching on again.
+
 ## 2026.10.19
 
 - Tag columns are now chosen per board: on a Klaar Board with Columns set to Status, list tags under **Tag columns** in the view menu (for example `waiting`, `blocked`). Each gets its own column after In progress, so one board can show Waiting while another doesn't. Drop a card on a tag column to add the tag; drop it anywhere else to remove it.

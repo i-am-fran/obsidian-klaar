@@ -2,7 +2,7 @@ import { Notice, type BasesAllOptions, type BasesViewConfig, type BasesViewRegis
 import { todayIso } from '../core/dates';
 import { isOpen } from '../core/query';
 import { TASK_DRAG_MIME, parseDragPayload } from '../core/dragPayload';
-import { BOARD_BY_LABELS, BOARD_KEYS, DEFAULT_BOARD_STATE, boardColumns, dropAction, readBoardState, rewriteForColumn, visibleCards, type BoardBy, type BoardColumn, type ColumnId } from '../core/taskBoard';
+import { BOARD_BY_LABELS, BOARD_KEYS, DEFAULT_BOARD_STATE, boardColumns, columnableTags, dropAction, enabledTagColumns, readBoardState, rewriteForColumn, tagColumnKey, visibleCards, type BoardBy, type BoardColumn, type ColumnId } from '../core/taskBoard';
 import { markersOf, setSchedule } from '../core/taskLine';
 import { TOOLBAR_KEY, filterTasks, readTableState, sortTasks } from '../core/taskTable';
 import type { TaskRef } from '../core/tasks';
@@ -35,10 +35,11 @@ class BoardView extends TaskBasesView {
 		// Columns show status, so the table's Status filter doesn't apply here.
 		const filtered = filterTasks(all, { ...table, status: 'all' }, query, today, this.noteName);
 		const sorted = sortTasks(filtered, table.sort, table.reverse, this.noteName);
-		const columns = boardColumns(sorted, state.by, today, settings.tags, state.showDone, settings.slashInProgress, markersOf(settings), state.tagColumns);
+		const tagColumns = enabledTagColumns(this.get, settings.tags);
+		const columns = boardColumns(sorted, state.by, today, settings.tags, state.showDone, settings.slashInProgress, markersOf(settings), tagColumns);
 
 		board.style.setProperty('--klaar-column-width', `${state.columnWidth}px`);
-		for (const column of columns) this.renderColumn(board, column, state.by, settings, state.tagColumns);
+		for (const column of columns) this.renderColumn(board, column, state.by, settings, tagColumns);
 		return columns.reduce((n, c) => n + c.tasks.length, 0);
 	}
 
@@ -105,9 +106,14 @@ class BoardView extends TaskBasesView {
 	}
 }
 
-/** The view's menu: columns, done column, tag columns, column width, filters and sort, and whether the search bar shows. */
-function viewOptions(config: BasesViewConfig): BasesAllOptions[] {
+/**
+ * The view's menu: columns, done column, column width, a switch per plain tag to give it a column, filters and sort,
+ * and whether the search bar shows.
+ */
+function viewOptions(config: BasesViewConfig, deps: TasksViewDeps): BasesAllOptions[] {
 	const b = DEFAULT_BOARD_STATE;
+	const notStatus = () => readBoardState((k) => config.get(k)).by !== 'status';
+	const tags = columnableTags(deps.getSettings().tags);
 	return [
 		{ type: 'toggle', key: TOOLBAR_KEY, displayName: 'Show search', default: true },
 		{ type: 'dropdown', key: BOARD_KEYS.by, displayName: 'Columns', default: b.by, options: BOARD_BY_LABELS },
@@ -116,16 +122,15 @@ function viewOptions(config: BasesViewConfig): BasesAllOptions[] {
 			key: BOARD_KEYS.showDone,
 			displayName: 'Show done',
 			default: b.showDone,
-			shouldHide: () => readBoardState((k) => config.get(k)).by !== 'status',
-		},
-		{
-			type: 'multitext',
-			key: BOARD_KEYS.tagColumns,
-			displayName: 'Tag columns',
-			default: b.tagColumns,
-			shouldHide: () => readBoardState((k) => config.get(k)).by !== 'status',
+			shouldHide: notStatus,
 		},
 		{ type: 'slider', key: BOARD_KEYS.columnWidth, displayName: 'Column width', default: b.columnWidth, min: 200, max: 480, step: 20 },
+		{
+			type: 'group',
+			displayName: 'Tag columns',
+			items: tags.map((tag) => ({ type: 'toggle', key: tagColumnKey(tag), displayName: `#${tag}`, default: false })),
+			shouldHide: () => notStatus() || tags.length === 0,
+		},
 		{ type: 'group', displayName: 'Filters', items: filterOptions(false) },
 		{ type: 'group', displayName: 'Sort', items: sortOptions(false) },
 	];
@@ -136,6 +141,6 @@ export function boardViewRegistration(deps: TasksViewDeps): BasesViewRegistratio
 		name: 'Klaar Board',
 		icon: 'square-kanban',
 		factory: (controller, containerEl) => new BoardView(controller, containerEl, deps),
-		options: viewOptions,
+		options: (config) => viewOptions(config, deps),
 	};
 }
