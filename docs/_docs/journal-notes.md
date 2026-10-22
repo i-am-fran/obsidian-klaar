@@ -17,7 +17,7 @@ headings:
 
 Journal notes are your day, week, month, quarter and year notes. When you open one, Klaar shows the tasks due in it above the note's own text. Tasks cascade: a week note shows the month around it and the days inside it, so the bigger plans are there every time you plan.
 
-![Today's note with Klaar: tasks scheduled for today, this week and overdue, grouped by project, and the calendar in the sidebar]({{ '/assets/today-note.png' | relative_url }}){: .doc-section__media}
+![A day note with Klaar: three tasks scheduled for the day, grouped by note and heading, a closed Scheduled this week section above the note's own text, and the calendar in the sidebar]({{ '/assets/day-note.webp' | relative_url }}){: .doc-section__media}
 
 ### Note names {#note-names}
 
@@ -33,7 +33,7 @@ When you open a note that doesn't exist yet, Klaar asks before creating it, as a
 
 ### What a note shows {#what-shows}
 
-- **Scheduled for today** (or this week, this month…): tasks linked to this note's period.
+- **Scheduled for today** (or this day, this week, this month…): tasks linked to this note's period.
 - **Scheduled this week** (or this month, this year…): open tasks from the period around it, so today's note shows what's still due this week.
 - The periods inside it: a week note lists each of its days, a month note each of its weeks. These start closed.
 - **Overdue**: open tasks whose period has passed, on today's note only.

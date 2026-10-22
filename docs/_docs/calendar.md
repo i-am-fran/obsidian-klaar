@@ -13,7 +13,7 @@ headings:
 
 A month view in the sidebar, with ISO week numbers. It's how you move between journal notes.
 
-<!-- Screenshot: the calendar in the right sidebar, with rings, checks and note dots on a few days and today highlighted. Save as docs/assets/calendar.png -->
+![The Klaar calendar for October 2026 with week numbers, today highlighted, and rings, checks and dots under the days and weeks]({{ '/assets/calendar.webp' | relative_url }}){: .doc-section__media}
 
 ### Opening it {#open-calendar}
 
