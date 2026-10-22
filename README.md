@@ -53,9 +53,12 @@ Klaar works with the default Obsidian theme and with Minimal. I'll test and add 
 
 You need Obsidian 1.13.0 or newer.
 
-The easiest way to install it is with BRAT: add `i-am-fran/obsidian-klaar` in the BRAT plugin, then turn on Klaar.
+Klaar is in Obsidian's community plugin directory: open Settings → Community plugins → Browse, search for **Klaar**, then install and turn it on. Or [open it on obsidian.md](https://obsidian.md/plugins?id=klaar).
 
-You can also install it by hand. Download `main.js`, `manifest.json` and `styles.css` from the [latest release](https://github.com/i-am-fran/obsidian-klaar/releases), put them in `<vault>/.obsidian/plugins/klaar/`, and turn on Klaar in Settings → Community plugins. If you want to check the files were built from this repository, run `gh attestation verify main.js --repo i-am-fran/obsidian-klaar`.
+Other ways to install:
+
+- **BRAT:** add `i-am-fran/obsidian-klaar` in the BRAT plugin to follow every release as soon as it's published.
+- **By hand:** download `main.js`, `manifest.json` and `styles.css` from the [latest release](https://github.com/i-am-fran/obsidian-klaar/releases), put them in `<vault>/.obsidian/plugins/klaar/`, and turn on Klaar in Settings → Community plugins. If you want to check the files were built from this repository, run `gh attestation verify main.js --repo i-am-fran/obsidian-klaar`.
 
 ### The basics
 

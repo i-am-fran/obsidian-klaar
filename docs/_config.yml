@@ -1,0 +1,29 @@
+remote_theme: i-am-fran/web-docs-template
+plugins:
+  - jekyll-remote-theme
+
+collections:
+  docs:
+    output: false
+
+title: "Klaar"
+tagline: "Tasks and journal notes for Obsidian. Your tasks stay plain Markdown checkboxes in your own notes: type > to schedule one, and it shows up in that day's, week's, month's or year's note."
+description: "Klaar is an Obsidian plugin for tasks and journal notes: schedule plain Markdown checkboxes with >[[date]] and see them in their day, week, month, quarter and year notes."
+github_url: "https://github.com/i-am-fran/obsidian-klaar"
+author_url: "https://iamfran.com"
+author_label: "iamfran.com"
+repository: "i-am-fran/obsidian-klaar"
+url: "https://i-am-fran.github.io"
+baseurl: "/obsidian-klaar"
+
+markdown: kramdown
+kramdown:
+  auto_ids: true
+
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - .bundle
+  - superpowers

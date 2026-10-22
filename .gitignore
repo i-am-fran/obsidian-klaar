@@ -4,7 +4,11 @@ main.js
 .DS_Store
 .claude
 CLAUDE.md
-docs/
+docs/superpowers/
+docs/_site/
+docs/.jekyll-cache/
+docs/vendor/
+docs/.bundle/
 TODO.md
 .nova
 INTRO.md
