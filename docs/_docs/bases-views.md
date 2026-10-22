@@ -66,4 +66,4 @@ Dropping a card back on its own column changes nothing. Cancelled tasks don't sh
 
 ### Tag columns {#tag-columns}
 
-On a board by status, list tags under **Tag columns**, for example `waiting` and `blocked`. Each gets its own column after In progress, so one board can have a Waiting column while another doesn't. Drop a card on a tag column to add the tag; drop it on any other status column to remove it. If a task has more than one of the tags, the first one listed wins.
+On a board by status, **Configure view** → **Tag columns** lists your tags from Settings → Tags that have the Label role, such as `#waiting` or `#blocked`, each with a switch. Each tag you turn on gets its own column after In progress, in the order of your settings, so one board can have a Waiting column while another doesn't. Drop a card on a tag column to add the tag; drop it on any other status column to remove it. If a task has more than one of the tags, the one listed first in settings wins.

@@ -47,7 +47,7 @@ Open the week note `Daily/2026-W43.md` and the task is listed above your own tex
 
 <!-- Screenshot: a Klaar Table grouped by date, with the search bar, the task count and a Priority column. Save as assets/screenshots/table.png -->
 
-**Your own markers and tags.** Besides open and done, Klaar understands in progress `[/]`, next `[>]`, someday `[<]` and cancelled `[-]`. Tags like `#p1` become coloured pills, you decide which tags mean priority, and any tag, like `#waiting`, can be a column on a board.
+**Your own markers and tags.** Besides open and done, Klaar understands in progress `[/]`, next `[>]`, someday `[<]` and cancelled `[-]`. Tags like `#p1` become coloured pills, you decide which tags mean priority, and any of your tags, like `#waiting`, can be a column on a board.
 
 The documentation has [every feature, including the little ones](https://i-am-fran.github.io/obsidian-klaar/docs.html#all-features).
 
