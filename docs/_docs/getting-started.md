@@ -22,7 +22,7 @@ Klaar keeps your tasks as plain Markdown checkboxes in your own notes. Schedule 
 Requires Obsidian 1.13.0 or newer. Klaar is in Obsidian's community plugin directory: open Settings → Community plugins → Browse, search for **Klaar**, then install and enable it. Or use the button below to open its page.
 
 <div class="actions not-prose">
-  <a class="button button--primary" href="https://obsidian.md/plugins?id=klaar">Install in Obsidian</a>
+  <a class="button button--primary" href="https://obsidian.md/plugins?id=klaar">Install in Obsidian{% include arrow-icon.html %}</a>
 </div>
 
 Other ways to install:

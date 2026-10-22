@@ -11,7 +11,7 @@ sections:
 <p class="lede">Tasks and journal notes for Obsidian. Your tasks stay plain Markdown checkboxes in your own notes: type <code>&gt;</code> to schedule one, and it shows up in that day's, week's, month's or year's note.</p>
 
 <div class="actions">
-  <a class="button button--primary" href="https://obsidian.md/plugins?id=klaar">Install in Obsidian</a>
+  <a class="button button--primary" href="https://obsidian.md/plugins?id=klaar">Install in Obsidian{% include arrow-icon.html %}</a>
   <a class="button" href="{{ site.github_url }}">View on GitHub</a>
 </div>
 
@@ -34,7 +34,7 @@ Open your week note and the task is listed there, with the ones scheduled for th
 Klaar is in Obsidian's community plugin directory. In Obsidian, open Settings → Community plugins → Browse, search for **Klaar**, then install and enable it. Requires Obsidian 1.13.0 or newer. Other ways to install are in [Getting Started]({{ '/docs.html#getting-started' | relative_url }}).
 
 <div class="actions">
-  <a class="button button--primary" href="https://obsidian.md/plugins?id=klaar">Install in Obsidian</a>
+  <a class="button button--primary" href="https://obsidian.md/plugins?id=klaar">Install in Obsidian{% include arrow-icon.html %}</a>
 </div>
 
 Klaar reads the Markdown files in your vault, on your device. It makes no network requests.
