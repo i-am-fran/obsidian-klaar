@@ -6,7 +6,7 @@ import type { MarkerFilter } from '../../src/core/query';
 import type { TaskRef } from '../../src/core/tasks';
 
 function task(text: string, scheduleKey: string | null, extra: Partial<TaskRef> = {}): TaskRef {
-	return { path: 'Other.md', line: 0, raw: `- [ ] ${text}`, checked: false, cancelled: false, someday: false, next: false, text, scheduleKey, explicit: true, doneDate: null, inProgress: false, priority: 0, tags: [], heading: null, subtask: false, ...extra };
+	return { path: 'Other.md', line: 0, raw: `- [ ] ${text}`, checked: false, cancelled: false, someday: false, next: false, text, scheduleKey, explicit: true, doneDate: null, inProgress: false, priority: 0, status: null, tags: [], heading: null, subtask: false, ...extra };
 }
 
 const day19 = task('day19', '2026-10-19');

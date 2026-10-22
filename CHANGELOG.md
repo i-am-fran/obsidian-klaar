@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Tags in settings now have a type: Tag, Priority or Status. A status tag like `#waiting` gets its own column on the status board, after In progress. Drop a card there to add the tag; drop it anywhere else to remove it. Your existing tags keep their meaning, and in progress tags are now a kind of status.
+- If a task has more than one status tag, the one listed first in settings wins.
 - On mobile, the toolbar in the Tasks and Board views now stays on one line: the New task button shows just its icon and the Today button is hidden.
 
 ## 2026.10.17

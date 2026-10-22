@@ -24,7 +24,7 @@ It had to fit into Obsidian without cluttering it. Klaar doesn't write anything 
 
 It had to be quick. Assigning a task takes a second: type `>` at the end of the line and pick a day or a week. Rescheduling is the same, or you drag the task onto a day in the calendar.
 
-And I wanted to customise things using what Obsidian already gives you. Klaar uses plain checkbox markers like `[/]` for in progress and ordinary tags like `#p1` for priority. You choose the tags and their colours.
+And I wanted to customise things using what Obsidian already gives you. Klaar uses plain checkbox markers like `[/]` for in progress and ordinary tags like `#p1` for priority or `#waiting` for a status with its own board column. You choose the tags and their colours.
 
 ## How I work with it
 

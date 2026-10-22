@@ -27,6 +27,8 @@ export interface TaskRef {
 	inProgress: boolean;
 	/** Highest priority among its tags' rules, 3 = high; 0 for none. */
 	priority: Priority;
+	/** The tag (lower case, no `#`) of the status rule that puts it in its own board column; null for none. */
+	status: string | null;
 	/** Inline `#tags` in the text. */
 	tags: string[];
 	/** Nearest heading above the task, if any. */
@@ -64,6 +66,7 @@ export function extractTasks(path: string, lines: string[], taskLines: number[],
 			doneDate: parsed.doneDate,
 			inProgress: isInProgress(parsed, meaning, useMarker),
 			priority: meaning.priority,
+			status: meaning.status,
 			tags,
 			heading: headingAt(headings, line),
 			subtask: false,
