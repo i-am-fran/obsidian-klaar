@@ -31,6 +31,11 @@ const PRIORITY_OF: Partial<Record<TagRole, Priority>> = { 'priority-low': 1, 'pr
 /** Cycle order: none, low, medium, high, then none again. */
 const PRIORITY_STEPS: TagRole[] = ['priority-low', 'priority-medium', 'priority-high'];
 
+/** Saved tag rules with any role Klaar no longer knows (2026.10.18's `status`) read as a plain label. */
+export function normaliseTagRules(rules: TagRule[]): TagRule[] {
+	return rules.map((r) => ({ ...r, role: r.role in ROLE_LABELS ? r.role : 'label' }));
+}
+
 /** The rule for a tag, given with or without `#`; the first match wins. */
 export function ruleFor(tag: string, rules: TagRule[]): TagRule | undefined {
 	const name = tag.replace(/^#/, '').toLowerCase();

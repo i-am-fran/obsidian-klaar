@@ -3,7 +3,8 @@ import { todayIso } from '../core/dates';
 import { groupHeading } from '../core/groupHeading';
 import { defaultOpen, groupId, stateKey } from '../core/groupState';
 import { groupByNote } from '../core/noteGroups';
-import { scheduledFor } from '../core/query';
+import { scheduledFor, splitDone } from '../core/query';
+import type { TaskRef } from '../core/tasks';
 import { periodOfFile } from '../obsidian/periodNotes';
 import type { TaskIndex } from '../obsidian/taskIndex';
 import type { KlaarSettings } from '../settings';
@@ -108,32 +109,46 @@ export class ScheduledSection {
 					else this.openChildren.delete(sectionKey);
 				},
 			});
-			for (const note of groupByNote(group.tasks)) {
-				const noteKey = `${sectionKey}|${note.path}`;
-				const noteAcc = renderAccordion(acc.body, {
-					title: note.name,
-					open: !this.closedNotes.has(noteKey),
-					cls: ['klaar-note'],
-					action: {
-						icon: 'file-text',
-						label: 'Open note',
-						onClick: (evt) => {
-							const source = this.app.vault.getFileByPath(note.path);
-							if (source) void this.app.workspace.getLeaf(Keymap.isModEvent(evt)).openFile(source);
-						},
-					},
-					onToggle: (open) => {
-						if (open) this.closedNotes.delete(noteKey);
-						else this.closedNotes.add(noteKey);
-					},
+			// Ticked tasks (only a day's own group has them) go in a Done group at the bottom, closed to start.
+			const { open, done } = splitDone(group.tasks);
+			this.renderNotes(acc.body, open, sectionKey, settings);
+			if (done.length > 0) {
+				const doneKey = stateKey(period.kind, 'done');
+				const doneAcc = renderAccordion(acc.body, {
+					title: 'Done',
+					count: done.length,
+					open: settings.sectionOpen[doneKey] ?? defaultOpen('done'),
+					cls: ['klaar-done'],
+					onToggle: (isOpen) => this.remember(doneKey, isOpen),
 				});
-				for (const { heading, tasks } of note.headings) {
-					if (heading) noteAcc.body.createDiv({ text: heading, cls: 'klaar-task-heading' });
-					for (const task of tasks) renderTaskRow(noteAcc.body, this.app, task, settings, { showSource: false });
-				}
+				this.renderNotes(doneAcc.body, done, `${sectionKey}|done`, settings);
 			}
 		}
 		if (section.parentElement !== anchor.parent || section.nextElementSibling !== anchor.before) anchor.parent.insertBefore(section, anchor.before);
+	}
+
+	/** One accordion per source note, with its tasks under their headings. */
+	private renderNotes(parent: HTMLElement, tasks: TaskRef[], sectionKey: string, settings: KlaarSettings): void {
+		for (const note of groupByNote(tasks)) {
+			const noteKey = `${sectionKey}|${note.path}`;
+			const noteAcc = renderAccordion(parent, {
+				title: note.name,
+				open: !this.closedNotes.has(noteKey),
+				cls: ['klaar-note'],
+				onTitleClick: (evt) => {
+					const source = this.app.vault.getFileByPath(note.path);
+					if (source) void this.app.workspace.getLeaf(Keymap.isModEvent(evt)).openFile(source);
+				},
+				onToggle: (open) => {
+					if (open) this.closedNotes.delete(noteKey);
+					else this.closedNotes.add(noteKey);
+				},
+			});
+			for (const { heading, tasks: rows } of note.headings) {
+				if (heading) noteAcc.body.createDiv({ text: heading, cls: 'klaar-task-heading' });
+				for (const task of rows) renderTaskRow(noteAcc.body, this.app, task, settings, { showSource: false });
+			}
+		}
 	}
 
 	private remember(key: string, open: boolean): void {

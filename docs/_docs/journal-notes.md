@@ -26,7 +26,7 @@ Each note is named after its schedule key and lives in the journal notes folder 
 - The periods inside it: a week note lists its days, a month note its weeks.
 - **Overdue**, on today's note only.
 
-Tasks are grouped by the note they live in, then by heading, and each group can be folded. Tick a task here and its line in its own note is updated.
+Tasks are grouped by the note they live in, then by heading, and each group can be folded. Tick a task here and its line in its own note is updated. In a day note, ticked tasks move into a Done group at the bottom of the day's own list, closed to start, so what's left stays at the top.
 
 <aside class="callout callout--legenda not-prose" markdown="1">
 Klaar never writes generated content into a note. It only changes a task line you acted on: ticking it, scheduling it, or changing its marker or priority.

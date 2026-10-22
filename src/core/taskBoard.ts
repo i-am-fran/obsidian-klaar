@@ -4,13 +4,15 @@ import type { EnabledPeriods } from './periods';
 import { isOpen, isOverdue, taskPeriod } from './query';
 import { canMarkInProgress, priorityLevels, setInProgress, setPriorityTag } from './tagRules';
 import type { TagRule } from './tagRules';
-import { ALL_MARKERS, parseTaskLine, reopenTask, setChecked, setOpenMarker, setSchedule } from './taskLine';
+import { ALL_MARKERS, addTag, parseTaskLine, removeTags, reopenTask, setChecked, setOpenMarker, setSchedule } from './taskLine';
 import type { MarkerSettings, Priority } from './taskLine';
 import { matchesWhen } from './taskTable';
 import type { TaskRef } from './tasks';
 
 export type BoardBy = 'status' | 'priority' | 'date';
-export type ColumnId = 'todo' | 'next' | 'in-progress' | 'someday' | 'done' | 'high' | 'medium' | 'low' | 'none' | 'overdue' | 'today' | 'this-week' | 'later' | 'undated';
+type FixedColumnId = 'todo' | 'next' | 'in-progress' | 'someday' | 'done' | 'high' | 'medium' | 'low' | 'none' | 'overdue' | 'today' | 'this-week' | 'later' | 'undated';
+/** A fixed column, or `tag:<tag>` for one of the view's tag columns (tag in lower case, no `#`). */
+export type ColumnId = FixedColumnId | `tag:${string}`;
 
 export interface BoardColumn {
 	id: ColumnId;
@@ -23,12 +25,14 @@ export interface BoardState {
 	by: BoardBy;
 	showDone: boolean;
 	columnWidth: number;
+	/** Tags (no `#`) that get a column each on the status board, in order. */
+	tagColumns: string[];
 }
 
 /** Config keys the board saves under; prefixed so they never clash with Bases' own keys. */
-export const BOARD_KEYS = { by: 'klaarBoardBy', showDone: 'klaarShowDone', columnWidth: 'klaarColumnWidth' } as const;
+export const BOARD_KEYS = { by: 'klaarBoardBy', showDone: 'klaarShowDone', columnWidth: 'klaarColumnWidth', tagColumns: 'klaarTagColumns' } as const;
 
-export const DEFAULT_BOARD_STATE: BoardState = { by: 'status', showDone: true, columnWidth: 280 };
+export const DEFAULT_BOARD_STATE: BoardState = { by: 'status', showDone: true, columnWidth: 280, tagColumns: [] };
 
 /** Names for each board kind, for the Columns pickers. */
 export const BOARD_BY_LABELS: Record<BoardBy, string> = { status: 'Status', priority: 'Priority', date: 'Date' };
@@ -37,14 +41,26 @@ const BOARD_BYS: BoardBy[] = ['status', 'priority', 'date'];
 const MIN_WIDTH = 200;
 const MAX_WIDTH = 480;
 
-const LABELS: Record<ColumnId, string> = {
+const LABELS: Record<FixedColumnId, string> = {
 	'todo': 'To do', 'next': 'Next', 'in-progress': 'In progress', 'someday': 'Someday', 'done': 'Done',
 	'high': 'High', 'medium': 'Medium', 'low': 'Low', 'none': 'No priority',
 	'overdue': 'Overdue', 'today': 'Today', 'this-week': 'This week', 'later': 'Later', 'undated': 'Undated',
 };
 
-const PRIORITY_IDS: Partial<Record<Priority, ColumnId>> = { 3: 'high', 2: 'medium', 1: 'low' };
+const PRIORITY_IDS: Partial<Record<Priority, FixedColumnId>> = { 3: 'high', 2: 'medium', 1: 'low' };
 const PRIORITY_OF_ID: Partial<Record<ColumnId, Priority>> = { high: 3, medium: 2, low: 1, none: 0 };
+
+/** Tag column names as typed: strings only, trimmed, without `#`, no blanks or repeats (ignoring case). */
+function cleanTagColumns(value: unknown): string[] {
+	if (!Array.isArray(value)) return [];
+	const tags: string[] = [];
+	for (const item of value) {
+		if (typeof item !== 'string') continue;
+		const tag = item.trim().replace(/^#/, '');
+		if (tag !== '' && !tags.some(t => t.toLowerCase() === tag.toLowerCase())) tags.push(tag);
+	}
+	return tags;
+}
 
 /** Reads saved board choices; anything unusable falls back to the default, and the width is kept within 200-480. */
 export function readBoardState(get: (key: string) => unknown): BoardState {
@@ -56,11 +72,20 @@ export function readBoardState(get: (key: string) => unknown): BoardState {
 		by: by ?? d.by,
 		showDone: typeof showDone === 'boolean' ? showDone : d.showDone,
 		columnWidth: typeof width === 'number' && Number.isFinite(width) ? Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, width)) : d.columnWidth,
+		tagColumns: cleanTagColumns(get(BOARD_KEYS.tagColumns)),
 	};
 }
 
-function column(id: ColumnId, tasks: TaskRef[]): BoardColumn {
+const TAG_PREFIX = 'tag:';
+
+function column(id: FixedColumnId, tasks: TaskRef[]): BoardColumn {
 	return { id, label: LABELS[id], tasks };
+}
+
+/** The first of `tagColumns` (lower case) among the task's tags, if any. */
+function columnTagOf(t: TaskRef, tagColumns: string[]): string | undefined {
+	const tags = new Set(t.tags.map(tag => tag.replace(/^#/, '').toLowerCase()));
+	return tagColumns.map(tag => tag.toLowerCase()).find(tag => tags.has(tag));
 }
 
 function dateBucket(t: TaskRef, today: IsoDate): ColumnId {
@@ -73,17 +98,25 @@ function dateBucket(t: TaskRef, today: IsoDate): ColumnId {
 /**
  * The board's columns in display order, empty ones included so they can take drops. Cancelled tasks never show, and
  * someday tasks only in their own column. `useMarker`: `[/]` means in progress; `markers`: whether `[>]` and `[<]` are in use.
+ * `tagColumns`: the view's tags that get a column each on the status board, after In progress; an open task with one goes
+ * there (the first listed wins) rather than To do, Next or In progress.
  */
-export function boardColumns(tasks: TaskRef[], by: BoardBy, today: IsoDate, rules: TagRule[], showDone: boolean, useMarker: boolean, markers: MarkerSettings = ALL_MARKERS): BoardColumn[] {
+export function boardColumns(tasks: TaskRef[], by: BoardBy, today: IsoDate, rules: TagRule[], showDone: boolean, useMarker: boolean, markers: MarkerSettings = ALL_MARKERS, tagColumns: string[] = []): BoardColumn[] {
 	switch (by) {
 		case 'status': {
 			const hasInProgress = canMarkInProgress(rules, useMarker);
+			const tagged = new Map(tasks.filter(isOpen).map(t => [t, columnTagOf(t, tagColumns)] as const));
+			const inTagColumn = (t: TaskRef) => tagged.get(t) !== undefined;
 			// A task both next and tagged in progress goes under In progress: work already started.
-			const inProgress = (t: TaskRef) => hasInProgress && t.inProgress;
-			const next = (t: TaskRef) => markers.next && t.next && !inProgress(t);
-			const columns = [column('todo', tasks.filter(t => isOpen(t) && !inProgress(t) && !next(t)))];
+			const inProgress = (t: TaskRef) => hasInProgress && t.inProgress && !inTagColumn(t);
+			const next = (t: TaskRef) => markers.next && t.next && !inProgress(t) && !inTagColumn(t);
+			const columns = [column('todo', tasks.filter(t => isOpen(t) && !inProgress(t) && !next(t) && !inTagColumn(t)))];
 			if (markers.next) columns.push(column('next', tasks.filter(t => isOpen(t) && next(t))));
 			if (hasInProgress) columns.push(column('in-progress', tasks.filter(t => isOpen(t) && inProgress(t))));
+			for (const tag of tagColumns) {
+				const key = tag.toLowerCase();
+				columns.push({ id: `${TAG_PREFIX}${key}`, label: tag.charAt(0).toUpperCase() + tag.slice(1), tasks: tasks.filter(t => tagged.get(t) === key) });
+			}
 			if (markers.someday) columns.push(column('someday', tasks.filter(t => t.someday)));
 			if (showDone) columns.push(column('done', tasks.filter(t => t.checked)));
 			return columns;
@@ -98,7 +131,7 @@ export function boardColumns(tasks: TaskRef[], by: BoardBy, today: IsoDate, rule
 		}
 		case 'date': {
 			const open = tasks.filter(isOpen);
-			const ids: ColumnId[] = ['overdue', 'today', 'this-week', 'later', 'undated'];
+			const ids: FixedColumnId[] = ['overdue', 'today', 'this-week', 'later', 'undated'];
 			return ids.map(id => column(id, open.filter(t => dateBucket(t, today) === id)));
 		}
 	}
@@ -124,8 +157,8 @@ export function dropAction(by: BoardBy, id: ColumnId, enabled: EnabledPeriods): 
 }
 
 /** The task line after its card is dropped on a column. Columns that need a date picker leave the line unchanged. */
-export function rewriteForColumn(line: string, by: BoardBy, id: ColumnId, ctx: { today: IsoDate; rules: TagRule[]; stampDone: boolean; useMarker: boolean }): string {
-	const { today, rules, stampDone, useMarker } = ctx;
+export function rewriteForColumn(line: string, by: BoardBy, id: ColumnId, ctx: { today: IsoDate; rules: TagRule[]; stampDone: boolean; useMarker: boolean; tagColumns?: string[] }): string {
+	const { today, rules, stampDone, useMarker, tagColumns = [] } = ctx;
 	if (by === 'priority') {
 		const level = PRIORITY_OF_ID[id];
 		return level === undefined ? line : setPriorityTag(line, level, rules);
@@ -136,19 +169,26 @@ export function rewriteForColumn(line: string, by: BoardBy, id: ColumnId, ctx: {
 		if (id === 'undated') return setSchedule(line, null);
 		return line;
 	}
+	// Every status column drops the view's tag-column tags, so the card leaves its tag column.
+	const untagged = tagColumns.length > 0 ? removeTags(line, tagColumns) : line;
+	const clear = (l: string) => setInProgress(l, false, rules, useMarker);
+	if (id.startsWith(TAG_PREFIX)) {
+		const tag = tagColumns.find(t => t.toLowerCase() === id.slice(TAG_PREFIX.length));
+		return tag === undefined ? line : addTag(setOpenMarker(clear(reopenTask(untagged)), ' '), tag);
+	}
 	switch (id) {
 		case 'done': {
-			const cleared = setInProgress(line, false, rules, useMarker);
+			const cleared = clear(untagged);
 			return parseTaskLine(cleared)?.checked ? cleared : setChecked(cleared, true, today, stampDone);
 		}
 		case 'todo':
-			return setOpenMarker(setInProgress(reopenTask(line), false, rules, useMarker), ' ');
+			return setOpenMarker(clear(reopenTask(untagged)), ' ');
 		case 'next':
-			return setOpenMarker(setInProgress(reopenTask(line), false, rules, useMarker), '>');
+			return setOpenMarker(clear(reopenTask(untagged)), '>');
 		case 'someday':
-			return setOpenMarker(setInProgress(reopenTask(line), false, rules, useMarker), '<');
+			return setOpenMarker(clear(reopenTask(untagged)), '<');
 		case 'in-progress':
-			return setInProgress(line, true, rules, useMarker);
+			return setInProgress(untagged, true, rules, useMarker);
 		default:
 			return line;
 	}

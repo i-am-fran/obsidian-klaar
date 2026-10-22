@@ -1,8 +1,16 @@
 import { describe, expect, test } from 'vitest';
-import { DEFAULT_TAG_RULES, canMarkInProgress, cyclePriorityTag, meaningOf, priorityLevels, ruleFor, setInProgress, setPriorityTag, toggleInProgress, type TagRule } from '../../src/core/tagRules';
+import { DEFAULT_TAG_RULES, canMarkInProgress, normaliseTagRules, cyclePriorityTag, meaningOf, priorityLevels, ruleFor, setInProgress, setPriorityTag, toggleInProgress, type TagRule } from '../../src/core/tagRules';
 
 const IN_PROGRESS: TagRule = { tag: 'in-progress', color: '#30a46c', role: 'in-progress' };
 const rules: TagRule[] = [...DEFAULT_TAG_RULES, IN_PROGRESS];
+
+describe('normaliseTagRules', () => {
+	test('an old status role reads as a label; the rest are kept', () => {
+		const saved = [{ tag: 'waiting', color: '#0090ff', role: 'status' }, ...rules] as TagRule[];
+		expect(normaliseTagRules(saved)).toEqual([{ tag: 'waiting', color: '#0090ff', role: 'label' }, ...rules]);
+	});
+	test('returns copies', () => expect(normaliseTagRules(rules)[0]).not.toBe(rules[0]));
+});
 
 describe('ruleFor', () => {
 	test('matches with or without #, ignoring case', () => {

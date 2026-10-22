@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import { ALL_PERIODS, parsePeriodKey } from '../../src/core/periods';
 import type { Period } from '../../src/core/periods';
-import { matchesMarker, scheduleStatus, scheduledFor, sortByMarkers } from '../../src/core/query';
+import { matchesMarker, scheduleStatus, scheduledFor, sortByMarkers, splitDone } from '../../src/core/query';
 import type { MarkerFilter } from '../../src/core/query';
 import type { TaskRef } from '../../src/core/tasks';
 
@@ -173,5 +173,20 @@ describe('next and someday', () => {
 		expect(matchesMarker(next, 'next')).toBe(true);
 		expect(matchesMarker(day19, 'next')).toBe(false);
 		expect(sortByMarkers([day19, next]).map(t => t.text)).toEqual(['next', 'day19']);
+	});
+});
+
+describe('splitDone', () => {
+	test('splits open and ticked tasks, keeping order', () => {
+		const a = task('a', null), b = task('b', null, { checked: true }), c = task('c', null), d = task('d', null, { checked: true });
+		const { open, done } = splitDone([a, b, c, d]);
+		expect(open.map(t => t.text)).toEqual(['a', 'c']);
+		expect(done.map(t => t.text)).toEqual(['b', 'd']);
+	});
+	test('no done tasks gives an empty done list', () => expect(splitDone([task('a', null)]).done).toEqual([]));
+	test("a day's own group keeps its done tasks for the Done group", () => {
+		const groups = scheduledFor([task('open', '2026-10-19'), task('ticked', '2026-10-19', { checked: true })], parsePeriodKey('2026-10-19') as Period, '2026-10-19', 'Daily/2026-10-19.md');
+		const own = groups.find(g => g.label === 'Scheduled');
+		expect(splitDone(own?.tasks ?? []).done.map(t => t.text)).toEqual(['ticked']);
 	});
 });

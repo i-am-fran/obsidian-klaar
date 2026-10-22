@@ -386,40 +386,32 @@ body {
 	white-space: nowrap;
 }
 
-/* Optional icon button at the right of a header; shown with the row where there is a pointer. */
-.klaar-acc.has-action {
-	position: relative;
+/* Split header: the chevron toggles, the title is a link (to its note). */
+.klaar-acc > .klaar-acc-head.is-split {
+	cursor: default;
 }
 
-.klaar-acc.has-action > .klaar-acc-head {
-	/* Room for the action button so a long title or count never runs under it. */
-	padding-right: calc(var(--size-4-2) + 32px);
+.klaar-acc-head.is-split > .klaar-acc-chevron {
+	width: auto;
+	height: auto;
+	margin-left: calc(-1 * var(--size-2-2));
+	padding: var(--size-2-2);
+	cursor: pointer;
 }
 
-.klaar-acc > .klaar-acc-action {
-	position: absolute;
-	top: 0;
-	height: 30px;
-	right: var(--size-4-2);
-	display: flex;
-	align-items: center;
-	color: var(--text-faint);
-	transition: opacity var(--klaar-fast) ease-out, color var(--klaar-fast) ease-out;
-}
-
-.klaar-acc > .klaar-acc-action:hover {
+.klaar-acc-head.is-split > .klaar-acc-chevron:hover {
 	color: var(--text-normal);
 }
 
-@media (hover: hover) {
-	.klaar-acc > .klaar-acc-action {
-		opacity: 0;
-	}
+.klaar-acc-head.is-split > .klaar-acc-title {
+	color: inherit;
+	text-decoration: none;
+	cursor: pointer;
+}
 
-	.klaar-acc:hover > .klaar-acc-action,
-	.klaar-acc > .klaar-acc-action:focus-visible {
-		opacity: 1;
-	}
+.klaar-acc-head.is-split > .klaar-acc-title:hover {
+	color: var(--text-accent);
+	text-decoration: underline;
 }
 
 .klaar-acc-count {
@@ -515,6 +507,15 @@ body {
 	margin-top: var(--size-2-1);
 }
 
+/* Done group: ticked tasks at the bottom of a day's own section, quieter than the open work above. */
+.klaar-done > .klaar-acc-head {
+	color: var(--text-muted);
+}
+
+.klaar-note + .klaar-done {
+	margin-top: var(--size-4-2);
+}
+
 .klaar-task-heading {
 	padding: var(--size-4-1) var(--size-4-2) var(--size-2-1) var(--size-4-8);
 	color: var(--text-muted);
@@ -601,15 +602,21 @@ body {
 	text-decoration: underline;
 }
 
-.klaar-task-text + .klaar-task-move {
-	margin-left: auto;
-}
-
+/*
+ * Pinned to the right end of the row and centred on the first line of text. Buttons don't inherit font metrics, so
+ * `font: inherit` makes 1lh the row's line; the padding is set here so the offset doesn't depend on the theme's.
+ */
 .klaar-task-row > .klaar-task-move {
 	flex: none;
-	margin: calc((1lh - var(--icon-size)) / 2 - var(--size-2-1)) 0 0;
+	margin: calc((1lh - var(--icon-size)) / 2 - var(--size-2-2)) 0 0 auto;
+	padding: var(--size-2-2);
+	font: inherit;
 	color: var(--text-faint);
 	transition: opacity var(--klaar-fast) ease-out, color var(--klaar-fast) ease-out, scale var(--klaar-fast) ease-out;
+}
+
+.klaar-task-row > .klaar-task-source + .klaar-task-move {
+	margin-left: 0;
 }
 
 .klaar-task-row > .klaar-task-move:hover {
@@ -722,6 +729,20 @@ body {
 .klaar-toolbar-button-icon svg {
 	width: var(--icon-s);
 	height: var(--icon-s);
+}
+
+/* On mobile the bar stays on one line: the New task button shows its icon only and the Today button is hidden. */
+.is-mobile .klaar-toolbar {
+	flex-wrap: nowrap;
+}
+
+.is-mobile .klaar-search {
+	min-width: 0;
+}
+
+.is-mobile .klaar-toolbar-button-text,
+.is-mobile .klaar-desktop-only {
+	display: none;
 }
 
 .klaar-new-task-input {
