@@ -91,14 +91,19 @@ export function renderMoveButton(el: HTMLElement, app: App, ref: TaskRef, settin
 	return move;
 }
 
-/** One task row: checkbox, text, optional source link, "move to day" button; draggable onto the calendar. */
+/**
+ * One task row: checkbox, text, optional source link, "move to day" button; draggable onto the calendar. Clicking the
+ * text opens the task's note at its line.
+ */
 export function renderTaskRow(el: HTMLElement, app: App, ref: TaskRef, settings: KlaarSettings, opts: { showSource: boolean }): void {
 	const row = el.createDiv({ cls: 'klaar-task-row' });
 	row.toggleClass('is-done', ref.checked && !ref.cancelled);
 	row.toggleClass('is-cancelled', ref.cancelled);
 	makeDraggable(row, ref);
 	renderCheckbox(row, app, ref, settings);
-	renderTaskText(row.createSpan({ cls: 'klaar-task-text' }), ref.text, settings.tags, app, ref.path);
+	const text = row.createSpan({ cls: 'klaar-task-text' });
+	makeOpenable(text, app, ref);
+	renderTaskText(text, ref.text, settings.tags, app, ref.path);
 	if (opts.showSource) renderSourceLink(row, app, ref);
 	renderMoveButton(row, app, ref, settings);
 }
