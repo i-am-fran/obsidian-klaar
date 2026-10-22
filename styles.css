@@ -507,6 +507,15 @@ body {
 	margin-top: var(--size-2-1);
 }
 
+/* Done group: ticked tasks at the bottom of a day's own section, quieter than the open work above. */
+.klaar-done > .klaar-acc-head {
+	color: var(--text-muted);
+}
+
+.klaar-note + .klaar-done {
+	margin-top: var(--size-4-2);
+}
+
 .klaar-task-heading {
 	padding: var(--size-4-1) var(--size-4-2) var(--size-2-1) var(--size-4-8);
 	color: var(--text-muted);

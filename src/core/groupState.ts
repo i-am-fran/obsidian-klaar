@@ -1,7 +1,8 @@
 import type { PeriodKind } from './periods';
 import type { TaskGroup } from './query';
 
-export type GroupId = 'own' | 'parent' | 'overdue' | 'child';
+/** `done` is the Done group inside a day's own group, not a group `scheduledFor` returns. */
+export type GroupId = 'own' | 'parent' | 'overdue' | 'child' | 'done';
 
 /** Which kind of group this is, from the labels `scheduledFor` gives them. */
 export function groupId(group: TaskGroup): GroupId {
@@ -16,7 +17,7 @@ export function stateKey(noteKind: PeriodKind, id: GroupId): string {
 	return `${noteKind}:${id}`;
 }
 
-/** Child-period groups start closed to keep the top of the note compact. */
+/** Child-period groups and the Done group start closed to keep the top of the note compact. */
 export function defaultOpen(id: GroupId): boolean {
-	return id !== 'child';
+	return id !== 'child' && id !== 'done';
 }

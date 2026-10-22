@@ -26,6 +26,11 @@ export function isOpen(t: TaskRef): boolean {
 	return !t.checked && !t.cancelled && !t.someday;
 }
 
+/** A group's tasks split into those still to do and the ticked ones, each in its original order. */
+export function splitDone(tasks: TaskRef[]): { open: TaskRef[]; done: TaskRef[] } {
+	return { open: tasks.filter(t => !t.checked), done: tasks.filter(t => t.checked) };
+}
+
 export function isOverdue(t: TaskRef, today: IsoDate): boolean {
 	const p = taskPeriod(t);
 	return isOpen(t) && p !== null && p.end < today;

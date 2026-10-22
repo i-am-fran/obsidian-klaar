@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- In a day note, completed tasks now sit in a "Done" group at the bottom of "Scheduled for today", closed to start, so what's left to do stays at the top. Open it to look back on the day; Klaar remembers whether you keep it open. The section count now shows only open tasks.
+
 ## 2026.10.18
 
 - Tags in settings now have a type: Tag, Priority or Status. A status tag like `#waiting` gets its own column on the status board, after In progress. Drop a card there to add the tag; drop it anywhere else to remove it. Your existing tags keep their meaning, and in progress tags are now a kind of status.
