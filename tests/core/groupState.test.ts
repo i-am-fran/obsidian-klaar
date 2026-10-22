@@ -22,10 +22,11 @@ describe('stateKey', () => {
 });
 
 describe('defaultOpen', () => {
-	test('scheduled and overdue groups start open, child periods start closed', () => {
+	test('scheduled and overdue groups start open, child periods and Done start closed', () => {
 		expect(defaultOpen('own')).toBe(true);
 		expect(defaultOpen('parent')).toBe(true);
 		expect(defaultOpen('overdue')).toBe(true);
 		expect(defaultOpen('child')).toBe(false);
+		expect(defaultOpen('done')).toBe(false);
 	});
 });

@@ -9,6 +9,10 @@ const p = (key: string) => parsePeriodKey(key) as Period;
 const group = (label: string, n: number): TaskGroup => ({ label, key: null, tasks: Array.from({ length: n }, () => ({}) as TaskRef) });
 
 describe('groupHeading', () => {
+	test('counts open tasks only; done ones have their own group', () => {
+		const tasks = [{ checked: false }, { checked: true }, { checked: true }] as TaskRef[];
+		expect(groupHeading({ label: 'Scheduled', key: null, tasks }, p('2026-10-19'), '2026-10-19').count).toBe(1);
+	});
 	test('own group names the period kind', () => {
 		expect(groupHeading(group('Scheduled', 2), p('2026-W43'), '2026-10-19')).toEqual({ title: 'Scheduled for this week', count: 2 });
 		expect(groupHeading(group('Scheduled', 1), p('2026-10'), '2026-10-19')).toEqual({ title: 'Scheduled for this month', count: 1 });
