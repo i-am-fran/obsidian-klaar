@@ -1,7 +1,7 @@
 import { tagsOf } from './taskFields';
 import { addTag, parseTaskLine, removeTags, reopenTask, setInProgressMarker, type ParsedLine, type Priority } from './taskLine';
 
-export type TagRole = 'label' | 'priority-high' | 'priority-medium' | 'priority-low' | 'in-progress' | 'status';
+export type TagRole = 'label' | 'priority-high' | 'priority-medium' | 'priority-low' | 'in-progress';
 
 /** A tag the user listed in settings: its colour and what it means for a task. */
 export interface TagRule {
@@ -19,31 +19,22 @@ export const DEFAULT_TAG_RULES: TagRule[] = [
 	{ tag: 'bugs', color: '#8e4ec6', role: 'label' },
 ];
 
-/** What a tag is, picked first in settings; a priority or status tag then picks its level or column. */
-export type TagKind = 'label' | 'priority' | 'status';
-
-export const KIND_LABELS: Record<TagKind, string> = { label: 'Tag', priority: 'Priority', status: 'Status' };
-
-/** The second picker for each kind; a plain tag has none. */
-export const ROLE_OPTIONS: Record<TagKind, Partial<Record<TagRole, string>>> = {
-	label: {},
-	priority: { 'priority-high': 'High', 'priority-medium': 'Medium', 'priority-low': 'Low' },
-	status: { status: 'Own column', 'in-progress': 'In progress' },
+export const ROLE_LABELS: Record<TagRole, string> = {
+	label: 'Label',
+	'priority-high': 'High priority',
+	'priority-medium': 'Medium priority',
+	'priority-low': 'Low priority',
+	'in-progress': 'In progress',
 };
-
-export function kindOf(role: TagRole): TagKind {
-	if (role.startsWith('priority-')) return 'priority';
-	return role === 'status' || role === 'in-progress' ? 'status' : 'label';
-}
-
-/** The role a tag gets when its kind changes: the first option of that kind. */
-export function defaultRole(kind: TagKind): TagRole {
-	return (Object.keys(ROLE_OPTIONS[kind])[0] as TagRole | undefined) ?? 'label';
-}
 
 const PRIORITY_OF: Partial<Record<TagRole, Priority>> = { 'priority-low': 1, 'priority-medium': 2, 'priority-high': 3 };
 /** Cycle order: none, low, medium, high, then none again. */
 const PRIORITY_STEPS: TagRole[] = ['priority-low', 'priority-medium', 'priority-high'];
+
+/** Saved tag rules with any role Klaar no longer knows (2026.10.18's `status`) read as a plain label. */
+export function normaliseTagRules(rules: TagRule[]): TagRule[] {
+	return rules.map((r) => ({ ...r, role: r.role in ROLE_LABELS ? r.role : 'label' }));
+}
 
 /** The rule for a tag, given with or without `#`; the first match wins. */
 export function ruleFor(tag: string, rules: TagRule[]): TagRule | undefined {
@@ -51,40 +42,18 @@ export function ruleFor(tag: string, rules: TagRule[]): TagRule | undefined {
 	return rules.find((r) => r.tag.toLowerCase() === name);
 }
 
-/** Status rules (in progress, or their own column) in settings order, the first per tag. */
-function statusRules(rules: TagRule[]): TagRule[] {
-	return rules.filter((r, i) => (r.role === 'status' || r.role === 'in-progress') && r.tag !== '' && ruleFor(r.tag, rules) === rules[i]);
-}
-
-/** The status rules that give a tag its own board column, in settings order. */
-export function statusColumns(rules: TagRule[]): TagRule[] {
-	return statusRules(rules).filter((r) => r.role === 'status');
-}
-
-/**
- * What a task's tags mean: the highest priority among them, and its status. With several status tags, the one listed
- * first in settings wins: `inProgress` if that is an in-progress tag, otherwise `status` names its tag in lower case.
- */
-export function meaningOf(tags: string[], rules: TagRule[]): { priority: Priority; inProgress: boolean; status: string | null } {
+/** What a task's tags mean: the highest priority among them, and whether one marks it in progress. */
+export function meaningOf(tags: string[], rules: TagRule[]): { priority: Priority; inProgress: boolean } {
 	let priority: Priority = 0;
+	let inProgress = false;
 	for (const tag of tags) {
-		const p = PRIORITY_OF[ruleFor(tag, rules)?.role ?? 'label'] ?? 0;
+		const role = ruleFor(tag, rules)?.role;
+		if (role === undefined) continue;
+		if (role === 'in-progress') inProgress = true;
+		const p = PRIORITY_OF[role] ?? 0;
 		if (p > priority) priority = p;
 	}
-	const present = new Set(tags.map((t) => t.replace(/^#/, '').toLowerCase()));
-	const winner = statusRules(rules).find((r) => present.has(r.tag.toLowerCase()));
-	return {
-		priority,
-		inProgress: winner?.role === 'in-progress',
-		status: winner?.role === 'status' ? winner.tag.toLowerCase() : null,
-	};
-}
-
-/** Replaces the task's own-column status tags with `tag` (a status rule's tag), or just removes them for null. */
-export function setStatusTag(line: string, tag: string | null, rules: TagRule[]): string {
-	const others = tagsWithRole(rules, 'status').filter((t) => t.toLowerCase() !== tag?.toLowerCase());
-	const cleared = others.length > 0 ? removeTags(line, others) : line;
-	return tag === null ? cleared : addTag(cleared, tag);
+	return { priority, inProgress };
 }
 
 function tagsWithRole(rules: TagRule[], role: TagRole): string[] {
@@ -127,9 +96,9 @@ export function cyclePriorityTag(line: string, rules: TagRule[]): string {
 	return setPriorityTag(line, next ? (PRIORITY_OF[next.role] ?? 0) : 0, rules);
 }
 
-/** In progress through the `[/]` marker (when `useMarker`, and no status tag says otherwise) or, as `meaningOf` found, a tag whose rule is "In progress". */
-export function isInProgress(parsed: ParsedLine, meaning: { inProgress: boolean; status: string | null }, useMarker: boolean): boolean {
-	return (useMarker && parsed.inProgress && meaning.status === null) || meaning.inProgress;
+/** In progress through the `[/]` marker (when `useMarker`) or, as `meaningOf` found, a tag whose rule is "In progress". */
+export function isInProgress(parsed: ParsedLine, meaning: { inProgress: boolean }, useMarker: boolean): boolean {
+	return (useMarker && parsed.inProgress) || meaning.inProgress;
 }
 
 /** Whether Klaar has a way to mark a task in progress: the `[/]` marker, or a tag with the "In progress" role. */
@@ -149,16 +118,14 @@ function applyInProgress(line: string, parsed: ParsedLine, on: boolean, rules: T
 		return tags.length > 0 ? removeTags(unmarked, tags) : unmarked;
 	}
 	if (openInProgress(parsed, rules, useMarker)) return line;
-	// Another status tag would keep the task out of In progress, so it goes.
-	const reopened = setStatusTag(reopenTask(line), null, rules);
-	if (useMarker) return setInProgressMarker(reopened, true);
+	if (useMarker) return setInProgressMarker(reopenTask(line), true);
 	const first = tags[0];
-	return first === undefined ? line : addTag(reopened, first);
+	return first === undefined ? line : addTag(reopenTask(line), first);
 }
 
 /**
  * Marks a task in progress with `[/]` (when `useMarker`) or the first in-progress tag, reopening it if it was done or
- * cancelled and dropping its other status tags. Turning it off clears both the marker and every in-progress tag. Unchanged if it is already as asked, or
+ * cancelled. Turning it off clears both the marker and every in-progress tag. Unchanged if it is already as asked, or
  * if a tag is needed and none has the role.
  */
 export function setInProgress(line: string, on: boolean, rules: TagRule[], useMarker: boolean): string {

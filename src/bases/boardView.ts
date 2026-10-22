@@ -35,14 +35,14 @@ class BoardView extends TaskBasesView {
 		// Columns show status, so the table's Status filter doesn't apply here.
 		const filtered = filterTasks(all, { ...table, status: 'all' }, query, today, this.noteName);
 		const sorted = sortTasks(filtered, table.sort, table.reverse, this.noteName);
-		const columns = boardColumns(sorted, state.by, today, settings.tags, state.showDone, settings.slashInProgress, markersOf(settings));
+		const columns = boardColumns(sorted, state.by, today, settings.tags, state.showDone, settings.slashInProgress, markersOf(settings), state.tagColumns);
 
 		board.style.setProperty('--klaar-column-width', `${state.columnWidth}px`);
-		for (const column of columns) this.renderColumn(board, column, state.by, settings);
+		for (const column of columns) this.renderColumn(board, column, state.by, settings, state.tagColumns);
 		return columns.reduce((n, c) => n + c.tasks.length, 0);
 	}
 
-	private renderColumn(board: HTMLElement, column: BoardColumn, by: BoardBy, settings: KlaarSettings): void {
+	private renderColumn(board: HTMLElement, column: BoardColumn, by: BoardBy, settings: KlaarSettings, tagColumns: string[]): void {
 		const col = board.createDiv({ cls: 'klaar-board-column' });
 		const header = col.createDiv({ cls: 'klaar-board-column-header' });
 		header.createSpan({ text: column.label, cls: 'klaar-board-column-title' });
@@ -78,7 +78,7 @@ class BoardView extends TaskBasesView {
 			if (column.tasks.some((t) => t.path === ref.path && t.line === ref.line)) return;
 			const failed = () => new Notice("Couldn't update the task.");
 			if (action === 'rewrite') {
-				const ctx = { today: todayIso(), rules: settings.tags, stampDone: settings.stampDone, useMarker: settings.slashInProgress };
+				const ctx = { today: todayIso(), rules: settings.tags, stampDone: settings.stampDone, useMarker: settings.slashInProgress, tagColumns };
 				editTask(this.app, ref, (line) => rewriteForColumn(line, by, column.id, ctx)).catch(failed);
 				return;
 			}
@@ -105,7 +105,7 @@ class BoardView extends TaskBasesView {
 	}
 }
 
-/** The view's menu: columns, done column, column width, filters and sort, and whether the search bar shows. */
+/** The view's menu: columns, done column, tag columns, column width, filters and sort, and whether the search bar shows. */
 function viewOptions(config: BasesViewConfig): BasesAllOptions[] {
 	const b = DEFAULT_BOARD_STATE;
 	return [
@@ -116,6 +116,13 @@ function viewOptions(config: BasesViewConfig): BasesAllOptions[] {
 			key: BOARD_KEYS.showDone,
 			displayName: 'Show done',
 			default: b.showDone,
+			shouldHide: () => readBoardState((k) => config.get(k)).by !== 'status',
+		},
+		{
+			type: 'multitext',
+			key: BOARD_KEYS.tagColumns,
+			displayName: 'Tag columns',
+			default: b.tagColumns,
 			shouldHide: () => readBoardState((k) => config.get(k)).by !== 'status',
 		},
 		{ type: 'slider', key: BOARD_KEYS.columnWidth, displayName: 'Column width', default: b.columnWidth, min: 200, max: 480, step: 20 },
