@@ -5,16 +5,38 @@ order: 4
 headings:
   - id: open-calendar
     label: Opening it
+  - id: calendar-markers
+    label: Markers
   - id: reschedule
     label: Drag to reschedule
 ---
 
-A month view in the sidebar, with ISO week numbers and a marker on days that have tasks.
+A month view in the sidebar, with ISO week numbers. It's how you move between journal notes.
+
+<!-- Screenshot: the calendar in the right sidebar, with rings, checks and note dots on a few days and today highlighted. Save as docs/assets/calendar.png -->
 
 ### Opening it {#open-calendar}
 
-The calendar opens in the sidebar the first time Klaar runs; after that it stays wherever you keep it. Bring it back with the **Open calendar** command. Click a day or a week number to open its journal note.
+The calendar opens in the right sidebar the first time Klaar runs. After that it stays wherever you put it, or closed if you close it. Bring it back with the **Open calendar** command or the calendar icon in the ribbon.
+
+- Click a day or a week number to open its journal note.
+- Click the month, year or quarter name at the top to open that note.
+- The arrows move between months; **Today** jumps back to the current month.
+- Cmd-click (Ctrl-click on Windows and Linux) opens the note in a new tab.
+- Days and weeks also work from the keyboard with Enter or Space.
+
+The note that's open in the editor is highlighted.
+
+### Markers {#calendar-markers}
+
+Under a day or a week number:
+
+- A **ring**: open tasks are scheduled for it.
+- A **check**: it had tasks, and all of them are done.
+- A **dot**: its journal note exists.
+
+Cancelled and someday tasks don't count, and the markers follow as you tick tasks or create and delete notes.
 
 ### Drag to reschedule {#reschedule}
 
-Drag a task from a journal note or a Klaar view onto a day in the calendar to reschedule it. Klaar rewrites just that task's `>` link.
+Drag a task from a journal note, a Klaar Table or a Klaar Board onto a day in the calendar. Klaar rewrites just that task's `>` link.

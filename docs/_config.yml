@@ -7,14 +7,18 @@ collections:
     output: false
 
 title: "Klaar"
-tagline: "Tasks and journal notes for Obsidian. Your tasks stay plain Markdown checkboxes in your own notes: type > to schedule one, and it shows up in that day's, week's, month's or year's note."
-description: "Klaar is an Obsidian plugin for tasks and journal notes: schedule plain Markdown checkboxes with >[[date]] and see them in their day, week, month, quarter and year notes."
+tagline: "A small task manager that lives in your Obsidian journal notes. Write tasks as normal checkboxes and assign them to a day, a week, a month or a year."
+description: "Klaar is a small task manager for Obsidian journal notes: schedule plain Markdown checkboxes with > and see them in their day, week, month, quarter and year notes."
 github_url: "https://github.com/i-am-fran/obsidian-klaar"
 author_url: "https://iamfran.com"
 author_label: "iamfran.com"
 repository: "i-am-fran/obsidian-klaar"
 url: "https://i-am-fran.github.io"
 baseurl: "/obsidian-klaar"
+
+# GitHub Pages turns on the Primer theme by default, whose style.scss can
+# overwrite the template's assets/css/style.css. Turn it off.
+theme: null
 
 markdown: kramdown
 kramdown:
