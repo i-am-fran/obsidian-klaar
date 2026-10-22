@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-klaar",
-	"version": "2026.10.18",
+	"version": "2026.10.19",
 	"description": "A simple task manager for your journal notes. Schedule a task with > and see it in its day, week, month or year note.",
 	"main": "main.js",
 	"type": "module",

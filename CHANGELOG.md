@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2026.10.19
 
 - Tag columns are now chosen per board: on a Klaar Board with Columns set to Status, list tags under **Tag columns** in the view menu (for example `waiting`, `blocked`). Each gets its own column after In progress, so one board can show Waiting while another doesn't. Drop a card on a tag column to add the tag; drop it anywhere else to remove it.
 - Settings → Tags is back to a single dropdown per tag. Tags you had set to Status → Own column are now plain tags: add them as tag columns on the boards where you want them.
