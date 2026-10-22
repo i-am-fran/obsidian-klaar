@@ -30,7 +30,7 @@ Keep typing to filter the list, for example `>fri` or `>next`. Typing a full key
 
 The `>` only opens the picker on a task line, at the start of the line or after a space, so `->` and `a > b` stay plain text.
 
-![Typing > on a task line opens the date picker with Today, Tomorrow and the next weekdays]({{ '/assets/schedule-picker.png' | relative_url }}){: .doc-section__media}
+![Typing > after a task opens the date picker: Today, Tomorrow and the next seven days with their dates]({{ '/assets/schedule-picker.webp' | relative_url }}){: .doc-section__media}
 
 ### Move task to… {#move-task}
 

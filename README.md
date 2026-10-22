@@ -29,23 +29,23 @@ Open the week note `Daily/2026-W43.md` and the task is listed above your own tex
 **Schedule with `>`.** On a task line, type `>` and pick Today, Tomorrow, a weekday, a week, a month, a quarter or a year. The link reads as a small chip such as `Fri 23 Oct` or `Week 43`, red when the task is overdue.
 
 <p>
-  <img src="assets/screenshots/schedule-picker.png" alt="Typing > on a task line opens the date picker with Today, Tomorrow and the next weekdays" width="49%">
+  <img src="assets/screenshots/schedule-picker.webp" alt="Typing > after a task opens the date picker: Today, Tomorrow and the next seven days with their dates" width="49%">
   <img src="assets/screenshots/schedule-chips.png" alt="Scheduled tasks shown as date chips: Sat 24 Oct, Week 43, Week 44, Nov 2026, Tomorrow" width="49%">
 </p>
 
 **Journal notes that cascade.** Each day, week, month, quarter and year note lists the tasks planned for it, the ones from the period around it and the periods inside it. Today's note adds anything overdue, and folds the day's ticked tasks into a Done group.
 
-<img src="assets/screenshots/today-note.png" alt="Today's note with Klaar: tasks scheduled for today, this week and overdue, grouped by project, and the calendar in the sidebar">
+<img src="assets/screenshots/day-note.webp" alt="A day note with Klaar: three tasks scheduled for the day, grouped by note and heading, a closed Scheduled this week section above the note's own text, and the calendar in the sidebar">
 
 **A calendar in the sidebar.** A month view with week numbers. Click a day or a week to open its note, and drag a task onto a day to move it. A ring marks days with open tasks, a check marks days where everything is done.
 
-<!-- Screenshot: the calendar in the right sidebar, with rings, checks and note dots on a few days and today highlighted. Save as assets/screenshots/calendar.png -->
+<img src="assets/screenshots/calendar.webp" alt="The Klaar calendar for October 2026 with week numbers, today highlighted, and rings, checks and dots under the days and weeks" width="360">
 
 **Tables and boards in Bases.** Klaar Table and Klaar Board show the tasks of any base, so a base for a project folder gives you that project's tasks. Drag a card to Done, In progress, a priority or a date column and Klaar changes just that line. A board by date puts everything without a date in its own Undated column.
 
-<img src="assets/screenshots/board.png" alt="The Klaar Board view with To do, In progress and Done columns, next to the calendar">
+<img src="assets/screenshots/board.webp" alt="A Klaar Board by status with To do, Next, In progress, Someday and Done columns, each card showing its date chip and note">
 
-<!-- Screenshot: a Klaar Table grouped by date, with the search bar, the task count and a Priority column. Save as assets/screenshots/table.png -->
+<img src="assets/screenshots/table.webp" alt="A Klaar Table grouped by date, with the search bar, the task count, and Task, Date and Note columns">
 
 **Your own markers and tags.** Besides open and done, Klaar understands in progress `[/]`, next `[>]`, someday `[<]` and cancelled `[-]`. Tags like `#p1` become coloured pills, you decide which tags mean priority, and any of your tags, like `#waiting`, can be a column on a board.
 

@@ -42,7 +42,7 @@ A table with the Task, Date and Note columns. Under **Configure view**:
 
 The default sort is by date, with priority tasks first within each date. Tick a task, click its text to open it at its line, use the calendar button to reschedule it, or drag the row onto the calendar.
 
-<!-- Screenshot: a Klaar Table grouped by date, with the search bar, the task count and a Priority column. Save as docs/assets/table.png -->
+![A Klaar Table grouped by date, with the search bar, the task count, and Task, Date and Note columns]({{ '/assets/table.webp' | relative_url }}){: .doc-section__media}
 
 ### Klaar Board {#board}
 
@@ -62,7 +62,7 @@ Drag a card to another column and Klaar rewrites just that task's line:
 
 Dropping a card back on its own column changes nothing. Cancelled tasks don't show on the board. Also under **Configure view**: **Show done** (status board only), **Column width**, and the same filters and sort as the table. A column with more than 100 cards shows a **Show more** button.
 
-![The Klaar Board view with To do, In progress and Done columns, next to the calendar]({{ '/assets/board.png' | relative_url }}){: .doc-section__media}
+![A Klaar Board by status with To do, Next, In progress, Someday and Done columns, each card showing its date chip and note]({{ '/assets/board.webp' | relative_url }}){: .doc-section__media}
 
 ### Tag columns {#tag-columns}
 
