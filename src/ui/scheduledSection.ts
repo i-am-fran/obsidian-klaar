@@ -114,13 +114,9 @@ export class ScheduledSection {
 					title: note.name,
 					open: !this.closedNotes.has(noteKey),
 					cls: ['klaar-note'],
-					action: {
-						icon: 'file-text',
-						label: 'Open note',
-						onClick: (evt) => {
-							const source = this.app.vault.getFileByPath(note.path);
-							if (source) void this.app.workspace.getLeaf(Keymap.isModEvent(evt)).openFile(source);
-						},
+					onTitleClick: (evt) => {
+						const source = this.app.vault.getFileByPath(note.path);
+						if (source) void this.app.workspace.getLeaf(Keymap.isModEvent(evt)).openFile(source);
 					},
 					onToggle: (open) => {
 						if (open) this.closedNotes.delete(noteKey);

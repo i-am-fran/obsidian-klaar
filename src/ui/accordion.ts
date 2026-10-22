@@ -8,31 +8,38 @@ export interface AccordionOptions {
 	/** Extra classes on the root. */
 	cls?: string[];
 	onToggle: (open: boolean) => void;
-	/** Icon button at the right of the header, beside it rather than inside it (a button can't nest in a button). */
-	action?: { icon: string; label: string; onClick: (evt: MouseEvent) => void };
+	/**
+	 * Makes the title a link of its own, e.g. to open a note. Only the chevron then opens and closes the block, so the
+	 * two clicks never compete.
+	 */
+	onTitleClick?: (evt: MouseEvent) => void;
 }
 
 /**
- * Collapsible block: a header button and a body that animates open and closed.
- * Returns the body to fill. Closed bodies are `inert`, so they leave the tab order.
+ * Collapsible block: a header and a body that animates open and closed. The whole header is the toggle button, or
+ * with `onTitleClick` only its chevron is. Returns the body to fill. Closed bodies are `inert`, so they leave the tab
+ * order.
  */
 export function renderAccordion(parent: HTMLElement, opts: AccordionOptions): { root: HTMLElement; body: HTMLElement } {
 	const root = parent.createDiv({ cls: 'klaar-acc' });
 	if (opts.cls) root.addClasses(opts.cls);
 
-	const head = root.createEl('button', { cls: 'klaar-acc-head' });
-	const chevron = head.createSpan({ cls: 'klaar-acc-chevron' });
-	setIcon(chevron, 'chevron-right');
-	head.createSpan({ text: opts.title, cls: 'klaar-acc-title' });
-	if (opts.count !== undefined) head.createSpan({ text: String(opts.count), cls: 'klaar-acc-count' });
-
-	if (opts.action) {
-		const { icon, label, onClick } = opts.action;
-		root.addClass('has-action');
-		const btn = root.createEl('button', { cls: 'klaar-acc-action clickable-icon', attr: { 'aria-label': label } });
-		setIcon(btn, icon);
-		btn.addEventListener('click', onClick);
+	const { onTitleClick } = opts;
+	const split = onTitleClick !== undefined;
+	const head = split ? root.createDiv({ cls: 'klaar-acc-head is-split' }) : root.createEl('button', { cls: 'klaar-acc-head' });
+	const toggle = split ? head.createEl('button', { cls: 'klaar-acc-chevron clickable-icon' }) : head.createSpan({ cls: 'klaar-acc-chevron' });
+	setIcon(toggle, 'chevron-right');
+	if (onTitleClick) {
+		const title = head.createEl('a', { text: opts.title, cls: 'klaar-acc-title', attr: { href: '#' } });
+		title.addEventListener('click', (evt) => {
+			evt.preventDefault();
+			onTitleClick(evt);
+		});
+	} else {
+		head.createSpan({ text: opts.title, cls: 'klaar-acc-title' });
 	}
+	if (opts.count !== undefined) head.createSpan({ text: String(opts.count), cls: 'klaar-acc-count' });
+	const button = split ? toggle : head;
 
 	const collapse = root.createDiv({ cls: 'klaar-acc-collapse' });
 	const inner = collapse.createDiv({ cls: 'klaar-acc-inner' });
@@ -40,12 +47,13 @@ export function renderAccordion(parent: HTMLElement, opts: AccordionOptions): { 
 
 	const apply = (open: boolean) => {
 		root.toggleClass('is-open', open);
-		head.setAttr('aria-expanded', String(open));
+		button.setAttr('aria-expanded', String(open));
+		if (split) button.setAttr('aria-label', open ? `Collapse ${opts.title}` : `Expand ${opts.title}`);
 		inner.toggleAttribute('inert', !open);
 	};
 	apply(opts.open);
 
-	head.addEventListener('click', () => {
+	button.addEventListener('click', () => {
 		const open = !root.hasClass('is-open');
 		apply(open);
 		opts.onToggle(open);
