@@ -5,21 +5,24 @@ order: 1
 headings:
   - id: install
     label: Install
-  - id: verify
-    label: Verify a release
   - id: first-steps
     label: First steps
+  - id: verify
+    label: Verify a release
   - id: privacy
     label: Privacy
 ---
 
-Klaar keeps your tasks as plain Markdown checkboxes in your own notes. Schedule a task by linking it to a day, week, month, quarter or year, and it shows up in that period's journal note. Nothing is stored anywhere else.
+Klaar is a small task manager that lives in your Obsidian journal notes. Tasks stay plain Markdown checkboxes in your own notes. Link one to a day, week, month, quarter or year, and it shows up in that period's journal note. Nothing is stored anywhere else.
 
 <video src="{{ '/assets/klaar-tour.mp4' | relative_url }}" poster="{{ '/assets/klaar-tour.jpg' | relative_url }}" controls preload="none" class="doc-section__media"></video>
 
 ### Install {#install}
 
-Requires Obsidian 1.13.0 or newer. Klaar is in Obsidian's community plugin directory: open Settings → Community plugins → Browse, search for **Klaar**, then install and enable it. Or use the button below to open its page.
+You need Obsidian 1.13.0 or newer. Klaar works on desktop and mobile.
+
+1. In Obsidian, open Settings → Community plugins → Browse.
+2. Search for **Klaar**, then install it and turn it on.
 
 <div class="actions not-prose">
   <a class="button button--primary" href="https://obsidian.md/plugins?id=klaar">Install in Obsidian{% include arrow-icon.html %}</a>
@@ -28,27 +31,27 @@ Requires Obsidian 1.13.0 or newer. Klaar is in Obsidian's community plugin direc
 Other ways to install:
 
 - **BRAT:** add `i-am-fran/obsidian-klaar` in the [BRAT](https://github.com/TfTHacker/obsidian42-brat) plugin to follow every release as soon as it's published.
-- **Manual:** copy `main.js`, `manifest.json` and `styles.css` from the [latest release](https://github.com/i-am-fran/obsidian-klaar/releases) into `<vault>/.obsidian/plugins/klaar/`, then enable Klaar in Settings → Community plugins.
-
-### Verify a release {#verify}
-
-Release files come with GitHub build provenance attestations. To check that `main.js` was built from this repository:
-
-```bash
-gh attestation verify main.js --repo i-am-fran/obsidian-klaar
-```
+- **By hand:** download `main.js`, `manifest.json` and `styles.css` from the [latest release](https://github.com/i-am-fran/obsidian-klaar/releases/latest), put them in `<vault>/.obsidian/plugins/klaar/`, and turn on Klaar in Settings → Community plugins.
 
 ### First steps {#first-steps}
 
-1. Klaar keeps journal notes in a folder called `Daily`. Change it under Settings → Klaar → Journal notes folder if yours live elsewhere.
-2. Open the calendar with the **Open calendar** command and click today to open (or create) today's note.
-3. In any note, write a task such as `- [ ] Call the bank`, type `>` at the end of the line and pick **Tomorrow**.
-4. Open tomorrow's note from the calendar: the task is listed at the top.
+1. Klaar looks for journal notes in a folder called `Daily`. If yours live elsewhere, change **Journal notes folder** in Settings → Klaar.
+2. The calendar opens in the right sidebar the first time Klaar runs. Click today to open today's note. If it doesn't exist yet, Klaar asks before creating it.
+3. In any note, write a task such as `- [ ] Call the plumber`, type `>` at the end of the line and pick **Tomorrow**.
+4. Click tomorrow in the calendar: the task is listed at the top of its note.
 
 <aside class="callout callout--tip not-prose" markdown="1">
 **Tip:** Klaar only reads and rewrites task lines. Uninstall it and your notes are still plain Markdown with ordinary `[[links]]`.
 </aside>
 
+### Verify a release {#verify}
+
+Release files come with GitHub build attestations. To check that `main.js` was built from this repository:
+
+```bash
+gh attestation verify main.js --repo i-am-fran/obsidian-klaar
+```
+
 ### Privacy {#privacy}
 
-Klaar reads the Markdown files in your vault, on your device, to find tasks. It makes no network requests. Found a bug? Please [report it](https://github.com/i-am-fran/obsidian-klaar/issues).
+Klaar only reads the Markdown files in your vault, on your device. It never connects to the internet. Found a bug? Please [open an issue](https://github.com/i-am-fran/obsidian-klaar/issues).

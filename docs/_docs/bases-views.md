@@ -3,22 +3,67 @@ title: Bases views
 slug: bases-views
 order: 6
 headings:
+  - id: add-view
+    label: Adding a view
+  - id: toolbar
+    label: Search and buttons
   - id: table
     label: Klaar Table
   - id: board
     label: Klaar Board
+  - id: tag-columns
+    label: Tag columns
 ---
 
-Klaar adds two views to Obsidian Bases. They show the tasks inside the notes a base matches, so a base filtered to a folder or a tag gives you that project's tasks.
+Klaar adds two views to Obsidian Bases. They show the tasks inside the notes a base matches, so a base filtered to a project folder or a tag gives you that project's tasks. Klaar uses Bases' own filters rather than a query language of its own.
+
+### Adding a view {#add-view}
+
+Open or create a base, click the view menu and add a view of type **Klaar Table** or **Klaar Board**. Everything Klaar adds is under **Configure view**, and each view remembers its own choices.
+
+### Search and buttons {#toolbar}
+
+Both views have a bar at the top:
+
+- A search box that filters by task text, tags and note names.
+- A task count, which reads "12 of 40" while search or filters hide some.
+- **New task**: adds `- [ ] your text` to today's note, creating the note if needed.
+- **Today**: opens today's note (desktop only). Cmd/Ctrl-click opens a new tab.
+
+Turn off **Show search** to hide the bar.
 
 ### Klaar Table {#table}
 
-A table of tasks with a toolbar to search, filter, sort and group them. Tick, schedule or move a task straight from the table.
+A table with the Task, Date and Note columns. Under **Configure view**:
+
+- **Columns**: add Status, Priority, Tags or Heading. A Priority or Tags column takes those pills out of the task text.
+- **Filters**: Status (Open tasks, Done, Someday, Cancelled, All tasks), When (Any date, Overdue, Today, This week, Undated), Marker (Any marker, In progress, Next, Priority) and **Show subtasks**.
+- **Sort and group**: sort by Date, Priority, Note or Task, **Reverse sort**, and group by date, note, priority or not at all.
+
+The default sort is by date, with priority tasks first within each date. Tick a task, click its text to open it at its line, use the calendar button to reschedule it, or drag the row onto the calendar.
+
+<!-- Screenshot: a Klaar Table grouped by date, with the search bar, the task count and a Priority column. Save as docs/assets/table.png -->
 
 ### Klaar Board {#board}
 
-Columns by status (To do, Next, In progress, Someday, Done), by priority (High, Medium, Low, No priority) or by date (Overdue, Today, This week, Later, Undated). Drag a card to another column and Klaar rewrites just that task's line: its marker, its priority tag or its schedule link.
+Columns of cards. Choose what the columns are under **Configure view** → **Columns**:
 
-On a status board you can also add **Tag columns** in the view's options, for example `waiting` or `blocked`. Each tag gets its own column after In progress, and every board keeps its own list. Drag a card into a tag column to add the tag, or out of it to remove it.
+| Columns | The board shows |
+| --- | --- |
+| Status | To do, Next, In progress, any tag columns, Someday, Done |
+| Priority | High, Medium, Low, No priority |
+| Date | Overdue, Today, This week, Later, Undated |
+
+Drag a card to another column and Klaar rewrites just that task's line:
+
+- **Done** ticks it, with the completed date if that's on. **To do**, **Next**, **In progress** and **Someday** set its marker.
+- A priority column swaps its priority tag.
+- **Today** and **This week** set its link, **Undated** removes it, and **Later** opens the date picker. Overdue doesn't take drops.
+
+Dropping a card back on its own column changes nothing. Cancelled tasks don't show on the board. Also under **Configure view**: **Show done** (status board only), **Column width**, and the same filters and sort as the table. A column with more than 100 cards shows a **Show more** button.
 
 ![The Klaar Board view with To do, In progress and Done columns, next to the calendar]({{ '/assets/board.png' | relative_url }}){: .doc-section__media}
+
+### Tag columns {#tag-columns}
+
+On a board by status, list tags under **Tag columns**, for example `waiting` and `blocked`. Each gets its own column after In progress, so one board can have a Waiting column while another doesn't. Drop a card on a tag column to add the tag; drop it on any other status column to remove it. If a task has more than one of the tags, the first one listed wins.
