@@ -2,7 +2,7 @@ import type { Extension } from '@codemirror/state';
 import { Editor, EditorChange, Plugin, WorkspaceLeaf, debounce } from 'obsidian';
 import { CURRENT_PERIOD_LABELS } from './core/dateOptions';
 import { todayIso } from './core/dates';
-import { PERIOD_ORDER, periodOf } from './core/periods';
+import { PERIOD_ORDER, periodOf, type PeriodKind } from './core/periods';
 import { DEFAULT_SETTINGS, KlaarSettings, KlaarSettingTab } from './settings';
 import { TaskIndex } from './obsidian/taskIndex';
 import { openPeriodNote } from './obsidian/periodNotes';
@@ -17,6 +17,15 @@ import { CalendarView, VIEW_TYPE_CALENDAR } from './ui/calendarView';
 import { ScheduledSection } from './ui/scheduledSection';
 import { BASES_VIEW_BOARD, boardViewRegistration } from './bases/boardView';
 import { BASES_VIEW_TASKS, tasksViewRegistration } from './bases/tasksView';
+
+/** Command icons for opening the current period's note; commands need an icon to show in the mobile toolbar. */
+const PERIOD_ICONS: Record<PeriodKind, string> = {
+	day: 'calendar-check',
+	week: 'calendar-range',
+	month: 'calendar-days',
+	quarter: 'calendar-clock',
+	year: 'calendar-fold',
+};
 
 export default class KlaarPlugin extends Plugin {
 	settings: KlaarSettings = { ...DEFAULT_SETTINGS };
@@ -46,6 +55,7 @@ export default class KlaarPlugin extends Plugin {
 		this.addCommand({
 			id: 'move-task',
 			name: 'Move task to…',
+			icon: 'calendar-arrow-up',
 			editorCheckCallback: (checking, editor) => {
 				if (!this.cursorOnTask(editor)) return false;
 				if (!checking) this.moveTaskUnderCursor(editor);
@@ -55,6 +65,7 @@ export default class KlaarPlugin extends Plugin {
 		this.addCommand({
 			id: 'toggle-in-progress',
 			name: 'Toggle in progress',
+			icon: 'circle-dashed',
 			// Hidden when neither `[/]` nor an in-progress tag is set up: it would change nothing.
 			editorCheckCallback: (checking, editor) =>
 				canMarkInProgress(this.settings.tags, this.settings.slashInProgress) &&
@@ -63,16 +74,19 @@ export default class KlaarPlugin extends Plugin {
 		this.addCommand({
 			id: 'toggle-next',
 			name: 'Toggle next',
+			icon: 'circle-arrow-right',
 			editorCheckCallback: (checking, editor) => this.settings.nextMarker && this.rewriteSelectedTasks(editor, checking, toggleNext),
 		});
 		this.addCommand({
 			id: 'toggle-someday',
 			name: 'Toggle someday',
+			icon: 'circle-arrow-left',
 			editorCheckCallback: (checking, editor) => this.settings.somedayMarker && this.rewriteSelectedTasks(editor, checking, toggleSomeday),
 		});
 		this.addCommand({
 			id: 'cycle-priority',
 			name: 'Cycle priority',
+			icon: 'flag',
 			editorCheckCallback: (checking, editor) => this.rewriteSelectedTasks(editor, checking, (line) => cyclePriorityTag(line, this.settings.tags)),
 		});
 		this.registerEvent(
@@ -87,13 +101,14 @@ export default class KlaarPlugin extends Plugin {
 		this.index = new TaskIndex(this.app, () => this.settings);
 		this.registerView(VIEW_TYPE_CALENDAR, (leaf: WorkspaceLeaf) => new CalendarView(leaf, { index: this.index, getSettings: () => this.settings }));
 		this.addRibbonIcon('calendar', 'Open calendar', () => void this.activateCalendar());
-		this.addCommand({ id: 'open-calendar', name: 'Open calendar', callback: () => void this.activateCalendar() });
+		this.addCommand({ id: 'open-calendar', name: 'Open calendar', icon: 'calendar', callback: () => void this.activateCalendar() });
 		// No default hotkeys, as Obsidian asks of plugins: people set their own under Settings → Hotkeys.
 		for (const kind of PERIOD_ORDER) {
 			const label = CURRENT_PERIOD_LABELS[kind];
 			this.addCommand({
 				id: `open-${label.toLowerCase().replace(' ', '-')}`,
 				name: `Open ${label.toLowerCase()}'s note`,
+				icon: PERIOD_ICONS[kind],
 				// Hidden for period types turned off in settings.
 				checkCallback: (checking) => {
 					if (!this.settings.periods[kind]) return false;
