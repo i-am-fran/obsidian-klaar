@@ -56,6 +56,7 @@ headings:
 - Previous, next and Today buttons
 - Opens by itself the first time, then stays where you put it
 - **Open calendar** command and ribbon icon
+- **Open today's note**, **Open this week's note** (and month, quarter, year) commands, ready for your hotkeys
 - Works with the keyboard
 
 ### Tasks {#features-tasks}
@@ -81,7 +82,8 @@ headings:
 - Search tasks, tags and note names
 - Task count, "n of m" while filtering
 - **New task** button that adds to today's note
-- **Today** button that opens today's note (desktop)
+- **Today** button that opens today's note, with a menu for this week, month, quarter or year
+- Icon-only buttons on mobile
 - Klaar Board by status, priority or date
 - Tag columns per board, like Waiting or Blocked
 - Show or hide the Done column

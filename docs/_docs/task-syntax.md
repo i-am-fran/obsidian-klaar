@@ -63,5 +63,6 @@ The roles are Label, High priority, Medium priority, Low priority and In progres
 | Toggle someday | Switch between open and `[<]`. |
 | Cycle priority | Step `#p3` → `#p2` → `#p1` → no priority. |
 | Open calendar | Show the calendar in the sidebar. |
+| Open today's note | Open (or create) today's note. Also for this week, this month, this quarter and this year, for the period types you use. |
 
-The toggles and **Cycle priority** work on every task in a selection, as one undo step.
+The toggles and **Cycle priority** work on every task in a selection, as one undo step. Klaar sets no hotkeys of its own: give any of these one in Settings → Hotkeys.

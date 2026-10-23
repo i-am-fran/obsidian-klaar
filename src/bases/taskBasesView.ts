@@ -1,4 +1,5 @@
-import { BasesView, Notice, type BasesQueryResult, type QueryController } from 'obsidian';
+import { BasesView, Keymap, Menu, Notice, type BasesQueryResult, type QueryController } from 'obsidian';
+import { currentPeriods } from '../core/dateOptions';
 import { todayIso } from '../core/dates';
 import type { TaskRef } from '../core/tasks';
 import type { TaskIndex } from '../obsidian/taskIndex';
@@ -52,9 +53,24 @@ export abstract class TaskBasesView extends BasesView {
 		toolbar.addSearch('Filter tasks, tags, notes');
 		toolbar.addCount();
 		toolbar.addButton('plus', 'New task', "New task in today's note", () => void this.addTask());
+		const go = toolbar.addGroup();
 		toolbar.addButton('calendar', 'Today', "Open today's note", (e) => {
-			void openPeriodNote(this.app, this.deps.getSettings(), todayIso(), e.metaKey || e.ctrlKey);
-		}, true);
+			void openPeriodNote(this.app, this.deps.getSettings(), todayIso(), Keymap.isModEvent(e));
+		}, go);
+		const more = toolbar.addButton('chevron-down', '', 'Open this week, month or year', () => this.showPeriodMenu(more), go);
+	}
+
+	/** Lists the current period of each enabled kind under `anchor`; picking one opens its note. */
+	private showPeriodMenu(anchor: HTMLElement): void {
+		const settings = this.deps.getSettings();
+		const menu = new Menu();
+		for (const period of currentPeriods(todayIso(), settings.periods)) {
+			menu.addItem((item) =>
+				item.setTitle(period.label).onClick((e) => void openPeriodNote(this.app, settings, period.key, Keymap.isModEvent(e))),
+			);
+		}
+		const rect = anchor.getBoundingClientRect();
+		menu.showAtPosition({ x: rect.left, y: rect.bottom, width: rect.width, overlap: true, left: true });
 	}
 
 	/** Asks for a task and adds it to today's note. The base may not include that note, so a notice says where it went. */
