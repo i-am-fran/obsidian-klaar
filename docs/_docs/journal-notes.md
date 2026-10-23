@@ -29,7 +29,7 @@ Each note is named after its schedule key and lives in the journal notes folder 
 - `Daily/2026-Q4.md`
 - `Daily/2026.md`
 
-When you open a note that doesn't exist yet, Klaar asks before creating it, as an empty file. If another note elsewhere in the vault has the same name, Klaar tells you once and keeps using the one in the journal notes folder.
+When you open a note that doesn't exist yet, Klaar asks before creating it, as an empty file.
 
 ### What a note shows {#what-shows}
 
@@ -54,8 +54,6 @@ Klaar never writes generated content into a note. It only changes a task line yo
 - Click a task's text to open its note at that line. The line flashes so you can find it.
 - Click a note's name to open the note. The arrow next to it folds the group.
 - Cmd-click (Ctrl-click on Windows and Linux) opens a new tab.
-- The calendar button on each task opens **Move task to…**.
-- Drag a task onto a calendar day to move it.
 
 ### Period types {#period-types}
 

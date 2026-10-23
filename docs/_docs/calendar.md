@@ -23,9 +23,6 @@ The calendar opens in the right sidebar the first time Klaar runs. After that it
 - Click the month, year or quarter name at the top to open that note.
 - The arrows move between months; **Today** jumps back to the current month.
 - Cmd-click (Ctrl-click on Windows and Linux) opens the note in a new tab.
-- Days and weeks also work from the keyboard with Enter or Space.
-
-The note that's open in the editor is highlighted.
 
 ### Markers {#calendar-markers}
 

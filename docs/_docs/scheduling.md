@@ -28,8 +28,6 @@ On a task line, type `>` and pick when it's due:
 
 Keep typing to filter the list, for example `>fri` or `>next`. Typing a full key such as `2026-W45` offers that exact period. Klaar replaces the `>` with a link like `>[[2026-10-23]]` or `>[[2026-W43]]`.
 
-The `>` only opens the picker on a task line, at the start of the line or after a space, so `->` and `a > b` stay plain text.
-
 ![Typing > after a task opens the date picker: Today, Tomorrow and the next seven days with their dates]({{ '/assets/schedule-picker.webp' | relative_url }}){: .doc-section__media}
 
 ### Move task to… {#move-task}
