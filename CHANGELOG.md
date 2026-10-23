@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026.10.22
+
+- Every Klaar command now has an icon, so **Move task to…**, the toggles and **Cycle priority** show properly when you add them to the mobile toolbar (Settings → Mobile), instead of a question mark.
+
 ## 2026.10.21
 
 - New commands open the note for today, this week, this month, this quarter or this year: **Open today's note**, **Open this week's note** and so on. Give them a hotkey in Settings → Hotkeys. Only the period types you use are listed.
