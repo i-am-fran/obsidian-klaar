@@ -27,8 +27,6 @@ Under Settings → Klaar:
 | Tags | `#p1`, `#p2`, `#p3`, `#bugs` |
 | Period types | Daily, Weekly, Monthly, Yearly on; Quarterly off |
 
-Changing a tag's colour recolours open notes straight away.
-
 <!-- Screenshot: Settings → Klaar, showing the Tags list with colours and roles. Save as docs/assets/settings.png -->
 
 ### Style Settings {#style-settings}
