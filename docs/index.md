@@ -15,7 +15,7 @@ sections:
   <a class="button" href="{{ site.github_url }}">View on GitHub</a>
 </div>
 
-<a href="{{ '/assets/klaar-tour.mp4' | relative_url }}"><img src="{{ '/assets/klaar-tour.jpg' | relative_url }}" alt="A short tour of Klaar: click to watch the video" class="showcase"></a>
+<video src="{{ '/assets/klaar-tour.mp4' | relative_url }}" poster="{{ '/assets/klaar-tour.jpg' | relative_url }}" autoplay muted loop playsinline controls class="showcase" aria-label="A short tour of Klaar: a task scheduled with >, the week note listing it, and the calendar in the sidebar"></video>
 
 ## How it works {#how-it-works}
 

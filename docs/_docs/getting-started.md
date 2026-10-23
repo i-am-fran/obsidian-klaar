@@ -11,7 +11,7 @@ headings:
 
 Klaar is a small task manager that lives in your Obsidian journal notes. Tasks stay plain Markdown checkboxes in your own notes. Link one to a day, week, month, quarter or year, and it shows up in that period's journal note. Nothing is stored anywhere else.
 
-<video src="{{ '/assets/klaar-tour.mp4' | relative_url }}" poster="{{ '/assets/klaar-tour.jpg' | relative_url }}" controls preload="none" class="doc-section__media"></video>
+<video src="{{ '/assets/klaar-tour.mp4' | relative_url }}" poster="{{ '/assets/klaar-tour.jpg' | relative_url }}" autoplay muted loop playsinline controls class="doc-section__media"></video>
 
 ### Install {#install}
 
