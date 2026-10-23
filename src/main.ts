@@ -1,7 +1,11 @@
 import type { Extension } from '@codemirror/state';
 import { Editor, EditorChange, Plugin, WorkspaceLeaf, debounce } from 'obsidian';
+import { CURRENT_PERIOD_LABELS } from './core/dateOptions';
+import { todayIso } from './core/dates';
+import { PERIOD_ORDER, periodOf } from './core/periods';
 import { DEFAULT_SETTINGS, KlaarSettings, KlaarSettingTab } from './settings';
 import { TaskIndex } from './obsidian/taskIndex';
+import { openPeriodNote } from './obsidian/periodNotes';
 import { DEFAULT_TAG_RULES, canMarkInProgress, cyclePriorityTag, normaliseTagRules, toggleInProgress } from './core/tagRules';
 import { markersOf, parseTaskLine, setSchedule, toggleNext, toggleSomeday } from './core/taskLine';
 import { flashLineExtension } from './ui/flashLine';
@@ -84,6 +88,20 @@ export default class KlaarPlugin extends Plugin {
 		this.registerView(VIEW_TYPE_CALENDAR, (leaf: WorkspaceLeaf) => new CalendarView(leaf, { index: this.index, getSettings: () => this.settings }));
 		this.addRibbonIcon('calendar', 'Open calendar', () => void this.activateCalendar());
 		this.addCommand({ id: 'open-calendar', name: 'Open calendar', callback: () => void this.activateCalendar() });
+		// No default hotkeys, as Obsidian asks of plugins: people set their own under Settings → Hotkeys.
+		for (const kind of PERIOD_ORDER) {
+			const label = CURRENT_PERIOD_LABELS[kind];
+			this.addCommand({
+				id: `open-${label.toLowerCase().replace(' ', '-')}`,
+				name: `Open ${label.toLowerCase()}'s note`,
+				// Hidden for period types turned off in settings.
+				checkCallback: (checking) => {
+					if (!this.settings.periods[kind]) return false;
+					if (!checking) void openPeriodNote(this.app, this.settings, periodOf(kind, todayIso()).key);
+					return true;
+				},
+			});
+		}
 
 		this.registerHoverLinkSource(HOVER_SOURCE, { display: 'Klaar', defaultMod: true });
 		this.registerBasesView(BASES_VIEW_TASKS, tasksViewRegistration({ index: this.index, getSettings: () => this.settings }));

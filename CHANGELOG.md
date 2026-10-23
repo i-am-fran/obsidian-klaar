@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- New commands open the note for today, this week, this month, this quarter or this year: **Open today's note**, **Open this week's note** and so on. Give them a hotkey in Settings → Hotkeys. Only the period types you use are listed.
+- In the Tasks and Board views, the Today button now has a small arrow next to it. Click it to open this week's, this month's, this quarter's or this year's note instead. Cmd/Ctrl-click opens a new tab.
+- On mobile, the toolbar buttons show as icons, and the Today button is back.
+
 ## 2026.10.20
 
 - Tag columns no longer need typing: a board's Configure view now lists your tags from Settings → Tags (those with the Tag role), each with a switch. Turn one on to give it a column. Tags you typed into the old list need switching on again.

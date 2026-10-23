@@ -28,7 +28,9 @@ Both views have a bar at the top:
 - A search box that filters by task text, tags and note names.
 - A task count, which reads "12 of 40" while search or filters hide some.
 - **New task**: adds `- [ ] your text` to today's note, creating the note if needed.
-- **Today**: opens today's note (desktop only). Cmd/Ctrl-click opens a new tab.
+- **Today**: opens today's note. The arrow next to it opens this week's, this month's, this quarter's or this year's note. Cmd/Ctrl-click opens a new tab.
+
+On mobile the buttons show their icons only.
 
 Turn off **Show search** to hide the bar.
 

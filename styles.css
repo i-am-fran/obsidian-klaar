@@ -731,7 +731,24 @@ body {
 	height: var(--icon-s);
 }
 
-/* On mobile the bar stays on one line: the New task button shows its icon only and the Today button is hidden. */
+/* Today and its period menu read as one split button. */
+.klaar-toolbar-split {
+	display: inline-flex;
+	gap: 1px;
+}
+
+.klaar-toolbar-split > .klaar-toolbar-button:not(:last-child) {
+	border-start-end-radius: 0;
+	border-end-end-radius: 0;
+}
+
+.klaar-toolbar-split > .klaar-toolbar-button:not(:first-child) {
+	border-start-start-radius: 0;
+	border-end-start-radius: 0;
+	padding-inline: var(--size-4-1);
+}
+
+/* On mobile the bar stays on one line and the buttons show their icons only, each at least as wide as it is tall. */
 .is-mobile .klaar-toolbar {
 	flex-wrap: nowrap;
 }
@@ -740,9 +757,18 @@ body {
 	min-width: 0;
 }
 
-.is-mobile .klaar-toolbar-button-text,
-.is-mobile .klaar-desktop-only {
+.is-mobile .klaar-toolbar-button {
+	flex: none;
+	justify-content: center;
+	min-width: var(--input-height);
+}
+
+.is-mobile .klaar-toolbar-button-text {
 	display: none;
+}
+
+.is-mobile .klaar-toolbar-split > .klaar-toolbar-button:not(:first-child) {
+	min-width: calc(var(--input-height) * 0.75);
 }
 
 .klaar-new-task-input {

@@ -1,6 +1,6 @@
 import { addDays, weekday } from './dates';
 import type { IsoDate } from './dates';
-import { ALL_PERIODS, parsePeriodKey, periodOf } from './periods';
+import { ALL_PERIODS, PERIOD_ORDER, parsePeriodKey, periodOf } from './periods';
 import type { EnabledPeriods, PeriodKind } from './periods';
 
 export interface DateOption {
@@ -36,6 +36,20 @@ export function buildDateOptions(today: IsoDate, enabled: EnabledPeriods = ALL_P
 		{ label: 'This year', key: periodOf('year', today).key },
 	);
 	return options.filter((o) => enabledKey(o.key, enabled));
+}
+
+/** How the current period of each kind is named: Today, This week... */
+export const CURRENT_PERIOD_LABELS: Record<PeriodKind, string> = {
+	day: 'Today',
+	week: 'This week',
+	month: 'This month',
+	quarter: 'This quarter',
+	year: 'This year',
+};
+
+/** The period of each enabled kind that holds `today`, smallest first; for jumping to their notes. */
+export function currentPeriods(today: IsoDate, enabled: EnabledPeriods = ALL_PERIODS): (DateOption & { kind: PeriodKind })[] {
+	return PERIOD_ORDER.filter((kind) => enabled[kind]).map((kind) => ({ kind, label: CURRENT_PERIOD_LABELS[kind], key: periodOf(kind, today).key }));
 }
 
 /**
