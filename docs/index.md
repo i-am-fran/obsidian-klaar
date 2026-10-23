@@ -5,8 +5,6 @@ sections:
     label: How it works
   - id: features
     label: Features
-  - id: install
-    label: Install
   - id: explore
     label: Explore
 ---
@@ -29,7 +27,7 @@ Write a task anywhere in your vault, in a meeting note, a project note or today'
 
 Open your week note and the task is there, along with what you planned for the month around it and for each day inside it. Today's note shows what's due today, what's still open this week and anything overdue. Tick a task there and it's ticked in the note where you wrote it.
 
-Klaar is minimal on purpose. It doesn't write anything into your journal notes, and your tasks stay plain Markdown. If you stop using Klaar tomorrow, nothing breaks.
+Klaar is minimal on purpose. It doesn't write anything into your journal notes, and your tasks stay plain Markdown. If you stop using Klaar tomorrow, nothing breaks. It only reads the Markdown files in your vault, on your device, and never connects to the internet.
 
 ***
 
@@ -44,18 +42,6 @@ Klaar is minimal on purpose. It doesn't write anything into your journal notes, 
 **Part of Obsidian.** Plain checkboxes, ordinary tags like `#p1`, a calendar in the sidebar, and tables and boards in Bases instead of a query language.
 
 [Every feature, including the little ones]({{ '/docs.html#all-features' | relative_url }}).
-
-***
-
-## Install {#install}
-
-Klaar is in Obsidian's community plugin directory. In Obsidian, open Settings → Community plugins → Browse, search for **Klaar**, then install it and turn it on. You need Obsidian 1.13.0 or newer. Other ways to install are in [Getting Started]({{ '/docs.html#getting-started' | relative_url }}).
-
-<div class="actions">
-  <a class="button button--primary" href="https://obsidian.md/plugins?id=klaar">Install in Obsidian{% include arrow-icon.html %}</a>
-</div>
-
-Klaar only reads the Markdown files in your vault, on your device. It never connects to the internet.
 
 ***
 

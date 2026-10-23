@@ -64,4 +64,4 @@ The roles are Label, High priority, Medium priority, Low priority and In progres
 | Cycle priority | Step `#p3` → `#p2` → `#p1` → no priority. |
 | Open calendar | Show the calendar in the sidebar. |
 
-The toggles and **Cycle priority** work on every task in a selection, as one undo step. Assign them hotkeys in Settings → Hotkeys.
+The toggles and **Cycle priority** work on every task in a selection, as one undo step.
