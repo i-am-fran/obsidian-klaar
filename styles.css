@@ -917,6 +917,15 @@ body {
 	overflow-x: auto;
 }
 
+/* On a phone the floating navbar covers the bottom of the view: leave room for it, as the native Bases views do. */
+.is-phone .klaar-board {
+	padding-bottom: calc(var(--bases-kanban-container-padding, var(--size-4-3)) + var(--view-bottom-spacing, 0px));
+}
+
+.is-phone .klaar-table-body {
+	margin-bottom: var(--view-bottom-spacing, 0px);
+}
+
 /* Rows: stacked bands, each as wide as its columns so the board scrolls sideways as one. */
 .klaar-board.has-rows {
 	flex-direction: column;
