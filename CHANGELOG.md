@@ -6,6 +6,7 @@
 - The Klaar Table can group by tag. A task with two tags shows under both, and untagged tasks come last.
 - The Klaar Board can be split into **Rows** by date, note, priority or tag. Each row has every column and folds away when you click its title. Dragging a card still only changes its column, never its row.
 - On mobile the calendar has more room: the days are wider and the task and note markers sit under the date instead of on top of it.
+- New setting: **Move task to note puts it at** the end of the note (as before) or the top. The top is just below any frontmatter.
 
 ## 2026.10.24
 

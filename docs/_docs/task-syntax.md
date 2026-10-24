@@ -58,7 +58,7 @@ The roles are Label, High priority, Medium priority, Low priority and In progres
 | Command | What it does |
 | --- | --- |
 | Schedule task… | Schedule or reschedule the task under the cursor. |
-| Move task to note… | Move the task under the cursor, with its subtasks, to the end of another note. |
+| Move task to note… | Move the task under the cursor, with its subtasks, to the end or top of another note (see Settings). |
 | Toggle in progress | Switch between open and in progress. |
 | Toggle next | Switch between open and `[>]`. |
 | Toggle someday | Switch between open and `[<]`. |

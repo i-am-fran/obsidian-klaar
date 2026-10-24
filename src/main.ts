@@ -7,7 +7,7 @@ import { DEFAULT_SETTINGS, KlaarSettings, KlaarSettingTab } from './settings';
 import { TaskIndex } from './obsidian/taskIndex';
 import { openPeriodNote, periodOfFile } from './obsidian/periodNotes';
 import { DEFAULT_TAG_RULES, canMarkInProgress, cyclePriorityTag, normaliseTagRules, toggleInProgress } from './core/tagRules';
-import { appendBlock, markersOf, outdentBlock, parseTaskLine, setSchedule, taskBlockEnd, toggleNext, toggleSomeday } from './core/taskLine';
+import { appendBlock, markersOf, outdentBlock, parseTaskLine, prependBlock, setSchedule, taskBlockEnd, toggleNext, toggleSomeday } from './core/taskLine';
 import { flashLineExtension } from './ui/flashLine';
 import { DateSuggest } from './ui/dateSuggest';
 import { dateChipsExtension, dateChipsPostProcessor } from './ui/dateChips';
@@ -231,8 +231,9 @@ export default class KlaarPlugin extends Plugin {
 	}
 
 	/**
-	 * Moves the task on the cursor line, with its subtasks, to the end of another note. The target is written first,
-	 * so a failed write leaves the task where it was; the removal goes through the editor, so it can be undone there.
+	 * Moves the task on the cursor line, with its subtasks, to the end or top of another note (setting `moveTo`). The
+	 * target is written first, so a failed write leaves the task where it was; the removal goes through the editor, so it
+	 * can be undone there.
 	 */
 	private moveTaskUnderCursor(editor: Editor, sourcePath: string) {
 		const start = editor.getCursor().line;
@@ -247,7 +248,7 @@ export default class KlaarPlugin extends Plugin {
 			const end = taskBlockEnd(lines, start);
 			const block = outdentBlock(lines.slice(start, end));
 			this.app.vault
-				.process(target, (content) => appendBlock(content, block))
+				.process(target, (content) => (this.settings.moveTo === 'start' ? prependBlock(content, block) : appendBlock(content, block)))
 				.then(() => {
 					const to = end < editor.lineCount() ? { line: end, ch: 0 } : { line: end - 1, ch: editor.getLine(end - 1).length };
 					const from = end < editor.lineCount() || start === 0 ? { line: start, ch: 0 } : { line: start - 1, ch: editor.getLine(start - 1).length };

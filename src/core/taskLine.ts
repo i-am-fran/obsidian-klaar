@@ -294,3 +294,10 @@ export function appendBlock(content: string, block: string[]): string {
 	const sep = content === '' || content.endsWith('\n') ? '' : '\n';
 	return `${content}${sep}${block.join('\n')}\n`;
 }
+
+/** Puts `block` as lines of their own at the start of a note's content, after its frontmatter if it has one. */
+export function prependBlock(content: string, block: string[]): string {
+	const frontmatter = /^---\n[\s\S]*?\n---(?:\n|$)/.exec(content)?.[0] ?? '';
+	const head = frontmatter === '' || frontmatter.endsWith('\n') ? frontmatter : `${frontmatter}\n`;
+	return `${head}${block.join('\n')}\n${content.slice(frontmatter.length)}`;
+}

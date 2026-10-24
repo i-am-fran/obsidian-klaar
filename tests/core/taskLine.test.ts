@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { addTag, appendBlock, appendTaskLine, outdentBlock, taskBlockEnd, lineSpans, parseTaskLine, removeDoneStamp, removeTags, reopenTask, setChecked, setInProgressMarker, setOpenMarker, setSchedule, taskMarker, toggleNext, toggleSomeday } from '../../src/core/taskLine';
+import { addTag, appendBlock, appendTaskLine, prependBlock, outdentBlock, taskBlockEnd, lineSpans, parseTaskLine, removeDoneStamp, removeTags, reopenTask, setChecked, setInProgressMarker, setOpenMarker, setSchedule, taskMarker, toggleNext, toggleSomeday } from '../../src/core/taskLine';
 
 describe('parseTaskLine', () => {
 	test('schedule link must be > plus a valid period', () => {
@@ -300,5 +300,21 @@ describe('appendBlock', () => {
 		expect(appendBlock('', ['- [ ] A', '\t- [ ] B'])).toBe('- [ ] A\n\t- [ ] B\n');
 		expect(appendBlock('# Notes', ['- [ ] A'])).toBe('# Notes\n- [ ] A\n');
 		expect(appendBlock('# Notes\n', ['- [ ] A'])).toBe('# Notes\n- [ ] A\n');
+	});
+});
+
+describe('prependBlock', () => {
+	test('adds the lines at the start, on lines of their own', () => {
+		expect(prependBlock('', ['- [ ] A', '\t- [ ] B'])).toBe('- [ ] A\n\t- [ ] B\n');
+		expect(prependBlock('# Notes\n- [ ] B\n', ['- [ ] A'])).toBe('- [ ] A\n# Notes\n- [ ] B\n');
+	});
+
+	test('goes after the frontmatter', () => {
+		expect(prependBlock('---\ntags: x\n---\n# Notes\n', ['- [ ] A'])).toBe('---\ntags: x\n---\n- [ ] A\n# Notes\n');
+		expect(prependBlock('---\ntags: x\n---', ['- [ ] A'])).toBe('---\ntags: x\n---\n- [ ] A\n');
+	});
+
+	test('a note with an unclosed --- has no frontmatter', () => {
+		expect(prependBlock('---\nnot closed\n', ['- [ ] A'])).toBe('- [ ] A\n---\nnot closed\n');
 	});
 });

@@ -24,7 +24,7 @@ headings:
 - This week, Next week, This month, Next month, This quarter, This year
 - Type a full key, like `2026-W45`, to pick that exact period
 - **Schedule task…** from the command palette or the right-click menu
-- **Move task to note…** moves a task and its subtasks to the end of another note
+- **Move task to note…** moves a task and its subtasks to the end or top of another note
 - Drag a task onto a calendar day to reschedule it
 - Tasks in a journal note belong to that note's period without a link
 - Date chips: Today, Tomorrow, Yesterday, `Fri 23 Oct`, `Week 43`, `Oct 2026`, `Q4 2026`, `2026`
