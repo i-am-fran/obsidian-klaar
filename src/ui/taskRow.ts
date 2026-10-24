@@ -7,7 +7,7 @@ import type { TaskRef } from '../core/tasks';
 import { editTask } from '../obsidian/editTask';
 import type { KlaarSettings } from '../settings';
 import { flashLine } from './flashLine';
-import { openMoveModal } from './moveModal';
+import { openScheduleModal } from './scheduleModal';
 import { renderTaskText } from './tagHighlight';
 
 /** Lets the element be dropped on a calendar day to reschedule the task. */
@@ -79,12 +79,12 @@ export function renderSourceLink(el: HTMLElement, app: App, ref: TaskRef): HTMLE
 	return link;
 }
 
-/** "Move to day" button that rewrites the task's schedule link. */
+/** "Schedule task" button that rewrites the task's schedule link. */
 export function renderMoveButton(el: HTMLElement, app: App, ref: TaskRef, settings: KlaarSettings): HTMLElement {
-	const move = el.createEl('button', { cls: 'klaar-task-move clickable-icon', attr: { 'aria-label': 'Move to day' } });
+	const move = el.createEl('button', { cls: 'klaar-task-move clickable-icon', attr: { 'aria-label': 'Schedule task' } });
 	setIcon(move, 'calendar-clock');
 	move.addEventListener('click', () => {
-		openMoveModal(app, settings.periods, (key) => {
+		openScheduleModal(app, settings.periods, (key) => {
 			editTask(app, ref, (line) => setSchedule(line, key)).catch(() => new Notice("Couldn't update the task."));
 		});
 	});
@@ -92,7 +92,7 @@ export function renderMoveButton(el: HTMLElement, app: App, ref: TaskRef, settin
 }
 
 /**
- * One task row: checkbox, text, optional source link, "move to day" button; draggable onto the calendar. Clicking the
+ * One task row: checkbox, text, optional source link, "schedule task" button; draggable onto the calendar. Clicking the
  * text opens the task's note at its line.
  */
 export function renderTaskRow(el: HTMLElement, app: App, ref: TaskRef, settings: KlaarSettings, opts: { showSource: boolean }): void {

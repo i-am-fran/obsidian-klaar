@@ -269,3 +269,28 @@ export function appendTaskLine(content: string, text: string): string {
 	const sep = content === '' || content.endsWith('\n') ? '' : '\n';
 	return `${content}${sep}- [ ] ${text.trim()}\n`;
 }
+
+/** How far a line is indented, a tab counting as four spaces. */
+function indentWidth(line: string): number {
+	return (/^[ \t]*/.exec(line)?.[0] ?? '').replace(/\t/g, '    ').length;
+}
+
+/** The line after the task on `start` and its subtasks: the following lines indented further than it, up to a blank line. */
+export function taskBlockEnd(lines: string[], start: number): number {
+	const own = indentWidth(lines[start] ?? '');
+	let end = start + 1;
+	while (end < lines.length && (lines[end] as string).trim() !== '' && indentWidth(lines[end] as string) > own) end++;
+	return end;
+}
+
+/** Strips the first line's indentation from every line of a block, so its top task starts at the margin. */
+export function outdentBlock(block: string[]): string[] {
+	const lead = /^[ \t]*/.exec(block[0] ?? '')?.[0] ?? '';
+	return block.map((line) => (line.startsWith(lead) ? line.slice(lead.length) : line));
+}
+
+/** Appends `block` as lines of their own at the end of a note's content. */
+export function appendBlock(content: string, block: string[]): string {
+	const sep = content === '' || content.endsWith('\n') ? '' : '\n';
+	return `${content}${sep}${block.join('\n')}\n`;
+}
