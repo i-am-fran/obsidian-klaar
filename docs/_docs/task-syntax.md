@@ -62,10 +62,11 @@ The roles are Label, High priority, Medium priority, Low priority and In progres
 | Toggle in progress | Switch between open and in progress. |
 | Toggle next | Switch between open and `[>]`. |
 | Toggle someday | Switch between open and `[<]`. |
+| Toggle cancelled | Switch between open and `[-]`. A done task loses its done stamp. Also in the right-click menu as **Cancel task** / **Reopen task**. |
 | Cycle priority | Step `#p3` → `#p2` → `#p1` → no priority. |
 | Move done tasks to the bottom | Move every done task in the note, with its subtasks, under a `## Done` heading at the bottom. Klaar adds the heading if the note has none. Also in the right-click menu. |
 | Open calendar | Show the calendar in the sidebar. |
 | Open today's note | Open (or create) today's note. Also for this week, this month, this quarter and this year, for the period types you use. |
 | Open previous day's note | Open the day before the journal note you have open, or yesterday from any other note. **Open next day's note** goes the other way. Also for weeks, months, quarters and years. |
 
-The toggles and **Cycle priority** work on every task in a selection, as one undo step. Klaar sets no hotkeys of its own: give any of these one in Settings → Hotkeys. Each command has an icon, so the editing ones can go on the mobile toolbar too (Settings → Mobile).
+The toggles (cancelled included) and **Cycle priority** work on every task in a selection, as one undo step. Klaar sets no hotkeys of its own: give any of these one in Settings → Hotkeys. Each command has an icon, so the editing ones can go on the mobile toolbar too (Settings → Mobile).

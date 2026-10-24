@@ -67,7 +67,7 @@ headings:
 - Each extra marker can be turned off
 - Someday tasks leave the scheduled lists and the calendar
 - Completed date stamp `(@done [[2026-10-23]])`, shown muted, as a chip or hidden
-- **Toggle in progress**, **Toggle next**, **Toggle someday** and **Cycle priority** commands
+- **Toggle in progress**, **Toggle next**, **Toggle someday**, **Toggle cancelled** and **Cycle priority** commands; **Cancel task** in the right-click menu
 - **Move done tasks to the bottom** gathers a note's done tasks under `## Done`, from the command palette or the right-click menu
 - Commands work on every task in a selection
 - Coloured tag pills in the editor, reading mode and Klaar's views

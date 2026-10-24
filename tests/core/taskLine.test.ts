@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { addTag, appendBlock, appendTaskLine, moveDoneToSection, prependBlock, outdentBlock, taskBlockEnd, lineSpans, parseTaskLine, removeDoneStamp, removeTags, reopenTask, setChecked, setInProgressMarker, setOpenMarker, setSchedule, taskMarker, toggleNext, toggleSomeday } from '../../src/core/taskLine';
+import { addTag, appendBlock, appendTaskLine, moveDoneToSection, prependBlock, outdentBlock, taskBlockEnd, lineSpans, parseTaskLine, removeDoneStamp, removeTags, reopenTask, setChecked, setInProgressMarker, setOpenMarker, setSchedule, taskMarker, toggleCancelled, toggleNext, toggleSomeday } from '../../src/core/taskLine';
 
 describe('parseTaskLine', () => {
 	test('schedule link must be > plus a valid period', () => {
@@ -342,5 +342,23 @@ describe('moveDoneToSection', () => {
 
 	test('a note without a trailing newline', () => {
 		expect(move('- [x] A\n- [ ] B')).toBe('- [ ] B\n\n## Done\n- [x] A');
+	});
+});
+
+describe('toggleCancelled', () => {
+	test('switches [ ] and [-]', () => {
+		expect(toggleCancelled('- [ ] A >[[2026-10-21]]')).toBe('- [-] A >[[2026-10-21]]');
+		expect(toggleCancelled('- [-] A')).toBe('- [ ] A');
+		expect(toggleCancelled('\t* [ ] A\r')).toBe('\t* [-] A\r');
+	});
+	test('from any other state gives [-], losing the done stamp', () => {
+		expect(toggleCancelled('- [/] A')).toBe('- [-] A');
+		expect(toggleCancelled('- [>] A')).toBe('- [-] A');
+		expect(toggleCancelled('- [<] A')).toBe('- [-] A');
+		expect(toggleCancelled('- [x] A (@done [[2026-10-21]])')).toBe('- [-] A');
+	});
+	test('leaves other lines alone', () => {
+		expect(toggleCancelled('- [!] A')).toBe('- [!] A');
+		expect(toggleCancelled('Text')).toBe('Text');
 	});
 });

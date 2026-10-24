@@ -221,6 +221,15 @@ export function toggleSomeday(line: string): string {
 	return toggleMarker(line, '<');
 }
 
+/** `[-]` ↔ `[ ]`; any other task (in progress, next, someday, done) becomes `[-]`, losing its done stamp. */
+export function toggleCancelled(line: string): string {
+	const parts = split(line);
+	if (!parts) return line;
+	if (parts.stateChar === '-') return reopenTask(line);
+	const body = parts.stamp ? parts.body.trimEnd() : parts.body;
+	return parts.prefix + '-' + parts.suffix + body + parts.eol;
+}
+
 /** Removes the done stamp, keeping the marker as it is. Non-task lines are returned unchanged. */
 export function removeDoneStamp(line: string): string {
 	const parts = split(line);

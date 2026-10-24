@@ -6,6 +6,7 @@
 - The Klaar Table can group by tag. A task with two tags shows under both, and untagged tasks come last.
 - The Klaar Board can be split into **Rows** by date, note, priority or tag. Each row has every column and folds away when you click its title. Dragging a card still only changes its column, never its row.
 - On mobile the calendar has more room: the days are wider and the task and note markers sit under the date instead of on top of it.
+- New command: **Toggle cancelled** switches a task between open and cancelled (`[-]`), on the cursor line or every task in a selection. A done task you cancel loses its done stamp. It's also in the right-click menu as **Cancel task**, or **Reopen task** on a cancelled one. Give it a hotkey in Settings → Hotkeys.
 - New command: **Move done tasks to the bottom** moves every done task in the note, with its subtasks, under a `## Done` heading at the end, adding the heading if there isn't one. If the note already has `## Done` somewhere else, they go to the end of that section. Done subtasks of open tasks, cancelled tasks and tasks in code blocks stay put. It's in the command palette and the right-click menu; give it a hotkey in Settings → Hotkeys.
 - New setting: **Move task to note puts it at** the end of the note (as before) or the top. The top is just below any frontmatter.
 

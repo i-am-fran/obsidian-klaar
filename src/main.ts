@@ -7,7 +7,7 @@ import { DEFAULT_SETTINGS, KlaarSettings, KlaarSettingTab } from './settings';
 import { TaskIndex } from './obsidian/taskIndex';
 import { openPeriodNote, periodOfFile } from './obsidian/periodNotes';
 import { DEFAULT_TAG_RULES, canMarkInProgress, cyclePriorityTag, normaliseTagRules, toggleInProgress } from './core/tagRules';
-import { appendBlock, markersOf, moveDoneToSection, outdentBlock, parseTaskLine, prependBlock, setSchedule, taskBlockEnd, toggleNext, toggleSomeday } from './core/taskLine';
+import { appendBlock, markersOf, moveDoneToSection, outdentBlock, parseTaskLine, prependBlock, setSchedule, taskBlockEnd, toggleCancelled, toggleNext, toggleSomeday } from './core/taskLine';
 import { flashLineExtension } from './ui/flashLine';
 import { DateSuggest } from './ui/dateSuggest';
 import { dateChipsExtension, dateChipsPostProcessor } from './ui/dateChips';
@@ -96,6 +96,12 @@ export default class KlaarPlugin extends Plugin {
 			editorCheckCallback: (checking, editor) => this.settings.somedayMarker && this.rewriteSelectedTasks(editor, checking, toggleSomeday),
 		});
 		this.addCommand({
+			id: 'toggle-cancelled',
+			name: 'Toggle cancelled',
+			icon: 'circle-slash',
+			editorCheckCallback: (checking, editor) => this.rewriteSelectedTasks(editor, checking, toggleCancelled),
+		});
+		this.addCommand({
 			id: 'cycle-priority',
 			name: 'Cycle priority',
 			icon: 'flag',
@@ -124,6 +130,13 @@ export default class KlaarPlugin extends Plugin {
 						item.setTitle('Move task to note…').setIcon('file-input').onClick(() => this.moveTaskUnderCursor(editor, path)),
 					);
 				}
+				const cancelled = parseTaskLine(editor.getLine(editor.getCursor().line), markersOf(this.settings))?.cancelled ?? false;
+				menu.addItem((item) =>
+					item
+						.setTitle(cancelled ? 'Reopen task' : 'Cancel task')
+						.setIcon(cancelled ? 'circle' : 'circle-slash')
+						.onClick(() => this.rewriteSelectedTasks(editor, false, toggleCancelled)),
+				);
 			}),
 		);
 
