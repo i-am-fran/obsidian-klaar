@@ -6,7 +6,7 @@ headings:
   - id: date-picker
     label: The > picker
   - id: move-task
-    label: Move task to…
+    label: Schedule task…
   - id: schedule-keys
     label: Schedule keys
   - id: date-chips
@@ -30,13 +30,15 @@ Keep typing to filter the list, for example `>fri` or `>next`. Typing a full key
 
 ![Typing > after a task opens the date picker: Today, Tomorrow and the next seven days with their dates]({{ '/assets/schedule-picker.webp' | relative_url }}){: .doc-section__media}
 
-### Move task to… {#move-task}
+### Schedule task… {#move-task}
 
-**Move task to…** opens the same list from the command palette or the editor's right-click menu, and replaces the task's existing link. To reschedule from elsewhere:
+**Schedule task…** opens the same list from the command palette or the editor's right-click menu, and replaces the task's existing link. To reschedule from elsewhere:
 
 - Click the calendar button on a task in a journal note, a Klaar Table or a Klaar Board.
 - Drag a task onto a day in the [calendar](#calendar).
 - Drag a card to Today or This week on a [board by date](#board).
+
+To put a task in a different note instead, use **Move task to note…** from the command palette or the right-click menu. Pick a note and Klaar moves the task, with its subtasks, to the end of it. Its schedule link stays as it is.
 
 ### Schedule keys {#schedule-keys}
 

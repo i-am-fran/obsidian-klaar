@@ -1,4 +1,4 @@
-import { App, Notice, TFile } from 'obsidian';
+import { App, Notice, TFile, type PaneType } from 'obsidian';
 import { cleanFolder, periodKeyForPath, periodNotePath } from '../core/periodPaths';
 import { parsePeriodKey, type Period } from '../core/periods';
 import { appendTaskLine } from '../core/taskLine';
@@ -16,7 +16,7 @@ export function periodOfFile(file: TFile, folder: string): Period | null {
 const warnedKeys = new Set<string>();
 
 /** Opens the period note for `key`; if missing, asks first, then creates the folder and an empty file. */
-export async function openPeriodNote(app: App, settings: KlaarSettings, key: string, newLeaf = false): Promise<void> {
+export async function openPeriodNote(app: App, settings: KlaarSettings, key: string, newLeaf: PaneType | boolean = false): Promise<void> {
 	const path = periodNotePath(settings.periodFolder, key);
 	if (!app.vault.getFileByPath(path) && !(await confirmCreate(app, path))) return;
 	const file = await ensurePeriodNote(app, settings, key);

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { addTag, appendTaskLine, lineSpans, parseTaskLine, removeDoneStamp, removeTags, reopenTask, setChecked, setInProgressMarker, setOpenMarker, setSchedule, taskMarker, toggleNext, toggleSomeday } from '../../src/core/taskLine';
+import { addTag, appendBlock, appendTaskLine, outdentBlock, taskBlockEnd, lineSpans, parseTaskLine, removeDoneStamp, removeTags, reopenTask, setChecked, setInProgressMarker, setOpenMarker, setSchedule, taskMarker, toggleNext, toggleSomeday } from '../../src/core/taskLine';
 
 describe('parseTaskLine', () => {
 	test('schedule link must be > plus a valid period', () => {
@@ -273,5 +273,32 @@ describe('appendTaskLine', () => {
 
 	test('trims the text', () => {
 		expect(appendTaskLine('', '  Call Sam  ')).toBe('- [ ] Call Sam\n');
+	});
+});
+
+describe('taskBlockEnd', () => {
+	const lines = ['- [ ] Trip', '\t- [ ] Book', '    - [ ] Pack', '  Notes', '- [ ] Next', '', '\t- [ ] After blank'];
+	test('takes the lines indented further, up to the next sibling', () => {
+		expect(taskBlockEnd(lines, 0)).toBe(4);
+		expect(taskBlockEnd(lines, 1)).toBe(2);
+	});
+	test('stops at a blank line and at the end', () => {
+		expect(taskBlockEnd(lines, 4)).toBe(5);
+		expect(taskBlockEnd(lines, 6)).toBe(7);
+	});
+});
+
+describe('outdentBlock', () => {
+	test("strips the top task's indentation from every line", () => {
+		expect(outdentBlock(['\t- [ ] Book', '\t\t- [ ] Train', '\tNote'])).toEqual(['- [ ] Book', '\t- [ ] Train', 'Note']);
+		expect(outdentBlock(['- [ ] Trip', '\t- [ ] Book'])).toEqual(['- [ ] Trip', '\t- [ ] Book']);
+	});
+});
+
+describe('appendBlock', () => {
+	test('adds the lines at the end, on lines of their own', () => {
+		expect(appendBlock('', ['- [ ] A', '\t- [ ] B'])).toBe('- [ ] A\n\t- [ ] B\n');
+		expect(appendBlock('# Notes', ['- [ ] A'])).toBe('# Notes\n- [ ] A\n');
+		expect(appendBlock('# Notes\n', ['- [ ] A'])).toBe('# Notes\n- [ ] A\n');
 	});
 });

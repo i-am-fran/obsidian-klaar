@@ -9,7 +9,7 @@ import type { TaskRef } from '../core/tasks';
 import { editTask } from '../obsidian/editTask';
 import type { KlaarSettings } from '../settings';
 import { renderScheduleChip } from '../ui/dateChips';
-import { openMoveModal } from '../ui/moveModal';
+import { openScheduleModal } from '../ui/scheduleModal';
 import { renderAccordion } from '../ui/accordion';
 import { renderTaskText } from '../ui/tagHighlight';
 import { makeDraggable, makeOpenable, renderCheckbox, renderMoveButton, renderSourceLink } from '../ui/taskRow';
@@ -107,13 +107,13 @@ class BoardView extends TaskBasesView {
 				editTask(this.app, ref, (line) => rewriteForColumn(line, by, column.id, ctx)).catch(failed);
 				return;
 			}
-			openMoveModal(this.app, settings.periods, (key) => {
+			openScheduleModal(this.app, settings.periods, (key) => {
 				editTask(this.app, ref, (line) => setSchedule(line, key)).catch(failed);
 			});
 		});
 	}
 
-	/** One card: checkbox, text, schedule chip, note link, move button; draggable onto columns and the calendar. */
+	/** One card: checkbox, text, schedule chip, note link, schedule button; draggable onto columns and the calendar. */
 	private renderCard(parent: HTMLElement, task: TaskRef, settings: KlaarSettings): void {
 		const card = parent.createDiv({ cls: 'klaar-board-card' });
 		card.toggleClass('is-done', task.checked);

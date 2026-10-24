@@ -41,14 +41,19 @@ export class TaskToolbar {
 
 	/**
 	 * A theme-styled button with an icon and short text; `tooltip` says more and must contain `text`. On mobile the
-	 * text is hidden (the tooltip still names the button), and `desktopOnly` hides the whole button.
+	 * text is hidden and the icon stands alone (the tooltip still names the button). Pass `parent` to place it in a group.
 	 */
-	addButton(icon: string, text: string, tooltip: string, onClick: (evt: MouseEvent) => void, desktopOnly = false): void {
-		const cls = desktopOnly ? 'klaar-toolbar-button klaar-desktop-only' : 'klaar-toolbar-button';
-		const button = this.el.createEl('button', { cls, attr: { 'aria-label': tooltip } });
+	addButton(icon: string, text: string, tooltip: string, onClick: (evt: MouseEvent) => void, parent: HTMLElement = this.el): HTMLButtonElement {
+		const button = parent.createEl('button', { cls: 'klaar-toolbar-button', attr: { 'aria-label': tooltip } });
 		setIcon(button.createSpan({ cls: 'klaar-toolbar-button-icon' }), icon);
-		button.createSpan({ cls: 'klaar-toolbar-button-text', text });
+		if (text !== '') button.createSpan({ cls: 'klaar-toolbar-button-text', text });
 		button.addEventListener('click', onClick);
+		return button;
+	}
+
+	/** A box that joins the buttons added to it into one split button. */
+	addGroup(): HTMLElement {
+		return this.el.createDiv({ cls: 'klaar-toolbar-split' });
 	}
 
 	/** Shows or hides the bar (TOOLBAR_KEY). */

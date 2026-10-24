@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { buildDateOptions, matchDateOptions } from '../../src/core/dateOptions';
+import { buildDateOptions, currentPeriods, matchDateOptions } from '../../src/core/dateOptions';
 import { ALL_PERIODS } from '../../src/core/periods';
 
 const today = '2026-10-19'; // a Monday
@@ -22,6 +22,20 @@ describe('dateOptions', () => {
 		expect(keyOf('Next month')).toBe('2026-11');
 		expect(keyOf('This quarter')).toBe('2026-Q4');
 		expect(keyOf('This year')).toBe('2026');
+	});
+
+	test('currentPeriods lists the enabled periods holding today, smallest first', () => {
+		expect(currentPeriods(today)).toEqual([
+			{ kind: 'day', label: 'Today', key: '2026-10-19' },
+			{ kind: 'week', label: 'This week', key: '2026-W43' },
+			{ kind: 'month', label: 'This month', key: '2026-10' },
+			{ kind: 'quarter', label: 'This quarter', key: '2026-Q4' },
+			{ kind: 'year', label: 'This year', key: '2026' },
+		]);
+		const enabled = { ...ALL_PERIODS, week: false, quarter: false };
+		expect(currentPeriods(today, enabled).map((p) => p.label)).toEqual(['Today', 'This month', 'This year']);
+		// The week follows ISO numbering across the new year.
+		expect(currentPeriods('2027-01-01').find((p) => p.kind === 'week')?.key).toBe('2026-W53');
 	});
 
 	test('next month rolls over the year', () => {

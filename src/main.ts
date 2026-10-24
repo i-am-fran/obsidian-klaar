@@ -1,18 +1,32 @@
 import type { Extension } from '@codemirror/state';
-import { Editor, EditorChange, Plugin, WorkspaceLeaf, debounce } from 'obsidian';
+import { Editor, EditorChange, MarkdownView, Notice, Plugin, WorkspaceLeaf, debounce } from 'obsidian';
+import { CURRENT_PERIOD_LABELS } from './core/dateOptions';
+import { todayIso } from './core/dates';
+import { PERIOD_ORDER, adjacentPeriod, periodOf, type Period, type PeriodKind } from './core/periods';
 import { DEFAULT_SETTINGS, KlaarSettings, KlaarSettingTab } from './settings';
 import { TaskIndex } from './obsidian/taskIndex';
+import { openPeriodNote, periodOfFile } from './obsidian/periodNotes';
 import { DEFAULT_TAG_RULES, canMarkInProgress, cyclePriorityTag, normaliseTagRules, toggleInProgress } from './core/tagRules';
-import { markersOf, parseTaskLine, setSchedule, toggleNext, toggleSomeday } from './core/taskLine';
+import { appendBlock, markersOf, outdentBlock, parseTaskLine, setSchedule, taskBlockEnd, toggleNext, toggleSomeday } from './core/taskLine';
 import { flashLineExtension } from './ui/flashLine';
 import { DateSuggest } from './ui/dateSuggest';
 import { dateChipsExtension, dateChipsPostProcessor } from './ui/dateChips';
 import { HOVER_SOURCE, tagHighlightExtension, tagHighlightPostProcessor } from './ui/tagHighlight';
-import { openMoveModal } from './ui/moveModal';
+import { openNoteModal } from './ui/noteModal';
+import { openScheduleModal } from './ui/scheduleModal';
 import { CalendarView, VIEW_TYPE_CALENDAR } from './ui/calendarView';
 import { ScheduledSection } from './ui/scheduledSection';
 import { BASES_VIEW_BOARD, boardViewRegistration } from './bases/boardView';
 import { BASES_VIEW_TASKS, tasksViewRegistration } from './bases/tasksView';
+
+/** Command icons for opening the current period's note; commands need an icon to show in the mobile toolbar. */
+const PERIOD_ICONS: Record<PeriodKind, string> = {
+	day: 'calendar-check',
+	week: 'calendar-range',
+	month: 'calendar-days',
+	quarter: 'calendar-clock',
+	year: 'calendar-fold',
+};
 
 export default class KlaarPlugin extends Plugin {
 	settings: KlaarSettings = { ...DEFAULT_SETTINGS };
@@ -40,17 +54,30 @@ export default class KlaarPlugin extends Plugin {
 		// Lets the Style Settings plugin pick up the @settings block in styles.css.
 		this.app.workspace.trigger('parse-style-settings');
 		this.addCommand({
+			// Kept from when this was "Move task to…", so hotkeys and toolbar buttons people set up still work.
 			id: 'move-task',
-			name: 'Move task to…',
+			name: 'Schedule task…',
+			icon: 'calendar-arrow-up',
 			editorCheckCallback: (checking, editor) => {
 				if (!this.cursorOnTask(editor)) return false;
-				if (!checking) this.moveTaskUnderCursor(editor);
+				if (!checking) this.scheduleTaskUnderCursor(editor);
+				return true;
+			},
+		});
+		this.addCommand({
+			id: 'move-task-to-note',
+			name: 'Move task to note…',
+			icon: 'file-input',
+			editorCheckCallback: (checking, editor, ctx) => {
+				if (!ctx.file || !this.cursorOnTask(editor)) return false;
+				if (!checking) this.moveTaskUnderCursor(editor, ctx.file.path);
 				return true;
 			},
 		});
 		this.addCommand({
 			id: 'toggle-in-progress',
 			name: 'Toggle in progress',
+			icon: 'circle-dashed',
 			// Hidden when neither `[/]` nor an in-progress tag is set up: it would change nothing.
 			editorCheckCallback: (checking, editor) =>
 				canMarkInProgress(this.settings.tags, this.settings.slashInProgress) &&
@@ -59,31 +86,67 @@ export default class KlaarPlugin extends Plugin {
 		this.addCommand({
 			id: 'toggle-next',
 			name: 'Toggle next',
+			icon: 'circle-arrow-right',
 			editorCheckCallback: (checking, editor) => this.settings.nextMarker && this.rewriteSelectedTasks(editor, checking, toggleNext),
 		});
 		this.addCommand({
 			id: 'toggle-someday',
 			name: 'Toggle someday',
+			icon: 'circle-arrow-left',
 			editorCheckCallback: (checking, editor) => this.settings.somedayMarker && this.rewriteSelectedTasks(editor, checking, toggleSomeday),
 		});
 		this.addCommand({
 			id: 'cycle-priority',
 			name: 'Cycle priority',
+			icon: 'flag',
 			editorCheckCallback: (checking, editor) => this.rewriteSelectedTasks(editor, checking, (line) => cyclePriorityTag(line, this.settings.tags)),
 		});
 		this.registerEvent(
-			this.app.workspace.on('editor-menu', (menu, editor) => {
+			this.app.workspace.on('editor-menu', (menu, editor, ctx) => {
 				if (!this.cursorOnTask(editor)) return;
 				menu.addItem((item) =>
-					item.setTitle('Move task to…').setIcon('calendar-arrow-up').onClick(() => this.moveTaskUnderCursor(editor)),
+					item.setTitle('Schedule task…').setIcon('calendar-arrow-up').onClick(() => this.scheduleTaskUnderCursor(editor)),
 				);
+				const path = ctx.file?.path;
+				if (path !== undefined) {
+					menu.addItem((item) =>
+						item.setTitle('Move task to note…').setIcon('file-input').onClick(() => this.moveTaskUnderCursor(editor, path)),
+					);
+				}
 			}),
 		);
 
 		this.index = new TaskIndex(this.app, () => this.settings);
 		this.registerView(VIEW_TYPE_CALENDAR, (leaf: WorkspaceLeaf) => new CalendarView(leaf, { index: this.index, getSettings: () => this.settings }));
 		this.addRibbonIcon('calendar', 'Open calendar', () => void this.activateCalendar());
-		this.addCommand({ id: 'open-calendar', name: 'Open calendar', callback: () => void this.activateCalendar() });
+		this.addCommand({ id: 'open-calendar', name: 'Open calendar', icon: 'calendar', callback: () => void this.activateCalendar() });
+		// No default hotkeys, as Obsidian asks of plugins: people set their own under Settings → Hotkeys.
+		for (const kind of PERIOD_ORDER) {
+			const label = CURRENT_PERIOD_LABELS[kind];
+			this.addCommand({
+				id: `open-${label.toLowerCase().replace(' ', '-')}`,
+				name: `Open ${label.toLowerCase()}'s note`,
+				icon: PERIOD_ICONS[kind],
+				// Hidden for period types turned off in settings.
+				checkCallback: (checking) => {
+					if (!this.settings.periods[kind]) return false;
+					if (!checking) void openPeriodNote(this.app, this.settings, periodOf(kind, todayIso()).key);
+					return true;
+				},
+			});
+			for (const [step, delta] of [['previous', -1], ['next', 1]] as const) {
+				this.addCommand({
+					id: `open-${step}-${kind}`,
+					name: `Open ${step} ${kind}'s note`,
+					icon: delta < 0 ? 'chevron-left' : 'chevron-right',
+					checkCallback: (checking) => {
+						if (!this.settings.periods[kind]) return false;
+						if (!checking) void openPeriodNote(this.app, this.settings, adjacentPeriod(kind, this.browseAnchor(kind), delta).key);
+						return true;
+					},
+				});
+			}
+		}
 
 		this.registerHoverLinkSource(HOVER_SOURCE, { display: 'Klaar', defaultMod: true });
 		this.registerBasesView(BASES_VIEW_TASKS, tasksViewRegistration({ index: this.index, getSettings: () => this.settings }));
@@ -147,12 +210,51 @@ export default class KlaarPlugin extends Plugin {
 		return true;
 	}
 
+	/**
+	 * Where previous and next count from: the open journal note when it is this kind or smaller (a day note's next
+	 * week is the week after the one it sits in), otherwise today.
+	 */
+	private browseAnchor(kind: PeriodKind): Period {
+		const file = this.app.workspace.getActiveViewOfType(MarkdownView)?.file;
+		const note = file ? periodOfFile(file, this.settings.periodFolder) : null;
+		if (note && PERIOD_ORDER.indexOf(note.kind) <= PERIOD_ORDER.indexOf(kind)) return note;
+		return periodOf('day', todayIso());
+	}
+
 	/** Reschedules the task on the cursor line, through the user's own editor buffer. */
-	private moveTaskUnderCursor(editor: Editor) {
+	private scheduleTaskUnderCursor(editor: Editor) {
 		const lineNumber = editor.getCursor().line;
-		openMoveModal(this.app, this.settings.periods, (key) => {
+		openScheduleModal(this.app, this.settings.periods, (key) => {
 			const line = editor.getLine(lineNumber);
 			if (parseTaskLine(line, markersOf(this.settings))) editor.setLine(lineNumber, setSchedule(line, key));
+		});
+	}
+
+	/**
+	 * Moves the task on the cursor line, with its subtasks, to the end of another note. The target is written first,
+	 * so a failed write leaves the task where it was; the removal goes through the editor, so it can be undone there.
+	 */
+	private moveTaskUnderCursor(editor: Editor, sourcePath: string) {
+		const start = editor.getCursor().line;
+		const raw = editor.getLine(start);
+		openNoteModal(this.app, sourcePath, (target) => {
+			// The note may have changed while the picker was open.
+			if (editor.getLine(start) !== raw) {
+				new Notice('That task changed. Try again.');
+				return;
+			}
+			const lines = Array.from({ length: editor.lineCount() }, (_, i) => editor.getLine(i));
+			const end = taskBlockEnd(lines, start);
+			const block = outdentBlock(lines.slice(start, end));
+			this.app.vault
+				.process(target, (content) => appendBlock(content, block))
+				.then(() => {
+					const to = end < editor.lineCount() ? { line: end, ch: 0 } : { line: end - 1, ch: editor.getLine(end - 1).length };
+					const from = end < editor.lineCount() || start === 0 ? { line: start, ch: 0 } : { line: start - 1, ch: editor.getLine(start - 1).length };
+					editor.replaceRange('', from, to);
+					new Notice(`Moved to ${target.basename}.`);
+				})
+				.catch(() => new Notice("Couldn't move the task."));
 		});
 	}
 

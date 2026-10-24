@@ -1,11 +1,27 @@
 # Changelog
 
-## 2026.10.21
+## 2026.10.25
 
 - The Klaar Table and Klaar Board have a **Tag** filter under Configure view → Filters. It lists every tag on your tasks, not only the ones in Settings → Tags, so you can pick `#claude` and see just those tasks. Nested tags count too: `#claude` also shows `#claude/review`.
 - The Klaar Table can group by tag. A task with two tags shows under both, and untagged tasks come last.
 - The Klaar Board can be split into **Rows** by date, note, priority or tag. Each row has every column and folds away when you click its title. Dragging a card still only changes its column, never its row.
 - On mobile the calendar has more room: the days are wider and the task and note markers sit under the date instead of on top of it.
+
+## 2026.10.24
+
+- **Move task to…** is now called **Schedule task…**, since that's what it does. Hotkeys and mobile toolbar buttons you set up for it keep working. The calendar button on each task now says "Schedule task" too.
+- New command: **Move task to note…** moves the task under the cursor, with its subtasks, to the end of another note. It's in the command palette and the editor's right-click menu, with recently opened notes at the top of the list. Undo in the original note brings the task back there.
+- New commands open the previous or next day, week, month, quarter or year: **Open previous day's note**, **Open next week's note** and so on. They count from the journal note you have open, so from 24 October, next day opens 25 October and next week opens week 44. From any other note, or from a bigger period like a month note asked for the next day, they count from today. Give them a hotkey in Settings → Hotkeys.
+
+## 2026.10.22
+
+- Every Klaar command now has an icon, so **Move task to…**, the toggles and **Cycle priority** show properly when you add them to the mobile toolbar (Settings → Mobile), instead of a question mark.
+
+## 2026.10.21
+
+- New commands open the note for today, this week, this month, this quarter or this year: **Open today's note**, **Open this week's note** and so on. Give them a hotkey in Settings → Hotkeys. Only the period types you use are listed.
+- In the Tasks and Board views, the Today button now has a small arrow next to it. Click it to open this week's, this month's, this quarter's or this year's note instead. Cmd/Ctrl-click opens a new tab.
+- On mobile, the toolbar buttons show as icons, and the Today button is back.
 
 ## 2026.10.20
 
