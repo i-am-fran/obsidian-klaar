@@ -102,3 +102,7 @@ Changes are listed in the [changelog](CHANGELOG.md).
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+## Made with AI
+
+Part of this project has been developed with the help of AI. I'm improving my development skills and it's helping me to learn new skills and review my code. If you don't like it, I understand your stance.
