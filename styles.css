@@ -328,6 +328,28 @@ body {
 	stroke-width: 3px;
 }
 
+/* On mobile the sidebar drawer is narrow and the text larger: less side padding and a narrower week
+   column give the days more width, and taller cells keep the markers in their own row under the number. */
+.is-mobile .klaar-calendar {
+	padding-left: var(--size-4-2);
+	padding-right: var(--size-4-2);
+}
+
+.is-mobile .klaar-cal-grid:not(.no-weeks) {
+	grid-template-columns: 1.8em repeat(7, 1fr);
+}
+
+.is-mobile .klaar-cal-day,
+.is-mobile .klaar-cal-weeknum.klaar-cal-link {
+	box-sizing: border-box;
+	min-height: 2.6em;
+	padding-bottom: 8px;
+}
+
+.is-mobile .klaar-cal-marks {
+	bottom: 3px;
+}
+
 /* Accordion: header button plus a body that slides open. */
 .klaar-acc > .klaar-acc-head {
 	display: flex;
