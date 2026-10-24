@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2026.10.24
 
 - **Move task to…** is now called **Schedule task…**, since that's what it does. Hotkeys and mobile toolbar buttons you set up for it keep working. The calendar button on each task now says "Schedule task" too.
 - New command: **Move task to note…** moves the task under the cursor, with its subtasks, to the end of another note. It's in the command palette and the editor's right-click menu, with recently opened notes at the top of the list. Undo in the original note brings the task back there.
