@@ -113,17 +113,14 @@ export default class KlaarPlugin extends Plugin {
 			icon: 'list-checks',
 			editorCheckCallback: (checking, editor) => this.moveDoneTasks(editor, checking),
 		});
-		// The note's "⋯" menu; only for an open note, so the move goes through its editor and can be undone there.
+		// The note's "⋯" menu (desktop and mobile); only for an open note, so the move goes through its editor and can be
+		// undone there. No section, so it sits with other plugins' items near the bottom. Without a leaf, the active note.
 		this.registerEvent(
 			this.app.workspace.on('file-menu', (menu, file, _source, leaf) => {
-				const view = leaf?.view;
+				const view = leaf?.view ?? this.app.workspace.getActiveViewOfType(MarkdownView);
 				if (!(view instanceof MarkdownView) || view.file !== file || !this.moveDoneTasks(view.editor, true)) return;
 				menu.addItem((item) =>
-					item
-						.setTitle('Move done tasks to the bottom')
-						.setIcon('list-checks')
-						.setSection('action')
-						.onClick(() => this.moveDoneTasks(view.editor, false)),
+					item.setTitle('Move done tasks to the bottom').setIcon('list-checks').onClick(() => this.moveDoneTasks(view.editor, false)),
 				);
 			}),
 		);
