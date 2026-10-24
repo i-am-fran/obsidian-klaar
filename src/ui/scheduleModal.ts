@@ -3,10 +3,10 @@ import { matchDateOptions, type DateOption } from '../core/dateOptions';
 import { todayIso } from '../core/dates';
 import type { EnabledPeriods } from '../core/periods';
 
-class MoveModal extends SuggestModal<DateOption> {
+class ScheduleModal extends SuggestModal<DateOption> {
 	constructor(app: App, private readonly enabled: EnabledPeriods, private readonly onPick: (key: string) => void) {
 		super(app);
-		this.setPlaceholder('Move task to…');
+		this.setPlaceholder('Schedule task for…');
 	}
 
 	getSuggestions(query: string): DateOption[] {
@@ -24,6 +24,6 @@ class MoveModal extends SuggestModal<DateOption> {
 }
 
 /** Asks for a date or period of an enabled kind and calls `onPick` with its key. */
-export function openMoveModal(app: App, enabled: EnabledPeriods, onPick: (key: string) => void): void {
-	new MoveModal(app, enabled, onPick).open();
+export function openScheduleModal(app: App, enabled: EnabledPeriods, onPick: (key: string) => void): void {
+	new ScheduleModal(app, enabled, onPick).open();
 }

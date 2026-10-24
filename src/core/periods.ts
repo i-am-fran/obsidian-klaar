@@ -105,6 +105,29 @@ export function periodOf(kind: PeriodKind, d: IsoDate): Period {
 	}
 }
 
+/**
+ * The period of `kind` holding `anchor`, moved `delta` periods back or forward. A week anchor counts by its Thursday,
+ * so a week note's previous month is the one before the month that week belongs to.
+ */
+export function adjacentPeriod(kind: PeriodKind, anchor: Period, delta: number): Period {
+	const d = anchor.kind === 'week' ? addDays(anchor.start, 3) : anchor.start;
+	switch (kind) {
+		case 'day':
+			return periodOf('day', addDays(d, delta));
+		case 'week':
+			return periodOf('week', addDays(periodOf('week', d).start, delta * 7));
+		case 'month':
+		case 'quarter': {
+			const months = kind === 'month' ? 1 : 3;
+			const index = yearOf(d) * 12 + monthOf(d) - 1 + delta * months;
+			const year = Math.floor(index / 12);
+			return periodOf(kind, `${pad(year, 4)}-${pad(index - year * 12 + 1, 2)}-01`);
+		}
+		case 'year':
+			return yearPeriod(yearOf(d) + delta);
+	}
+}
+
 /** Parses a period key (day, week, month, quarter or year), or null if it isn't one. */
 export function parsePeriodKey(key: string): Period | null {
 	let m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(key);

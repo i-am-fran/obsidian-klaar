@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { addDays, todayIso, weekday } from '../../src/core/dates';
-import { ALL_PERIODS, childKindIn, contains, isoWeek, parsePeriodKey, parentKind, periodOf } from '../../src/core/periods';
+import { ALL_PERIODS, adjacentPeriod, childKindIn, contains, isoWeek, parsePeriodKey, parentKind, periodOf } from '../../src/core/periods';
 
 describe('periods', () => {
 	test('iso week boundaries', () => {
@@ -17,6 +17,20 @@ describe('periods', () => {
 		expect(parsePeriodKey('2025-W53')).toBeNull();
 		expect(parsePeriodKey('2026-02-30')).toBeNull();
 		expect(parsePeriodKey('Meeting notes')).toBeNull();
+	});
+	test('adjacent periods', () => {
+		const day = parsePeriodKey('2026-12-31')!;
+		expect(adjacentPeriod('day', day, 1).key).toBe('2027-01-01');
+		expect(adjacentPeriod('day', day, -1).key).toBe('2026-12-30');
+		expect(adjacentPeriod('week', day, 1).key).toBe('2027-W01');
+		expect(adjacentPeriod('week', parsePeriodKey('2026-01-01')!, -1).key).toBe('2025-W52');
+		expect(adjacentPeriod('month', day, 1).key).toBe('2027-01');
+		expect(adjacentPeriod('month', parsePeriodKey('2026-01')!, -1).key).toBe('2025-12');
+		expect(adjacentPeriod('quarter', day, 1).key).toBe('2027-Q1');
+		expect(adjacentPeriod('quarter', parsePeriodKey('2026-Q1')!, -1).key).toBe('2025-Q4');
+		expect(adjacentPeriod('year', day, -1).key).toBe('2025');
+		// Week 27 starts on Monday 29 June, but its Thursday is in July.
+		expect(adjacentPeriod('month', parsePeriodKey('2026-W27')!, 1).key).toBe('2026-08');
 	});
 	test('containment', () => {
 		expect(contains(parsePeriodKey('2026-W43')!, parsePeriodKey('2026-10-22')!)).toBe(true);

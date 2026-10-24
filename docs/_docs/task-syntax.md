@@ -57,12 +57,14 @@ The roles are Label, High priority, Medium priority, Low priority and In progres
 
 | Command | What it does |
 | --- | --- |
-| Move task to… | Schedule or reschedule the task under the cursor. |
+| Schedule task… | Schedule or reschedule the task under the cursor. |
+| Move task to note… | Move the task under the cursor, with its subtasks, to the end of another note. |
 | Toggle in progress | Switch between open and in progress. |
 | Toggle next | Switch between open and `[>]`. |
 | Toggle someday | Switch between open and `[<]`. |
 | Cycle priority | Step `#p3` → `#p2` → `#p1` → no priority. |
 | Open calendar | Show the calendar in the sidebar. |
 | Open today's note | Open (or create) today's note. Also for this week, this month, this quarter and this year, for the period types you use. |
+| Open previous day's note | Open the day before the journal note you have open, or yesterday from any other note. **Open next day's note** goes the other way. Also for weeks, months, quarters and years. |
 
 The toggles and **Cycle priority** work on every task in a selection, as one undo step. Klaar sets no hotkeys of its own: give any of these one in Settings → Hotkeys. Each command has an icon, so the editing ones can go on the mobile toolbar too (Settings → Mobile).

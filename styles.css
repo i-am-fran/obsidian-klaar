@@ -627,7 +627,7 @@ body {
 	scale: 0.96;
 }
 
-/* Where there is a pointer, the move button appears with the row; touch keeps it visible. */
+/* Where there is a pointer, the schedule button appears with the row; touch keeps it visible. */
 @media (hover: hover) {
 	.klaar-task-row > .klaar-task-move {
 		opacity: 0;

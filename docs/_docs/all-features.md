@@ -23,7 +23,8 @@ headings:
 - Today, Tomorrow and the next seven days by name
 - This week, Next week, This month, Next month, This quarter, This year
 - Type a full key, like `2026-W45`, to pick that exact period
-- **Move task to…** from the command palette or the right-click menu
+- **Schedule task…** from the command palette or the right-click menu
+- **Move task to note…** moves a task and its subtasks to the end of another note
 - Drag a task onto a calendar day to reschedule it
 - Tasks in a journal note belong to that note's period without a link
 - Date chips: Today, Tomorrow, Yesterday, `Fri 23 Oct`, `Week 43`, `Oct 2026`, `Q4 2026`, `2026`
@@ -44,7 +45,7 @@ headings:
 - Click a note's name to open it, Cmd/Ctrl-click for a new tab
 - Click a task to jump to its line, which flashes
 - Tick a task to update its own note
-- A move button on every task
+- A schedule button on every task
 - Asks before creating a missing note
 - Nothing is written into your notes
 
@@ -57,6 +58,7 @@ headings:
 - Opens by itself the first time, then stays where you put it
 - **Open calendar** command and ribbon icon
 - **Open today's note**, **Open this week's note** (and month, quarter, year) commands, ready for your hotkeys
+- **Open previous day's note**, **Open next day's note** (and week, month, quarter, year), counting from the journal note you have open
 - Works with the keyboard
 
 ### Tasks {#features-tasks}
