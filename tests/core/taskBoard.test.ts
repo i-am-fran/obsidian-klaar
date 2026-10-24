@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest';
 import { ALL_PERIODS } from '../../src/core/periods';
 import { DEFAULT_TAG_RULES, type TagRule } from '../../src/core/tagRules';
 import { ALL_MARKERS } from '../../src/core/taskLine';
-import { boardColumns, columnableTags, DEFAULT_BOARD_STATE, enabledTagColumns, tagColumnKey, dropAction, readBoardState, rewriteForColumn, visibleCards } from '../../src/core/taskBoard';
+import { boardColumns, boardRows, columnableTags, rowOptions, DEFAULT_BOARD_STATE, enabledTagColumns, tagColumnKey, dropAction, readBoardState, rewriteForColumn, visibleCards } from '../../src/core/taskBoard';
 import type { BoardBy } from '../../src/core/taskBoard';
 import type { TaskRef } from '../../src/core/tasks';
 
@@ -20,7 +20,7 @@ describe('readBoardState', () => {
 	test('empty gives defaults', () => expect(readBoardState(() => undefined)).toEqual(DEFAULT_BOARD_STATE));
 	test('reads saved values', () => {
 		const saved: Record<string, unknown> = { klaarBoardBy: 'date', klaarShowDone: false, klaarColumnWidth: 320 };
-		expect(readBoardState(k => saved[k])).toEqual({ by: 'date', showDone: false, columnWidth: 320 });
+		expect(readBoardState(k => saved[k])).toEqual({ by: 'date', showDone: false, columnWidth: 320, rows: 'none' });
 	});
 	test('bad values fall back or clamp', () => {
 		const bad: Record<string, unknown> = { klaarBoardBy: 'x', klaarShowDone: 'no', klaarColumnWidth: 'wide' };
@@ -250,5 +250,33 @@ describe('visibleCards', () => {
 	});
 	test('an expanded column shows everything', () => {
 		expect(visibleCards(many, true, 3)).toEqual({ shown: many, hidden: 0 });
+	});
+});
+
+describe('board rows', () => {
+	const note = (path: string) => path.replace(/\.md$/, '');
+	const a = task('a', '2026-10-21', { path: 'A.md', priority: 3, tags: ['#p1', '#claude'] });
+	const b = task('b', null, { path: 'B.md' });
+	test('readBoardState reads rows; columns already used are not allowed', () => {
+		expect(readBoardState(k => (k === 'klaarBoardRows' ? 'note' : undefined)).rows).toBe('note');
+		expect(readBoardState(k => (k === 'klaarBoardRows' ? 'bogus' : undefined)).rows).toBe('none');
+		const saved: Record<string, unknown> = { klaarBoardBy: 'priority', klaarBoardRows: 'priority' };
+		expect(readBoardState(k => saved[k]).rows).toBe('none');
+	});
+	test('row choices leave out what the columns show', () => {
+		expect(Object.keys(rowOptions('status'))).toEqual(['none', 'date', 'note', 'priority', 'tag']);
+		expect(Object.keys(rowOptions('priority'))).toEqual(['none', 'date', 'note', 'tag']);
+		expect(Object.keys(rowOptions('date'))).toEqual(['none', 'note', 'priority', 'tag']);
+	});
+	test('no rows is one unlabelled row with every task', () => {
+		expect(boardRows([a, b], 'none', note)).toEqual([{ label: '', key: null, tasks: [a, b] }]);
+	});
+	test('rows by note, priority and tag', () => {
+		expect(boardRows([b, a], 'note', note).map(r => r.label)).toEqual(['A', 'B']);
+		expect(boardRows([b, a], 'priority', note).map(r => r.label)).toEqual(['High', 'No priority']);
+		expect(boardRows([b, a], 'tag', note).map(r => [r.label, r.tasks.map(t => t.text)])).toEqual([['#claude', ['a']], ['#p1', ['a']], ['No tag', ['b']]]);
+	});
+	test('no tasks still gives one row, so the columns can take drops', () => {
+		expect(boardRows([], 'note', note)).toEqual([{ label: '', key: null, tasks: [] }]);
 	});
 });

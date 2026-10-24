@@ -24,7 +24,7 @@ headings:
 - This week, Next week, This month, Next month, This quarter, This year
 - Type a full key, like `2026-W45`, to pick that exact period
 - **Schedule task…** from the command palette or the right-click menu
-- **Move task to note…** moves a task and its subtasks to the end of another note
+- **Move task to note…** moves a task and its subtasks to the end or top of another note
 - Drag a task onto a calendar day to reschedule it
 - Tasks in a journal note belong to that note's period without a link
 - Date chips: Today, Tomorrow, Yesterday, `Fri 23 Oct`, `Week 43`, `Oct 2026`, `Q4 2026`, `2026`
@@ -67,7 +67,8 @@ headings:
 - Each extra marker can be turned off
 - Someday tasks leave the scheduled lists and the calendar
 - Completed date stamp `(@done [[2026-10-23]])`, shown muted, as a chip or hidden
-- **Toggle in progress**, **Toggle next**, **Toggle someday** and **Cycle priority** commands
+- **Toggle in progress**, **Toggle next**, **Toggle someday**, **Toggle cancelled** and **Cycle priority** commands; **Cancel task** in the right-click menu
+- **Move done tasks to the bottom** gathers a note's done tasks under `## Done`, from the command palette or the right-click menu
 - Commands work on every task in a selection
 - Coloured tag pills in the editor, reading mode and Klaar's views
 - Tag roles: label, high, medium or low priority, in progress
@@ -78,9 +79,9 @@ headings:
 
 - Klaar Table: Task, Date and Note columns
 - Optional Status, Priority, Tags and Heading columns
-- Filters: Status, When (Overdue, Today, This week, Undated), Marker, Show subtasks
+- Filters: Status, When (Overdue, Today, This week, Undated), Marker, Tag, Show subtasks
 - Sort by date, priority, note or task, reversed if you like
-- Group by date, note or priority
+- Group by date, note, priority or tag
 - Search tasks, tags and note names
 - Task count, "n of m" while filtering
 - **New task** button that adds to today's note
@@ -88,6 +89,7 @@ headings:
 - Icon-only buttons on mobile
 - Klaar Board by status, priority or date
 - Tag columns per board, like Waiting or Blocked
+- Rows on the board by date, note, priority or tag
 - Show or hide the Done column
 - Adjustable column width
 - Long columns show the first 100 cards

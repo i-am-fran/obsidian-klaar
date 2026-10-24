@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { DEFAULT_TABLE_STATE, filterTasks, groupTasks, legacyKeysToSave, matchesSearch, matchesStatus, matchesWhen, readColumns, readTableState, sortTasks } from '../../src/core/taskTable';
+import { DEFAULT_TABLE_STATE, filterTasks, groupTasks, legacyKeysToSave, matchesSearch, matchesStatus, matchesTag, matchesWhen, readColumns, readTableState, sortTasks, taskTags } from '../../src/core/taskTable';
 import type { StatusFilter, TableState, WhenFilter } from '../../src/core/taskTable';
 import type { TaskRef } from '../../src/core/tasks';
 
@@ -56,7 +56,7 @@ describe('readTableState', () => {
 	const read = (cfg: Record<string, unknown>) => readTableState(k => cfg[k]);
 	test('nothing saved gives the defaults', () => {
 		expect(read({})).toEqual(DEFAULT_TABLE_STATE);
-		expect(DEFAULT_TABLE_STATE).toEqual({ status: 'open', when: 'any', marker: 'any', sort: 'date', reverse: false, group: 'date', subtasks: true });
+		expect(DEFAULT_TABLE_STATE).toEqual({ status: 'open', when: 'any', marker: 'any', sort: 'date', reverse: false, group: 'date', subtasks: true, tag: 'any' });
 	});
 	test('old date filter becomes Open + When; marker is read as-is', () => {
 		expect(read({ filter: 'this-week', marker: 'priority' })).toMatchObject({ status: 'open', when: 'this-week', marker: 'priority' });
@@ -196,4 +196,46 @@ describe('filterTasks subtasks', () => {
 	const run = (subtasks: boolean) => filterTasks([parent, child], { ...DEFAULT_TABLE_STATE, subtasks }, '', today, () => 'Other').map(t => t.text);
 	test('shown by default', () => expect(run(true)).toEqual(['parent', 'child']));
 	test('hidden when switched off', () => expect(run(false)).toEqual(['parent']));
+});
+
+describe('tag filter', () => {
+	const claude = task('ask', null, { tags: ['#Claude'] });
+	const nested = task('review', null, { tags: ['#claude/review'] });
+	const other = task('other', null, { tags: ['#claudette'] });
+	const plain = task('plain', null);
+	test('any tag keeps everything', () => expect([claude, plain].filter(t => matchesTag(t, 'any'))).toHaveLength(2));
+	test('matches the tag and its nested tags, ignoring case', () => {
+		expect([claude, nested, other, plain].filter(t => matchesTag(t, '#claude')).map(t => t.text)).toEqual(['ask', 'review']);
+	});
+	test('a nested tag does not match its parent', () => expect(matchesTag(claude, '#claude/review')).toBe(false));
+	test('filterTasks applies it', () => {
+		expect(filterTasks([claude, plain], { ...DEFAULT_TABLE_STATE, status: 'all', tag: '#claude' }, '', today, () => 'Other').map(t => t.text)).toEqual(['ask']);
+	});
+	test('readTableState reads a saved tag; anything else is any', () => {
+		expect(readTableState(k => (k === 'klaarTag' ? '#claude' : undefined)).tag).toBe('#claude');
+		expect(readTableState(k => (k === 'klaarTag' ? 'claude' : undefined)).tag).toBe('any');
+		expect(readTableState(k => (k === 'klaarTag' ? 3 : undefined)).tag).toBe('any');
+	});
+});
+
+describe('taskTags', () => {
+	test('every tag and its parents, once ignoring case, sorted', () => {
+		const tasks = [task('a', null, { tags: ['#work', '#Claude/review'] }), task('b', null, { tags: ['#claude', '#Work'] })];
+		expect(taskTags(tasks)).toEqual(['#Claude', '#Claude/review', '#work']);
+	});
+	test('no tasks, no tags', () => expect(taskTags([])).toEqual([]));
+});
+
+describe('groupTasks by tag', () => {
+	const both = task('both', null, { tags: ['#claude', '#bugs'] });
+	const one = task('one', null, { tags: ['#Claude'] });
+	const none = task('none', null);
+	const groups = groupTasks([none, one, both], { ...DEFAULT_TABLE_STATE, group: 'tag' }, () => 'Other');
+	test('one group per tag, alphabetical, untagged last', () => {
+		expect(groups.map(g => g.label)).toEqual(['#bugs', '#claude', 'No tag']);
+	});
+	test('a task with two tags is in both groups; case is ignored', () => {
+		expect(groups.map(g => g.tasks.map(t => t.text))).toEqual([['both'], ['one', 'both'], ['none']]);
+	});
+	test('readTableState accepts the tag group', () => expect(readTableState(k => (k === 'klaarGroup' ? 'tag' : undefined)).group).toBe('tag'));
 });

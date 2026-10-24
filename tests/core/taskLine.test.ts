@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { addTag, appendBlock, appendTaskLine, outdentBlock, taskBlockEnd, lineSpans, parseTaskLine, removeDoneStamp, removeTags, reopenTask, setChecked, setInProgressMarker, setOpenMarker, setSchedule, taskMarker, toggleNext, toggleSomeday } from '../../src/core/taskLine';
+import { addTag, appendBlock, appendTaskLine, moveDoneToSection, prependBlock, outdentBlock, taskBlockEnd, lineSpans, parseTaskLine, removeDoneStamp, removeTags, reopenTask, setChecked, setInProgressMarker, setOpenMarker, setSchedule, taskMarker, toggleCancelled, toggleNext, toggleSomeday } from '../../src/core/taskLine';
 
 describe('parseTaskLine', () => {
 	test('schedule link must be > plus a valid period', () => {
@@ -300,5 +300,65 @@ describe('appendBlock', () => {
 		expect(appendBlock('', ['- [ ] A', '\t- [ ] B'])).toBe('- [ ] A\n\t- [ ] B\n');
 		expect(appendBlock('# Notes', ['- [ ] A'])).toBe('# Notes\n- [ ] A\n');
 		expect(appendBlock('# Notes\n', ['- [ ] A'])).toBe('# Notes\n- [ ] A\n');
+	});
+});
+
+describe('prependBlock', () => {
+	test('adds the lines at the start, on lines of their own', () => {
+		expect(prependBlock('', ['- [ ] A', '\t- [ ] B'])).toBe('- [ ] A\n\t- [ ] B\n');
+		expect(prependBlock('# Notes\n- [ ] B\n', ['- [ ] A'])).toBe('- [ ] A\n# Notes\n- [ ] B\n');
+	});
+
+	test('goes after the frontmatter', () => {
+		expect(prependBlock('---\ntags: x\n---\n# Notes\n', ['- [ ] A'])).toBe('---\ntags: x\n---\n- [ ] A\n# Notes\n');
+		expect(prependBlock('---\ntags: x\n---', ['- [ ] A'])).toBe('---\ntags: x\n---\n- [ ] A\n');
+	});
+
+	test('a note with an unclosed --- has no frontmatter', () => {
+		expect(prependBlock('---\nnot closed\n', ['- [ ] A'])).toBe('- [ ] A\n---\nnot closed\n');
+	});
+});
+
+describe('moveDoneToSection', () => {
+	const move = (text: string) => moveDoneToSection(text.split('\n'))?.join('\n') ?? null;
+
+	test('creates ## Done at the end and moves done tasks there, in order, with their subtasks', () => {
+		expect(move('# Today\n- [x] A\n\t- [ ] A1\n- [ ] B\n- [X] C\n')).toBe('# Today\n- [ ] B\n\n## Done\n- [x] A\n\t- [ ] A1\n- [X] C\n');
+	});
+
+	test('adds to the end of an existing ## Done section, before the next heading', () => {
+		expect(move('- [x] A\n- [ ] B\n\n## Done\n- [x] Old\n\n## Notes\ntext\n')).toBe('- [ ] B\n\n## Done\n- [x] Old\n- [x] A\n\n## Notes\ntext\n');
+		expect(move('## done\n- [x] Old\n### Sub\n- [x] S\n- [x] A')).toBe(null);
+	});
+
+	test('leaves tasks already under ## Done, open, cancelled and nested done tasks alone', () => {
+		expect(move('- [ ] A\n\t- [x] A1\n- [-] B\n\n## Done\n- [x] Old\n')).toBe(null);
+		expect(move('- [ ] A\n')).toBe(null);
+	});
+
+	test('skips tasks in code blocks', () => {
+		expect(move('```\n- [x] code\n```\n- [ ] A\n')).toBe(null);
+	});
+
+	test('a note without a trailing newline', () => {
+		expect(move('- [x] A\n- [ ] B')).toBe('- [ ] B\n\n## Done\n- [x] A');
+	});
+});
+
+describe('toggleCancelled', () => {
+	test('switches [ ] and [-]', () => {
+		expect(toggleCancelled('- [ ] A >[[2026-10-21]]')).toBe('- [-] A >[[2026-10-21]]');
+		expect(toggleCancelled('- [-] A')).toBe('- [ ] A');
+		expect(toggleCancelled('\t* [ ] A\r')).toBe('\t* [-] A\r');
+	});
+	test('from any other state gives [-], losing the done stamp', () => {
+		expect(toggleCancelled('- [/] A')).toBe('- [-] A');
+		expect(toggleCancelled('- [>] A')).toBe('- [-] A');
+		expect(toggleCancelled('- [<] A')).toBe('- [-] A');
+		expect(toggleCancelled('- [x] A (@done [[2026-10-21]])')).toBe('- [-] A');
+	});
+	test('leaves other lines alone', () => {
+		expect(toggleCancelled('- [!] A')).toBe('- [!] A');
+		expect(toggleCancelled('Text')).toBe('Text');
 	});
 });

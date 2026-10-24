@@ -26,9 +26,12 @@ export interface KlaarSettings {
 	dateLabels: DateLabelStyle;
 	/** How the `(@done [[DATE]])` stamp shows in live preview and reading mode. */
 	doneStamp: DoneStampStyle;
+	/** Where "Move task to note…" puts the task in the other note. */
+	moveTo: MovePosition;
 }
 
 export type DoneStampStyle = 'muted' | 'hidden' | 'chip';
+export type MovePosition = 'end' | 'start';
 
 export const DEFAULT_SETTINGS: KlaarSettings = {
 	periodFolder: 'Daily',
@@ -42,6 +45,7 @@ export const DEFAULT_SETTINGS: KlaarSettings = {
 	tags: DEFAULT_TAG_RULES.map((r) => ({ ...r })),
 	dateLabels: 'friendly',
 	doneStamp: 'muted',
+	moveTo: 'end',
 };
 
 const PERIOD_TOGGLES: { kind: PeriodKind; name: string }[] = [
@@ -93,6 +97,11 @@ export class KlaarSettingTab extends PluginSettingTab {
 						name: 'Mark someday with [<]',
 						desc: 'A [<] task is parked for someday: it leaves the scheduled sections, the calendar and the open-task filters until you bring it back. Turn off to leave [<] lines alone.',
 						control: { type: 'toggle', key: 'somedayMarker' },
+					},
+					{
+						name: 'Move task to note puts it at',
+						desc: 'Where "Move task to note…" adds the task in the other note. The top is just below any frontmatter.',
+						control: { type: 'dropdown', key: 'moveTo', options: { end: 'The end of the note', start: 'The top of the note' } },
 					},
 				],
 			},

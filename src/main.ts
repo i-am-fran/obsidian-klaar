@@ -7,7 +7,7 @@ import { DEFAULT_SETTINGS, KlaarSettings, KlaarSettingTab } from './settings';
 import { TaskIndex } from './obsidian/taskIndex';
 import { openPeriodNote, periodOfFile } from './obsidian/periodNotes';
 import { DEFAULT_TAG_RULES, canMarkInProgress, cyclePriorityTag, normaliseTagRules, toggleInProgress } from './core/tagRules';
-import { appendBlock, markersOf, outdentBlock, parseTaskLine, setSchedule, taskBlockEnd, toggleNext, toggleSomeday } from './core/taskLine';
+import { appendBlock, markersOf, moveDoneToSection, outdentBlock, parseTaskLine, prependBlock, setSchedule, taskBlockEnd, toggleCancelled, toggleNext, toggleSomeday } from './core/taskLine';
 import { flashLineExtension } from './ui/flashLine';
 import { DateSuggest } from './ui/dateSuggest';
 import { dateChipsExtension, dateChipsPostProcessor } from './ui/dateChips';
@@ -96,13 +96,30 @@ export default class KlaarPlugin extends Plugin {
 			editorCheckCallback: (checking, editor) => this.settings.somedayMarker && this.rewriteSelectedTasks(editor, checking, toggleSomeday),
 		});
 		this.addCommand({
+			id: 'toggle-cancelled',
+			name: 'Toggle cancelled',
+			icon: 'circle-slash',
+			editorCheckCallback: (checking, editor) => this.rewriteSelectedTasks(editor, checking, toggleCancelled),
+		});
+		this.addCommand({
 			id: 'cycle-priority',
 			name: 'Cycle priority',
 			icon: 'flag',
 			editorCheckCallback: (checking, editor) => this.rewriteSelectedTasks(editor, checking, (line) => cyclePriorityTag(line, this.settings.tags)),
 		});
+		this.addCommand({
+			id: 'move-done-tasks',
+			name: 'Move done tasks to the bottom',
+			icon: 'list-checks',
+			editorCheckCallback: (checking, editor) => this.moveDoneTasks(editor, checking),
+		});
 		this.registerEvent(
 			this.app.workspace.on('editor-menu', (menu, editor, ctx) => {
+				if (this.moveDoneTasks(editor, true)) {
+					menu.addItem((item) =>
+						item.setTitle('Move done tasks to the bottom').setIcon('list-checks').onClick(() => this.moveDoneTasks(editor, false)),
+					);
+				}
 				if (!this.cursorOnTask(editor)) return;
 				menu.addItem((item) =>
 					item.setTitle('Schedule task…').setIcon('calendar-arrow-up').onClick(() => this.scheduleTaskUnderCursor(editor)),
@@ -113,6 +130,13 @@ export default class KlaarPlugin extends Plugin {
 						item.setTitle('Move task to note…').setIcon('file-input').onClick(() => this.moveTaskUnderCursor(editor, path)),
 					);
 				}
+				const cancelled = parseTaskLine(editor.getLine(editor.getCursor().line), markersOf(this.settings))?.cancelled ?? false;
+				menu.addItem((item) =>
+					item
+						.setTitle(cancelled ? 'Reopen task' : 'Cancel task')
+						.setIcon(cancelled ? 'circle' : 'circle-slash')
+						.onClick(() => this.rewriteSelectedTasks(editor, false, toggleCancelled)),
+				);
 			}),
 		);
 
@@ -211,6 +235,27 @@ export default class KlaarPlugin extends Plugin {
 	}
 
 	/**
+	 * Moves the note's done tasks under `## Done` at the bottom (see `moveDoneToSection`), as one undo step. False when
+	 * there are none to move.
+	 */
+	private moveDoneTasks(editor: Editor, checking: boolean): boolean {
+		const lines = Array.from({ length: editor.lineCount() }, (_, i) => editor.getLine(i));
+		const next = moveDoneToSection(lines, markersOf(this.settings));
+		if (!next) return false;
+		if (checking) return true;
+		// Only rewrite from the first line that changes, so the text above keeps its place.
+		let first = 0;
+		while (lines[first] === next[first]) first++;
+		const cursor = editor.getCursor();
+		const last = lines.length - 1;
+		editor.transaction({
+			changes: [{ from: { line: first, ch: 0 }, to: { line: last, ch: lines[last]?.length ?? 0 }, text: next.slice(first).join('\n') }],
+		});
+		editor.setCursor(Math.min(cursor.line, editor.lineCount() - 1), 0);
+		return true;
+	}
+
+	/**
 	 * Where previous and next count from: the open journal note when it is this kind or smaller (a day note's next
 	 * week is the week after the one it sits in), otherwise today.
 	 */
@@ -231,8 +276,9 @@ export default class KlaarPlugin extends Plugin {
 	}
 
 	/**
-	 * Moves the task on the cursor line, with its subtasks, to the end of another note. The target is written first,
-	 * so a failed write leaves the task where it was; the removal goes through the editor, so it can be undone there.
+	 * Moves the task on the cursor line, with its subtasks, to the end or top of another note (setting `moveTo`). The
+	 * target is written first, so a failed write leaves the task where it was; the removal goes through the editor, so it
+	 * can be undone there.
 	 */
 	private moveTaskUnderCursor(editor: Editor, sourcePath: string) {
 		const start = editor.getCursor().line;
@@ -247,7 +293,7 @@ export default class KlaarPlugin extends Plugin {
 			const end = taskBlockEnd(lines, start);
 			const block = outdentBlock(lines.slice(start, end));
 			this.app.vault
-				.process(target, (content) => appendBlock(content, block))
+				.process(target, (content) => (this.settings.moveTo === 'start' ? prependBlock(content, block) : appendBlock(content, block)))
 				.then(() => {
 					const to = end < editor.lineCount() ? { line: end, ch: 0 } : { line: end - 1, ch: editor.getLine(end - 1).length };
 					const from = end < editor.lineCount() || start === 0 ? { line: start, ch: 0 } : { line: start - 1, ch: editor.getLine(start - 1).length };

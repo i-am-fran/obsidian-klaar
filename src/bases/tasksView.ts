@@ -1,9 +1,9 @@
-import type { BasesAllOptions, BasesViewRegistration, QueryController } from 'obsidian';
+import type { BasesAllOptions, BasesViewConfig, BasesViewRegistration, QueryController } from 'obsidian';
 import { todayIso } from '../core/dates';
 import { isOpen } from '../core/query';
 import { ruleFor } from '../core/tagRules';
 import { withoutTags } from '../core/taskFields';
-import { COLUMN_KEYS, TOOLBAR_KEY, filterTasks, groupTasks, legacyKeysToSave, readColumns, readTableState, type OptionalColumn } from '../core/taskTable';
+import { COLUMN_KEYS, TOOLBAR_KEY, filterTasks, groupTasks, legacyKeysToSave, readColumns, readTableState, taskTags, type OptionalColumn } from '../core/taskTable';
 import type { TaskRef } from '../core/tasks';
 import type { KlaarSettings } from '../settings';
 import { renderScheduleChip } from '../ui/dateChips';
@@ -116,8 +116,9 @@ class TasksView extends TaskBasesView {
 	}
 }
 
-/** The view's menu: filters, sort and group, columns, and whether the search bar shows. */
-function viewOptions(): BasesAllOptions[] {
+/** The view's menu: filters (the Tag filter offers every tag on a task in the vault), sort and group, columns, and whether the search bar shows. */
+function viewOptions(config: BasesViewConfig, deps: TasksViewDeps): BasesAllOptions[] {
+	const savedTag = readTableState((k) => config.get(k)).tag;
 	return [
 		{ type: 'toggle', key: TOOLBAR_KEY, displayName: 'Show search', default: true },
 		{
@@ -125,7 +126,7 @@ function viewOptions(): BasesAllOptions[] {
 			displayName: 'Columns',
 			items: (Object.keys(COLUMN_LABELS) as OptionalColumn[]).map((c) => ({ type: 'toggle', key: COLUMN_KEYS[c], displayName: COLUMN_LABELS[c], default: false })),
 		},
-		{ type: 'group', displayName: 'Filters', items: filterOptions(true) },
+		{ type: 'group', displayName: 'Filters', items: filterOptions(true, taskTags(deps.index.all()), savedTag) },
 		{ type: 'group', displayName: 'Sort and group', items: sortOptions(true) },
 	];
 }
@@ -135,6 +136,6 @@ export function tasksViewRegistration(deps: TasksViewDeps): BasesViewRegistratio
 		name: 'Klaar Table',
 		icon: 'list-checks',
 		factory: (controller, containerEl) => new TasksView(controller, containerEl, deps),
-		options: viewOptions,
+		options: (config) => viewOptions(config, deps),
 	};
 }
