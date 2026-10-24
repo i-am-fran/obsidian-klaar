@@ -75,15 +75,16 @@ headings:
 
 - Klaar Table: Task, Date and Note columns
 - Optional Status, Priority, Tags and Heading columns
-- Filters: Status, When (Overdue, Today, This week, Undated), Marker, Show subtasks
+- Filters: Status, When (Overdue, Today, This week, Undated), Marker, Tag, Show subtasks
 - Sort by date, priority, note or task, reversed if you like
-- Group by date, note or priority
+- Group by date, note, priority or tag
 - Search tasks, tags and note names
 - Task count, "n of m" while filtering
 - **New task** button that adds to today's note
 - **Today** button that opens today's note (desktop)
 - Klaar Board by status, priority or date
 - Tag columns per board, like Waiting or Blocked
+- Rows on the board by date, note, priority or tag
 - Show or hide the Done column
 - Adjustable column width
 - Long columns show the first 100 cards

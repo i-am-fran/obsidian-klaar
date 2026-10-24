@@ -6,7 +6,9 @@ import { canMarkInProgress, priorityLevels, setInProgress, setPriorityTag } from
 import type { TagRule } from './tagRules';
 import { ALL_MARKERS, addTag, parseTaskLine, removeTags, reopenTask, setChecked, setOpenMarker, setSchedule } from './taskLine';
 import type { MarkerSettings, Priority } from './taskLine';
-import { matchesWhen } from './taskTable';
+import { groupSorted, matchesWhen } from './taskTable';
+import type { GroupKey } from './taskTable';
+import type { TaskGroup } from './query';
 import type { TaskRef } from './tasks';
 
 export type BoardBy = 'status' | 'priority' | 'date';
@@ -25,17 +27,26 @@ export interface BoardState {
 	by: BoardBy;
 	showDone: boolean;
 	columnWidth: number;
+	/** What splits the board into rows; never what the columns already show. */
+	rows: GroupKey;
 }
 
 /** Config keys the board saves under; prefixed so they never clash with Bases' own keys. */
-export const BOARD_KEYS = { by: 'klaarBoardBy', showDone: 'klaarShowDone', columnWidth: 'klaarColumnWidth' } as const;
+export const BOARD_KEYS = { by: 'klaarBoardBy', showDone: 'klaarShowDone', columnWidth: 'klaarColumnWidth', rows: 'klaarBoardRows' } as const;
 
-export const DEFAULT_BOARD_STATE: BoardState = { by: 'status', showDone: true, columnWidth: 280 };
+export const DEFAULT_BOARD_STATE: BoardState = { by: 'status', showDone: true, columnWidth: 280, rows: 'none' };
 
 /** Names for each board kind, for the Columns pickers. */
 export const BOARD_BY_LABELS: Record<BoardBy, string> = { status: 'Status', priority: 'Priority', date: 'Date' };
 
 const BOARD_BYS: BoardBy[] = ['status', 'priority', 'date'];
+
+const ROW_LABELS: Record<GroupKey, string> = { none: 'No rows', date: 'Date', note: 'Note', priority: 'Priority', tag: 'Tag' };
+
+/** The Rows picker's choices for a board, leaving out what its columns show. */
+export function rowOptions(by: BoardBy): Partial<Record<GroupKey, string>> {
+	return Object.fromEntries(Object.entries(ROW_LABELS).filter(([key]) => key !== by));
+}
 const MIN_WIDTH = 200;
 const MAX_WIDTH = 480;
 
@@ -73,10 +84,12 @@ export function readBoardState(get: (key: string) => unknown): BoardState {
 	const by = BOARD_BYS.find(b => b === get(BOARD_KEYS.by));
 	const showDone = get(BOARD_KEYS.showDone);
 	const width = get(BOARD_KEYS.columnWidth);
+	const rows = (Object.keys(rowOptions(by ?? d.by)) as GroupKey[]).find(r => r === get(BOARD_KEYS.rows));
 	return {
 		by: by ?? d.by,
 		showDone: typeof showDone === 'boolean' ? showDone : d.showDone,
 		columnWidth: typeof width === 'number' && Number.isFinite(width) ? Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, width)) : d.columnWidth,
+		rows: rows ?? d.rows,
 	};
 }
 
@@ -139,6 +152,15 @@ export function boardColumns(tasks: TaskRef[], by: BoardBy, today: IsoDate, rule
 			return ids.map(id => column(id, open.filter(t => dateBucket(t, today) === id)));
 		}
 	}
+}
+
+/**
+ * The board's rows, each drawn with every column. Rows only sort cards for looking: a drop changes the column, never
+ * the row. A task with several tags is in each tag's row. With no tasks there is still one row, so columns take drops.
+ */
+export function boardRows(sorted: TaskRef[], rows: GroupKey, noteName: (path: string) => string): TaskGroup[] {
+	const groups = rows === 'none' ? [] : groupSorted(sorted, rows, false, noteName);
+	return groups.length > 0 ? groups : [{ label: '', key: null, tasks: sorted }];
 }
 
 export type DropAction = 'rewrite' | 'pick' | 'none';

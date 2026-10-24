@@ -7,7 +7,7 @@ import type { TaskRef } from './tasks';
 export type StatusFilter = 'open' | 'done' | 'someday' | 'cancelled' | 'all';
 export type WhenFilter = 'any' | 'overdue' | 'today' | 'this-week' | 'undated';
 export type SortKey = 'date' | 'priority' | 'note' | 'task';
-export type GroupKey = 'date' | 'note' | 'priority' | 'none';
+export type GroupKey = 'date' | 'note' | 'priority' | 'tag' | 'none';
 
 /** What the Tasks view toolbar shows, saved per view. The search text is not part of it. */
 export interface TableState {
@@ -19,12 +19,14 @@ export interface TableState {
 	group: GroupKey;
 	/** Tasks nested under another task; off hides them. */
 	subtasks: boolean;
+	/** `any`, or a `#tag`: only tasks with that tag or one nested under it. */
+	tag: string;
 }
 
-export const DEFAULT_TABLE_STATE: TableState = { status: 'open', when: 'any', marker: 'any', sort: 'date', reverse: false, group: 'date', subtasks: true };
+export const DEFAULT_TABLE_STATE: TableState = { status: 'open', when: 'any', marker: 'any', sort: 'date', reverse: false, group: 'date', subtasks: true, tag: 'any' };
 
 /** Config keys the view saves under; prefixed so they never clash with Bases' own keys (`sort`, `groupBy`, `filters`...). */
-export const TABLE_KEYS = { status: 'klaarStatus', when: 'klaarWhen', marker: 'klaarMarker', sort: 'klaarSort', reverse: 'klaarReverse', group: 'klaarGroup', subtasks: 'klaarSubtasks' } as const;
+export const TABLE_KEYS = { status: 'klaarStatus', when: 'klaarWhen', marker: 'klaarMarker', sort: 'klaarSort', reverse: 'klaarReverse', group: 'klaarGroup', subtasks: 'klaarSubtasks', tag: 'klaarTag' } as const;
 
 /** Saved toggle for the toolbar above the table; on unless saved as `false`. */
 export const TOOLBAR_KEY = 'klaarToolbar';
@@ -44,7 +46,7 @@ const STATUSES: StatusFilter[] = ['open', 'done', 'someday', 'cancelled', 'all']
 const WHENS: WhenFilter[] = ['any', 'overdue', 'today', 'this-week', 'undated'];
 const MARKERS: MarkerFilter[] = ['any', 'in-progress', 'next', 'priority'];
 const SORTS: SortKey[] = ['date', 'priority', 'note', 'task'];
-const GROUPS: GroupKey[] = ['date', 'note', 'priority', 'none'];
+const GROUPS: GroupKey[] = ['date', 'note', 'priority', 'tag', 'none'];
 
 function pick<T extends string>(value: unknown, allowed: T[]): T | undefined {
 	return allowed.find(a => a === value);
@@ -62,6 +64,7 @@ export function readTableState(get: (key: string) => unknown): TableState {
 	}
 	const reverse = get(TABLE_KEYS.reverse);
 	const subtasks = get(TABLE_KEYS.subtasks);
+	const tag = get(TABLE_KEYS.tag);
 	return {
 		status: status ?? d.status,
 		when: when ?? d.when,
@@ -70,6 +73,7 @@ export function readTableState(get: (key: string) => unknown): TableState {
 		reverse: typeof reverse === 'boolean' ? reverse : d.reverse,
 		group: pick(get(TABLE_KEYS.group), GROUPS) ?? d.group,
 		subtasks: typeof subtasks === 'boolean' ? subtasks : d.subtasks,
+		tag: typeof tag === 'string' && tag.startsWith('#') ? tag : d.tag,
 	};
 }
 
@@ -124,6 +128,31 @@ export function matchesWhen(t: TaskRef, w: WhenFilter, today: IsoDate): boolean 
 	}
 }
 
+/** The task has `tag` (`#tag`) or a tag nested under it, ignoring case; `any` matches every task. */
+export function matchesTag(t: TaskRef, tag: string): boolean {
+	if (tag === 'any') return true;
+	const want = tag.toLowerCase();
+	return t.tags.some(own => {
+		const lower = own.toLowerCase();
+		return lower === want || lower.startsWith(`${want}/`);
+	});
+}
+
+/** Every tag on the tasks plus the parents of nested ones, for the Tag filter: once each ignoring case (first spelling wins), sorted. */
+export function taskTags(tasks: TaskRef[]): string[] {
+	const byLower = new Map<string, string>();
+	for (const t of tasks) {
+		for (const tag of t.tags) {
+			const parts = tag.split('/');
+			for (let i = 1; i <= parts.length; i++) {
+				const name = parts.slice(0, i).join('/');
+				if (!byLower.has(name.toLowerCase())) byLower.set(name.toLowerCase(), name);
+			}
+		}
+	}
+	return [...byLower.values()].sort(compareText);
+}
+
 /** Case-insensitive substring match on the task text (markers excluded), its tags and the note name. */
 export function matchesSearch(t: TaskRef, query: string, noteName: string): boolean {
 	const q = query.trim().toLowerCase();
@@ -137,6 +166,7 @@ export function filterTasks(tasks: TaskRef[], state: TableState, query: string, 
 		matchesStatus(t, state.status) &&
 		matchesWhen(t, state.when, today) &&
 		matchesMarker(t, state.marker) &&
+		matchesTag(t, state.tag) &&
 		matchesSearch(t, query, noteName(t.path)));
 }
 
@@ -180,8 +210,12 @@ const PRIORITY_LABELS = ['No priority', 'Low', 'Medium', 'High'];
 /** Sorted rows split into groups. Groups keep their natural order unless the group key is also the sort key. */
 export function groupTasks(tasks: TaskRef[], state: TableState, noteName: (path: string) => string): TaskGroup[] {
 	const sorted = sortTasks(tasks, state.sort, state.reverse, noteName);
-	const flip = state.reverse && state.sort === state.group;
-	switch (state.group) {
+	return groupSorted(sorted, state.group, state.reverse && state.sort === state.group, noteName);
+}
+
+/** Already sorted tasks split into groups, keeping their order inside each; `flip` reverses the groups' natural order. */
+export function groupSorted(sorted: TaskRef[], group: GroupKey, flip: boolean, noteName: (path: string) => string): TaskGroup[] {
+	switch (group) {
 		case 'none':
 			return sorted.length > 0 ? [{ label: '', key: null, tasks: sorted }] : [];
 		case 'date': {
@@ -208,6 +242,21 @@ export function groupTasks(tasks: TaskRef[], state: TableState, noteName: (path:
 			const rest = sorted.filter(t => t.priority === 0);
 			const unmarked: TaskGroup[] = rest.length > 0 ? [{ label: 'No priority', key: null, tasks: rest }] : [];
 			return [...(flip ? marked.reverse() : marked), ...unmarked];
+		}
+		case 'tag': {
+			// A task with several tags shows under each; tags that differ only in case share a group.
+			const byTag = new Map<string, TaskGroup>();
+			const untagged: TaskRef[] = [];
+			for (const t of sorted) {
+				if (t.tags.length === 0) untagged.push(t);
+				for (const tag of t.tags) {
+					const group = byTag.get(tag.toLowerCase()) ?? { label: tag.toLowerCase(), key: null, tasks: [] };
+					group.tasks.push(t);
+					byTag.set(tag.toLowerCase(), group);
+				}
+			}
+			const groups = [...byTag.values()].sort((a, b) => compareText(a.label, b.label));
+			return untagged.length > 0 ? [...groups, { label: 'No tag', key: null, tasks: untagged }] : groups;
 		}
 	}
 }

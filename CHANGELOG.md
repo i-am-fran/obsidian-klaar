@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026.10.21
+
+- The Klaar Table and Klaar Board have a **Tag** filter under Configure view → Filters. It lists every tag on your tasks, not only the ones in Settings → Tags, so you can pick `#claude` and see just those tasks. Nested tags count too: `#claude` also shows `#claude/review`.
+- The Klaar Table can group by tag. A task with two tags shows under both, and untagged tasks come last.
+- The Klaar Board can be split into **Rows** by date, note, priority or tag. Each row has every column and folds away when you click its title. Dragging a card still only changes its column, never its row.
+
 ## 2026.10.20
 
 - Tag columns no longer need typing: a board's Configure view now lists your tags from Settings → Tags (those with the Tag role), each with a switch. Turn one on to give it a column. Tags you typed into the old list need switching on again.
