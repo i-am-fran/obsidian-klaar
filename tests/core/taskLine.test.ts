@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { addTag, appendBlock, appendTaskLine, prependBlock, outdentBlock, taskBlockEnd, lineSpans, parseTaskLine, removeDoneStamp, removeTags, reopenTask, setChecked, setInProgressMarker, setOpenMarker, setSchedule, taskMarker, toggleNext, toggleSomeday } from '../../src/core/taskLine';
+import { addTag, appendBlock, appendTaskLine, moveDoneToSection, prependBlock, outdentBlock, taskBlockEnd, lineSpans, parseTaskLine, removeDoneStamp, removeTags, reopenTask, setChecked, setInProgressMarker, setOpenMarker, setSchedule, taskMarker, toggleNext, toggleSomeday } from '../../src/core/taskLine';
 
 describe('parseTaskLine', () => {
 	test('schedule link must be > plus a valid period', () => {
@@ -316,5 +316,31 @@ describe('prependBlock', () => {
 
 	test('a note with an unclosed --- has no frontmatter', () => {
 		expect(prependBlock('---\nnot closed\n', ['- [ ] A'])).toBe('- [ ] A\n---\nnot closed\n');
+	});
+});
+
+describe('moveDoneToSection', () => {
+	const move = (text: string) => moveDoneToSection(text.split('\n'))?.join('\n') ?? null;
+
+	test('creates ## Done at the end and moves done tasks there, in order, with their subtasks', () => {
+		expect(move('# Today\n- [x] A\n\t- [ ] A1\n- [ ] B\n- [X] C\n')).toBe('# Today\n- [ ] B\n\n## Done\n- [x] A\n\t- [ ] A1\n- [X] C\n');
+	});
+
+	test('adds to the end of an existing ## Done section, before the next heading', () => {
+		expect(move('- [x] A\n- [ ] B\n\n## Done\n- [x] Old\n\n## Notes\ntext\n')).toBe('- [ ] B\n\n## Done\n- [x] Old\n- [x] A\n\n## Notes\ntext\n');
+		expect(move('## done\n- [x] Old\n### Sub\n- [x] S\n- [x] A')).toBe(null);
+	});
+
+	test('leaves tasks already under ## Done, open, cancelled and nested done tasks alone', () => {
+		expect(move('- [ ] A\n\t- [x] A1\n- [-] B\n\n## Done\n- [x] Old\n')).toBe(null);
+		expect(move('- [ ] A\n')).toBe(null);
+	});
+
+	test('skips tasks in code blocks', () => {
+		expect(move('```\n- [x] code\n```\n- [ ] A\n')).toBe(null);
+	});
+
+	test('a note without a trailing newline', () => {
+		expect(move('- [x] A\n- [ ] B')).toBe('- [ ] B\n\n## Done\n- [x] A');
 	});
 });

@@ -301,3 +301,46 @@ export function prependBlock(content: string, block: string[]): string {
 	const head = frontmatter === '' || frontmatter.endsWith('\n') ? frontmatter : `${frontmatter}\n`;
 	return `${head}${block.join('\n')}\n${content.slice(frontmatter.length)}`;
 }
+
+const DONE_HEADING = /^##\s+done\s*$/i;
+const SECTION_END = /^#{1,2}\s/;
+const FENCE = /^\s*(```|~~~)/;
+
+/**
+ * Moves every done top-level task, with its subtasks, to the end of the note's `## Done` section, adding the section at
+ * the end of the note when there is none. Nested done tasks, tasks already under `## Done` and tasks in code blocks
+ * stay where they are. Null when there is nothing to move.
+ */
+export function moveDoneToSection(lines: string[], markers: MarkerSettings = ALL_MARKERS): string[] | null {
+	const kept: string[] = [];
+	const moved: string[] = [];
+	let doneAt = -1;
+	let inDone = false;
+	let inFence = false;
+	for (let i = 0; i < lines.length; i++) {
+		const line = lines[i] as string;
+		if (FENCE.test(line)) inFence = !inFence;
+		else if (!inFence && SECTION_END.test(line)) {
+			inDone = doneAt === -1 && DONE_HEADING.test(line);
+			if (inDone) doneAt = kept.length;
+		} else if (!inFence && !inDone && indentWidth(line) === 0 && parseTaskLine(line, markers)?.checked) {
+			const end = taskBlockEnd(lines, i);
+			moved.push(...lines.slice(i, end));
+			i = end - 1;
+			continue;
+		}
+		kept.push(line);
+	}
+	if (moved.length === 0) return null;
+
+	if (doneAt === -1) {
+		const trailing = kept[kept.length - 1] === '' ? [''] : [];
+		while (kept.length > 0 && (kept[kept.length - 1] as string).trim() === '') kept.pop();
+		return [...kept, ...(kept.length > 0 ? [''] : []), '## Done', ...moved, ...trailing];
+	}
+	let sectionEnd = doneAt + 1;
+	while (sectionEnd < kept.length && !SECTION_END.test(kept[sectionEnd] as string)) sectionEnd++;
+	let insertAt = sectionEnd;
+	while (insertAt > doneAt + 1 && (kept[insertAt - 1] as string).trim() === '') insertAt--;
+	return [...kept.slice(0, insertAt), ...moved, ...kept.slice(insertAt)];
+}

@@ -7,7 +7,7 @@ import { DEFAULT_SETTINGS, KlaarSettings, KlaarSettingTab } from './settings';
 import { TaskIndex } from './obsidian/taskIndex';
 import { openPeriodNote, periodOfFile } from './obsidian/periodNotes';
 import { DEFAULT_TAG_RULES, canMarkInProgress, cyclePriorityTag, normaliseTagRules, toggleInProgress } from './core/tagRules';
-import { appendBlock, markersOf, outdentBlock, parseTaskLine, prependBlock, setSchedule, taskBlockEnd, toggleNext, toggleSomeday } from './core/taskLine';
+import { appendBlock, markersOf, moveDoneToSection, outdentBlock, parseTaskLine, prependBlock, setSchedule, taskBlockEnd, toggleNext, toggleSomeday } from './core/taskLine';
 import { flashLineExtension } from './ui/flashLine';
 import { DateSuggest } from './ui/dateSuggest';
 import { dateChipsExtension, dateChipsPostProcessor } from './ui/dateChips';
@@ -101,8 +101,19 @@ export default class KlaarPlugin extends Plugin {
 			icon: 'flag',
 			editorCheckCallback: (checking, editor) => this.rewriteSelectedTasks(editor, checking, (line) => cyclePriorityTag(line, this.settings.tags)),
 		});
+		this.addCommand({
+			id: 'move-done-tasks',
+			name: 'Move done tasks to the bottom',
+			icon: 'list-checks',
+			editorCheckCallback: (checking, editor) => this.moveDoneTasks(editor, checking),
+		});
 		this.registerEvent(
 			this.app.workspace.on('editor-menu', (menu, editor, ctx) => {
+				if (this.moveDoneTasks(editor, true)) {
+					menu.addItem((item) =>
+						item.setTitle('Move done tasks to the bottom').setIcon('list-checks').onClick(() => this.moveDoneTasks(editor, false)),
+					);
+				}
 				if (!this.cursorOnTask(editor)) return;
 				menu.addItem((item) =>
 					item.setTitle('Schedule task…').setIcon('calendar-arrow-up').onClick(() => this.scheduleTaskUnderCursor(editor)),
@@ -207,6 +218,27 @@ export default class KlaarPlugin extends Plugin {
 		}
 		if (changes.length === 0) return false;
 		if (!checking) editor.transaction({ changes });
+		return true;
+	}
+
+	/**
+	 * Moves the note's done tasks under `## Done` at the bottom (see `moveDoneToSection`), as one undo step. False when
+	 * there are none to move.
+	 */
+	private moveDoneTasks(editor: Editor, checking: boolean): boolean {
+		const lines = Array.from({ length: editor.lineCount() }, (_, i) => editor.getLine(i));
+		const next = moveDoneToSection(lines, markersOf(this.settings));
+		if (!next) return false;
+		if (checking) return true;
+		// Only rewrite from the first line that changes, so the text above keeps its place.
+		let first = 0;
+		while (lines[first] === next[first]) first++;
+		const cursor = editor.getCursor();
+		const last = lines.length - 1;
+		editor.transaction({
+			changes: [{ from: { line: first, ch: 0 }, to: { line: last, ch: lines[last]?.length ?? 0 }, text: next.slice(first).join('\n') }],
+		});
+		editor.setCursor(Math.min(cursor.line, editor.lineCount() - 1), 0);
 		return true;
 	}
 
