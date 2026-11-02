@@ -13,6 +13,8 @@ export interface AccordionOptions {
 	 * two clicks never compete.
 	 */
 	onTitleClick?: (evt: MouseEvent) => void;
+	/** A quiet text button at the right end of the header, beside (not inside) the toggle. */
+	action?: { label: string; onClick: () => void };
 }
 
 /**
@@ -40,6 +42,11 @@ export function renderAccordion(parent: HTMLElement, opts: AccordionOptions): { 
 	}
 	if (opts.count !== undefined) head.createSpan({ text: String(opts.count), cls: 'klaar-acc-count' });
 	const button = split ? toggle : head;
+	if (opts.action) {
+		const { onClick } = opts.action;
+		root.addClass('has-action');
+		root.createEl('button', { text: opts.action.label, cls: 'klaar-acc-action' }).addEventListener('click', () => onClick());
+	}
 
 	const collapse = root.createDiv({ cls: 'klaar-acc-collapse' });
 	const inner = collapse.createDiv({ cls: 'klaar-acc-inner' });

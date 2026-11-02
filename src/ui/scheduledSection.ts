@@ -104,6 +104,7 @@ export class ScheduledSection {
 				count,
 				open: id === 'child' ? this.openChildren.has(sectionKey) : (settings.sectionOpen[key] ?? defaultOpen(id)),
 				cls: id === 'overdue' ? ['klaar-section', 'is-overdue'] : ['klaar-section'],
+				action: id === 'overdue' ? { label: 'Review', onClick: () => openReviewModal(this.app, settings, this.deps.index.all()) } : undefined,
 				onToggle: (open) => {
 					if (id !== 'child') this.remember(key, open);
 					else if (open) this.openChildren.add(sectionKey);
@@ -112,10 +113,6 @@ export class ScheduledSection {
 			});
 			// Ticked tasks (only a day's own group has them) go in a Done group at the bottom, closed to start.
 			const { open, done } = splitDone(group.tasks);
-			if (id === 'overdue') {
-				const review = acc.body.createEl('button', { text: 'Review overdue…', cls: 'klaar-review-link mod-muted' });
-				review.addEventListener('click', () => openReviewModal(this.app, settings, this.deps.index.all()));
-			}
 			this.renderNotes(acc.body, open, sectionKey, settings);
 			if (done.length > 0) {
 				const doneKey = stateKey(period.kind, 'done');

@@ -75,7 +75,7 @@ A notice says where the task went and has an Undo button. From the editor, ordin
 | Enter | Skip |
 | Backspace | Undo the last one |
 
-Tasks move or get a new link by the same rule as the ⋯ menu. Run it from the command palette or the **Review overdue…** button at the top of the Overdue section in today's note.
+Tasks move or get a new link by the same rule as the ⋯ menu. Run it from the command palette or the **Review** link at the right of the Overdue heading in today's note.
 
 ### Schedule keys {#schedule-keys}
 

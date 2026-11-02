@@ -16,6 +16,13 @@ interface Action {
 	run: (task: TaskRef) => Promise<SendRecord | null> | 'skip' | 'pick';
 }
 
+/** Actions shown as plain text under the targets: someday, cancel, skip. */
+const SECONDARY = new Set(['s', 'c', 'Enter']);
+
+function keyLabel(key: string): string {
+	return key === 'Enter' ? '↵' : key === 'Backspace' ? '⌫' : key.toUpperCase();
+}
+
 /** Keys for the quick targets, by label. */
 const TARGET_KEYS: Record<string, string> = { Today: 't', Tomorrow: 'm', 'This week': 'w', 'Next week': 'n', 'This month': 'o', 'Next month': 'x' };
 
@@ -50,7 +57,6 @@ class ReviewModal extends Modal {
 
 	onOpen(): void {
 		this.modalEl.addClass('klaar-review');
-		this.setTitle('Review overdue');
 		for (const action of this.actions) {
 			this.scope.register([], action.key, (e) => {
 				e.preventDefault();
@@ -75,35 +81,49 @@ class ReviewModal extends Modal {
 		el.empty();
 		const total = this.tasks.length;
 		const task = this.tasks[this.index];
-		const head = el.createDiv({ cls: 'klaar-review-head' });
-		head.createSpan({ text: task ? `${this.index + 1} of ${total}` : `${total} of ${total}`, cls: 'klaar-review-count' });
+		this.titleEl.setText('Review overdue');
+		if (task) this.titleEl.createSpan({ cls: 'klaar-review-count', text: `${this.index + 1} of ${total}` });
 		const bar = el.createDiv({ cls: 'klaar-review-bar' }).createDiv();
 		bar.style.setProperty('width', total === 0 ? '100%' : `${(this.index / total) * 100}%`);
 
 		if (!task) {
 			el.createDiv({ cls: 'klaar-review-done', text: total === 0 ? 'Nothing is overdue.' : 'All caught up.' });
-			if (this.history.length > 0) this.renderUndo(el);
+			if (this.history.length > 0) this.renderFooter(el, []);
 			return;
 		}
 		const card = el.createDiv({ cls: 'klaar-review-task' });
 		renderTaskText(card.createDiv({ cls: 'klaar-review-text' }), task.text, this.settings.tags, this.app, task.path);
 		const meta = card.createDiv({ cls: 'klaar-review-meta' });
 		meta.appendText(this.app.vault.getFileByPath(task.path)?.basename ?? task.path);
-		if (task.scheduleKey) meta.createSpan({ cls: 'klaar-review-overdue', text: ` · overdue since ${scheduleLabel(task.scheduleKey, todayIso(), this.settings.dateLabels)}` });
-
-		const buttons = el.createDiv({ cls: 'klaar-review-actions' });
-		for (const action of this.actions) {
-			const button = buttons.createEl('button', { text: action.label });
-			button.createEl('kbd', { text: action.key === 'Enter' ? '↵' : action.key.toUpperCase() });
-			button.addEventListener('click', () => void this.apply(action));
+		if (task.scheduleKey) {
+			meta.appendText(' · overdue since ');
+			meta.createSpan({ cls: 'klaar-review-overdue', text: scheduleLabel(task.scheduleKey, todayIso(), this.settings.dateLabels) });
 		}
-		if (this.history.length > 0) this.renderUndo(el);
+
+		// Where it can go, as a quiet list; parking, cancelling and skipping sit underneath as plain text.
+		const targets = this.actions.filter((a) => !SECONDARY.has(a.key));
+		el.createDiv({ cls: 'klaar-review-label', text: 'Send to' });
+		const list = el.createDiv({ cls: 'klaar-review-targets' });
+		for (const action of targets) this.renderAction(list, action, 'klaar-review-target');
+		this.renderFooter(el, this.actions.filter((a) => SECONDARY.has(a.key)));
 	}
 
-	private renderUndo(el: HTMLElement): void {
-		const undo = el.createEl('button', { text: 'Undo last', cls: 'klaar-review-undo mod-muted' });
-		undo.createEl('kbd', { text: '⌫' });
-		undo.addEventListener('click', () => void this.undo());
+	private renderAction(parent: HTMLElement, action: Action, cls: string): void {
+		const button = parent.createEl('button', { cls });
+		button.createSpan({ text: action.label });
+		button.createEl('kbd', { text: keyLabel(action.key) });
+		button.addEventListener('click', () => void this.apply(action));
+	}
+
+	private renderFooter(el: HTMLElement, actions: Action[]): void {
+		const footer = el.createDiv({ cls: 'klaar-review-footer' });
+		for (const action of actions) this.renderAction(footer, action, 'klaar-review-quiet');
+		if (this.history.length === 0) return;
+		const undo: Action = { key: 'Backspace', label: 'Undo', run: () => 'skip' };
+		const button = footer.createEl('button', { cls: 'klaar-review-quiet klaar-review-undo' });
+		button.createSpan({ text: undo.label });
+		button.createEl('kbd', { text: keyLabel(undo.key) });
+		button.addEventListener('click', () => void this.undo());
 	}
 
 	private async apply(action: Action): Promise<void> {

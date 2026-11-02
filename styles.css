@@ -1138,37 +1138,40 @@ body {
 }
 
 /* Review overdue */
-.klaar-review .klaar-review-head {
-	display: flex;
-	justify-content: flex-end;
-	color: var(--text-muted);
-	font-size: var(--font-ui-small);
+.klaar-review .klaar-review-count {
+	margin-left: var(--size-4-2);
+	color: var(--text-faint);
+	font-weight: var(--font-normal);
+	font-size: var(--font-ui-smaller);
+	font-variant-numeric: tabular-nums;
 }
 
 .klaar-review .klaar-review-bar {
-	height: 4px;
-	margin: var(--size-4-2) 0 var(--size-4-4);
-	border-radius: 2px;
+	height: 2px;
+	margin: 0 0 var(--size-4-5);
+	border-radius: 1px;
 	background: var(--background-modifier-border);
 }
 
 .klaar-review .klaar-review-bar > div {
 	height: 100%;
-	border-radius: 2px;
-	background: var(--interactive-accent);
+	border-radius: 1px;
+	background: var(--text-faint);
 	transition: width var(--klaar-fast) ease-out;
 }
 
 .klaar-review .klaar-review-task {
-	padding: var(--size-4-3) var(--size-4-4);
-	margin-bottom: var(--size-4-4);
-	border: var(--border-width) solid var(--background-modifier-border);
-	border-radius: var(--radius-m);
+	margin-bottom: var(--size-4-6);
+}
+
+.klaar-review .klaar-review-text {
+	font-size: var(--font-text-size);
+	line-height: var(--line-height-tight);
 }
 
 .klaar-review .klaar-review-meta {
 	margin-top: var(--size-4-1);
-	color: var(--text-muted);
+	color: var(--text-faint);
 	font-size: var(--font-ui-small);
 }
 
@@ -1176,24 +1179,72 @@ body {
 	color: var(--text-error);
 }
 
-.klaar-review .klaar-review-actions {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-	gap: var(--size-4-2);
+.klaar-review .klaar-review-label {
+	margin: 0 0 var(--size-4-1) var(--size-4-2);
+	color: var(--text-faint);
+	font-size: var(--font-ui-smaller);
+	font-weight: var(--font-semibold);
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
 }
 
-.klaar-review button {
+.klaar-review .klaar-review-targets {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	column-gap: var(--size-4-2);
+}
+
+.klaar-review button.klaar-review-target,
+.klaar-review button.klaar-review-quiet {
 	justify-content: space-between;
-	gap: var(--size-4-2);
+	gap: var(--size-4-3);
+	height: auto;
+	padding: var(--size-4-1) var(--size-4-2);
+	border: 0;
+	border-radius: var(--radius-s);
+	background: transparent;
+	box-shadow: none;
+	color: var(--text-normal);
+	font-size: var(--font-ui-small);
+	font-weight: var(--font-normal);
+	transition: background-color var(--klaar-fast) ease-out, color var(--klaar-fast) ease-out;
+}
+
+.klaar-review button.klaar-review-target:hover,
+.klaar-review button.klaar-review-quiet:hover {
+	background: var(--background-modifier-hover);
+	color: var(--text-normal);
+}
+
+.klaar-review button:focus:not(:focus-visible) {
+	box-shadow: none;
 }
 
 .klaar-review kbd {
+	padding: 0;
+	border: 0;
+	background: none;
+	box-shadow: none;
+	color: var(--text-faint);
+	font-family: var(--font-interface);
 	font-size: var(--font-ui-smaller);
+}
+
+.klaar-review .klaar-review-footer {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--size-4-1);
+	margin-top: var(--size-4-3);
+	padding-top: var(--size-4-3);
+	border-top: var(--border-width) solid var(--background-modifier-border);
+}
+
+.klaar-review button.klaar-review-quiet {
 	color: var(--text-muted);
 }
 
-.klaar-review .klaar-review-undo {
-	margin-top: var(--size-4-4);
+.klaar-review button.klaar-review-undo {
+	margin-left: auto;
 }
 
 .klaar-review .klaar-review-done {
@@ -1202,9 +1253,33 @@ body {
 	color: var(--text-muted);
 }
 
-.klaar-scheduled .klaar-review-link {
-	margin: 0 0 var(--size-4-2);
-	font-size: var(--font-ui-small);
+.klaar-acc.has-action {
+	position: relative;
+}
+
+.klaar-acc.has-action > .klaar-acc-head {
+	padding-right: calc(var(--size-4-12) + var(--size-4-4));
+}
+
+.klaar-acc > .klaar-acc-action {
+	position: absolute;
+	top: 0;
+	right: var(--size-4-1);
+	height: 30px;
+	padding: 0 var(--size-4-2);
+	border: 0;
+	background: transparent;
+	box-shadow: none;
+	color: var(--text-faint);
+	font-size: var(--font-ui-smaller);
+	font-weight: var(--font-normal);
+	cursor: pointer;
+	transition: color var(--klaar-fast) ease-out;
+}
+
+.klaar-acc > .klaar-acc-action:hover {
+	background: transparent;
+	color: var(--text-normal);
 }
 
 @media (prefers-reduced-motion: reduce) {
