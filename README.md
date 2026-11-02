@@ -24,6 +24,10 @@ Write a task anywhere in your vault, in a meeting note, a project note or today'
 
 Open the week note `Daily/2026-W43.md` and the task is listed above your own text, along with what you planned for the month around it and for each day inside it. Today's note shows what's due today, what's still open this week and anything overdue. Tick a task there and it's ticked in the note where you wrote it.
 
+The two-minute intro walks through all of it:
+
+[![The two-minute Klaar intro: today's note with its scheduled and overdue sections next to the calendar. Click to watch it with sound](assets/video/klaar-intro.jpg)](assets/video/klaar-intro.mp4)
+
 ## Features
 
 **Schedule with `>`.** On a task line, type `>` and pick Today, Tomorrow, a weekday, a week, a month, a quarter or a year. The link reads as a small chip such as `Fri 23 Oct` or `Week 43`, red when the task is overdue.

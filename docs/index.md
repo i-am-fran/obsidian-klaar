@@ -29,6 +29,10 @@ Open your week note and the task is there, along with what you planned for the m
 
 Klaar is minimal on purpose. It doesn't write anything into your journal notes, and your tasks stay plain Markdown. If you stop using Klaar tomorrow, nothing breaks. It only reads the Markdown files in your vault, on your device, and never connects to the internet.
 
+The two-minute intro walks through all of it, with sound:
+
+<video src="{{ '/assets/klaar-intro.mp4' | relative_url }}" poster="{{ '/assets/klaar-intro.jpg' | relative_url }}" controls playsinline preload="none" class="showcase" aria-label="The two-minute Klaar intro: writing and scheduling tasks, the calendar, today's note, reviewing overdue tasks, the Bases table and board, and the commands"></video>
+
 ***
 
 ## Features {#features}
