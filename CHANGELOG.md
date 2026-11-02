@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026.11.2
+
+- A Klaar Table or Klaar Board embedded in a note with `![[Tasks.base]]` now shows its tasks.
+
 ## 2026.11.1
 
 - **Send tasks to another day, week or month.** The calendar button on each task (in journal notes, the Klaar Table and the Klaar Board) is now a ⋯ menu: Today, Tomorrow, This week, Next week, This month, Next month, Pick a date…, Move to note…, Someday and Cancel task. A task that lives in a journal note moves into the target note, with its subtasks and without its old `>` link, and Klaar creates the note if it doesn't exist yet. A task in any other note stays in its note and gets the new link instead. The notice that follows has an Undo button.

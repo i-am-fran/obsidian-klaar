@@ -23,6 +23,10 @@ export abstract class TaskBasesView extends BasesView {
 
 	constructor(controller: QueryController, protected containerEl: HTMLElement, protected deps: TasksViewDeps, private classes: { root: string; body: string }) {
 		super(controller);
+		// In an embed (`![[x.base]]`) Obsidian hides an empty view, and Bases only scans the vault once the view is
+		// shown: drawing nothing until the first results would wait forever. The toolbar build replaces this.
+		containerEl.addClass(classes.root);
+		containerEl.createDiv({ cls: classes.body });
 		// Registered on the Component, so the listener goes away when Bases unloads the view.
 		this.registerEvent(this.deps.index.on('updated', () => this.render()));
 	}
