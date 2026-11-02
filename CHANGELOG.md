@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026.11.3
+
+- Sorting and grouping by date now go by deadline, so a task due today comes before one due this week, then this month, this quarter and this year.
+
 ## 2026.11.2
 
 - A Klaar Table or Klaar Board embedded in a note with `![[Tasks.base]]` now shows its tasks.

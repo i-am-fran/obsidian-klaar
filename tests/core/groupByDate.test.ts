@@ -21,9 +21,14 @@ describe('groupByDate', () => {
 		]);
 	});
 
-	test('orders mixed period kinds by start date, ties broken by key', () => {
-		const groups = groupByDate([task('day', '2026-10-19'), task('week', '2026-W43'), task('month', '2026-10'), task('year', '2026')]);
-		expect(groups.map(g => g.key)).toEqual(['2026', '2026-10', '2026-10-19', '2026-W43']);
+	test('orders mixed period kinds by deadline: day, week, month, quarter, year', () => {
+		const groups = groupByDate([task('year', '2026'), task('quarter', '2026-Q4'), task('month', '2026-11'), task('day', '2026-11-02'), task('week', '2026-W45')]);
+		expect(groups.map(g => g.key)).toEqual(['2026-11-02', '2026-W45', '2026-11', '2026-Q4', '2026']);
+	});
+
+	test('overdue: the longest-passed deadline first, a day before the week it ended in', () => {
+		const groups = groupByDate([task('lastWeek', '2026-W44'), task('lastWed', '2026-10-28'), task('twoWeeks', '2026-W43'), task('sunday', '2026-11-01')]);
+		expect(groups.map(g => g.key)).toEqual(['2026-W43', '2026-10-28', '2026-11-01', '2026-W44']);
 	});
 
 	test('puts undated tasks in a final "Undated" group', () => {

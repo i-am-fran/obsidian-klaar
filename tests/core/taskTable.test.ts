@@ -146,6 +146,11 @@ describe('sortTasks', () => {
 	test('date reversed: newest first, undated still last, same tie order', () => {
 		expect(texts(sortTasks(tasks, 'date', true, name))).toEqual(['w43', 'd19top', 'd19low', 'd19prog', 'd19plain', 'none']);
 	});
+	test('date: by deadline, so a day comes before its week, month, quarter and year', () => {
+		const mixed = [task('year', '2026'), task('q4', '2026-Q4'), task('nov', '2026-11'), task('today', '2026-11-02'), task('w45', '2026-W45'), task('fri', '2026-11-06')];
+		expect(texts(sortTasks(mixed, 'date', false, name))).toEqual(['today', 'fri', 'w45', 'nov', 'q4', 'year']);
+		expect(texts(sortTasks(mixed, 'date', true, name))).toEqual(['year', 'q4', 'nov', 'w45', 'fri', 'today']);
+	});
 	test('priority: highest first, ties by date', () => {
 		const p = [task('a', null, { priority: 2 }), task('b', '2026-10-19'), task('c', '2026-10-20', { priority: 3 }), task('d', '2026-10-19', { inProgress: true }), task('e', null)];
 		expect(texts(sortTasks(p, 'priority', false, name))).toEqual(['c', 'a', 'd', 'b', 'e']);

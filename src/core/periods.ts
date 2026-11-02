@@ -167,3 +167,14 @@ export function contains(outer: Period, inner: Period): boolean {
 	}
 	return inner.start >= outer.start && inner.end <= outer.end;
 }
+
+/**
+ * Orders periods by deadline: the last day first, so a day comes before the week,
+ * month, quarter and year that end after it. On the same last day the shorter
+ * period wins (Sunday before its week), then the key.
+ */
+export function compareDeadline(a: Period, b: Period): number {
+	if (a.end !== b.end) return a.end < b.end ? -1 : 1;
+	if (a.start !== b.start) return a.start > b.start ? -1 : 1;
+	return a.key < b.key ? -1 : a.key > b.key ? 1 : 0;
+}

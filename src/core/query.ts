@@ -1,6 +1,6 @@
 import { addDays } from './dates';
 import type { IsoDate } from './dates';
-import { ALL_PERIODS, PERIOD_ORDER, childKindIn, contains, parentKind, parsePeriodKey, periodOf } from './periods';
+import { ALL_PERIODS, PERIOD_ORDER, childKindIn, compareDeadline, contains, parentKind, parsePeriodKey, periodOf } from './periods';
 import type { EnabledPeriods, Period } from './periods';
 import { isParked } from './taskLine';
 import type { TaskRef } from './tasks';
@@ -116,9 +116,9 @@ export function scheduleStatus(all: TaskRef[], key: string): 'open' | 'done' | n
 	return status;
 }
 
-/** Groups tasks by schedule key, oldest period first; tasks without a (valid) schedule go in a last "Undated" group. */
+/** Groups tasks by schedule key, earliest deadline first (`compareDeadline`); tasks without a (valid) schedule go in a last "Undated" group. */
 export function groupByDate(tasks: TaskRef[]): TaskGroup[] {
-	const dated = new Map<string, { start: IsoDate; tasks: TaskRef[] }>();
+	const dated = new Map<string, { period: Period; tasks: TaskRef[] }>();
 	const undated: TaskRef[] = [];
 	for (const t of tasks) {
 		const p = taskPeriod(t);
@@ -126,13 +126,13 @@ export function groupByDate(tasks: TaskRef[]): TaskGroup[] {
 			undated.push(t);
 			continue;
 		}
-		const entry = dated.get(p.key) ?? { start: p.start, tasks: [] };
+		const entry = dated.get(p.key) ?? { period: p, tasks: [] };
 		entry.tasks.push(t);
 		dated.set(p.key, entry);
 	}
-	const groups: TaskGroup[] = [...dated.entries()]
-		.sort((a, b) => (a[1].start < b[1].start ? -1 : a[1].start > b[1].start ? 1 : a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0))
-		.map(([key, entry]) => ({ label: key, key, tasks: entry.tasks }));
+	const groups: TaskGroup[] = [...dated.values()]
+		.sort((a, b) => compareDeadline(a.period, b.period))
+		.map(entry => ({ label: entry.period.key, key: entry.period.key, tasks: entry.tasks }));
 	if (undated.length > 0) groups.push({ label: 'Undated', key: null, tasks: undated });
 	return groups;
 }

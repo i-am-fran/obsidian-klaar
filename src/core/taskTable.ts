@@ -1,5 +1,5 @@
 import type { IsoDate } from './dates';
-import { contains, periodOf } from './periods';
+import { compareDeadline, contains, periodOf } from './periods';
 import { groupByDate, isOpen, isOverdue, markerRank, matchesMarker, taskPeriod } from './query';
 import type { MarkerFilter, TaskGroup } from './query';
 import type { MarkerSettings } from './taskLine';
@@ -186,13 +186,12 @@ function compareText(a: string, b: string): number {
 	return a.localeCompare(b, undefined, { sensitivity: 'base' });
 }
 
-/** Dated tasks by period start (then key); 0 when either is undated. */
+/** Dated tasks by deadline (see `compareDeadline`); 0 when either is undated. */
 function compareDated(a: TaskRef, b: TaskRef): number {
 	const pa = taskPeriod(a);
 	const pb = taskPeriod(b);
 	if (!pa || !pb) return 0;
-	if (pa.start !== pb.start) return pa.start < pb.start ? -1 : 1;
-	return pa.key < pb.key ? -1 : pa.key > pb.key ? 1 : 0;
+	return compareDeadline(pa, pb);
 }
 
 /** Undated after dated, whatever the direction. */
