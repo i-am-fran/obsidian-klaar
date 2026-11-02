@@ -15,7 +15,7 @@ sections:
   <a class="button" href="{{ site.github_url }}">View on GitHub</a>
 </div>
 
-<video src="{{ '/assets/klaar-tour.mp4' | relative_url }}" poster="{{ '/assets/klaar-tour.jpg' | relative_url }}" autoplay muted loop playsinline controls class="showcase" aria-label="A short tour of Klaar: a task scheduled with >, the week note listing it, and the calendar in the sidebar"></video>
+<video src="{{ '/assets/klaar-intro.mp4' | relative_url }}" poster="{{ '/assets/klaar-intro.jpg' | relative_url }}" controls playsinline preload="none" class="showcase" aria-label="The two-minute Klaar intro: writing and scheduling tasks, the calendar, today's note, reviewing overdue tasks, the Bases table and board, and the commands"></video>
 
 ## How it works {#how-it-works}
 
@@ -28,10 +28,6 @@ Write a task anywhere in your vault, in a meeting note, a project note or today'
 Open your week note and the task is there, along with what you planned for the month around it and for each day inside it. Today's note shows what's due today, what's still open this week and anything overdue. Tick a task there and it's ticked in the note where you wrote it.
 
 Klaar is minimal on purpose. It doesn't write anything into your journal notes, and your tasks stay plain Markdown. If you stop using Klaar tomorrow, nothing breaks. It only reads the Markdown files in your vault, on your device, and never connects to the internet.
-
-The two-minute intro walks through all of it, with sound:
-
-<video src="{{ '/assets/klaar-intro.mp4' | relative_url }}" poster="{{ '/assets/klaar-intro.jpg' | relative_url }}" controls playsinline preload="none" class="showcase" aria-label="The two-minute Klaar intro: writing and scheduling tasks, the calendar, today's note, reviewing overdue tasks, the Bases table and board, and the commands"></video>
 
 ***
 

@@ -1,6 +1,6 @@
 # Klaar
 
-[![A short tour of Klaar: a task scheduled with >, the week note listing it, and the calendar in the sidebar. Click to watch it with sound](assets/video/klaar-tour.webp)](assets/video/klaar-tour.mp4)
+[![The two-minute Klaar intro: today's note with its scheduled and overdue sections next to the calendar. Click to watch it with sound](assets/video/klaar-intro.jpg)](assets/video/klaar-intro.mp4)
 
 Klaar is a small task manager that lives in your Obsidian journal notes. You write tasks as normal checkboxes, and assign them to a day, a week, a month or a year.
 
@@ -23,10 +23,6 @@ Write a task anywhere in your vault, in a meeting note, a project note or today'
 ```
 
 Open the week note `Daily/2026-W43.md` and the task is listed above your own text, along with what you planned for the month around it and for each day inside it. Today's note shows what's due today, what's still open this week and anything overdue. Tick a task there and it's ticked in the note where you wrote it.
-
-The two-minute intro walks through all of it:
-
-[![The two-minute Klaar intro: today's note with its scheduled and overdue sections next to the calendar. Click to watch it with sound](assets/video/klaar-intro.jpg)](assets/video/klaar-intro.mp4)
 
 ## Features
 
