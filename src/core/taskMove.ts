@@ -57,13 +57,6 @@ export function blocksForLines(lines: string[], lineNumbers: number[], markers: 
 	return blocks;
 }
 
-/** `lines` with each block's task line scheduled to `key` (null removes the link); subtasks are left alone. */
-export function scheduleBlocks(lines: string[], blocks: TaskBlock[], key: string | null): string[] {
-	const next = [...lines];
-	for (const b of blocks) next[b.start] = setSchedule(b.lines[0] as string, key);
-	return next;
-}
-
 /** Every open (not done, cancelled or someday) task at the margin, with its subtasks; tasks in code blocks are skipped. */
 export function openTopLevelBlocks(lines: string[], markers: MarkerSettings = ALL_MARKERS): TaskBlock[] {
 	const blocks: TaskBlock[] = [];

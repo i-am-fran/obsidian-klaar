@@ -1,7 +1,7 @@
 import { ItemView, Notice, WorkspaceLeaf, setIcon } from 'obsidian';
 import { todayIso } from '../core/dates';
 import type { IsoDate } from '../core/dates';
-import { EDITOR_DRAG_MIME, TASK_DRAG_MIME, parseDragPayload } from '../core/dragPayload';
+import { TASK_DRAG_MIME, parseDragPayload } from '../core/dragPayload';
 import { monthGrid } from '../core/monthGrid';
 import { periodOf } from '../core/periods';
 import { scheduleStatus } from '../core/query';
@@ -32,8 +32,6 @@ function onActivate(el: HTMLElement, handler: (evt: MouseEvent | KeyboardEvent) 
 export interface CalendarDeps {
 	index: TaskIndex;
 	getSettings: () => KlaarSettings;
-	/** Takes the task lines of an editor selection dropped on day `key`; `move` (Alt) sends them there. */
-	dropEditorTasks: (key: string, move: boolean) => void;
 }
 
 /** Right-sidebar month grid with ISO week numbers; days and weeks show note and task markers; days accept dropped tasks. */
@@ -185,13 +183,10 @@ export class CalendarView extends ItemView {
 		if (openable) onActivate(cell, (e) => this.openPeriod(day.date, e));
 		else cell.addClass('is-static');
 		cell.addEventListener('dragover', (e) => {
-			const types = e.dataTransfer?.types ?? [];
-			const fromEditor = types.includes(EDITOR_DRAG_MIME);
-			if (!e.dataTransfer || (!fromEditor && !types.includes(TASK_DRAG_MIME))) return;
+			if (!e.dataTransfer?.types.includes(TASK_DRAG_MIME)) return;
 			e.preventDefault();
-			// Alt (Option) moves the task into the day's note; a plain drop only reschedules it. The editor only allows
-			// copy or move for its text drags, so a reschedule from there shows as copy.
-			e.dataTransfer.dropEffect = e.altKey ? 'move' : fromEditor ? 'copy' : 'link';
+			// Alt (Option) moves the task into the day's note; a plain drop only reschedules it.
+			e.dataTransfer.dropEffect = e.altKey ? 'move' : 'link';
 			cell.addClass('is-drop-target');
 		});
 		// dragleave also fires when moving onto the cell's own children; only clear on really leaving.
@@ -201,12 +196,7 @@ export class CalendarView extends ItemView {
 		cell.addEventListener('drop', (e) => {
 			cell.removeClass('is-drop-target');
 			const ref = parseDragPayload(e.dataTransfer?.getData(TASK_DRAG_MIME) ?? '');
-			if (!ref) {
-				if (!e.dataTransfer?.types.includes(EDITOR_DRAG_MIME)) return;
-				e.preventDefault();
-				this.deps.dropEditorTasks(day.date, e.altKey);
-				return;
-			}
+			if (!ref) return;
 			e.preventDefault();
 			if (e.altKey) {
 				sendTaskWithNotice(this.app, this.deps.getSettings(), ref, day.date).catch(() => new Notice("Couldn't move the task."));

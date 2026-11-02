@@ -7,7 +7,6 @@
 - New command: **Review overdue tasks** shows your overdue tasks one at a time, oldest first. Press T for today, M tomorrow, W this week, N next week, O this month, X next month, D to pick a date, S someday, C cancel, or Enter to skip. Backspace undoes the last one. There's also a quiet **Review** link at the right of the Overdue heading in today's note.
 - New command: **Move open tasks to…** moves every unfinished task in a journal note, with its subtasks, to another day, week or month in one go. It's in the command palette and the note's ⋯ menu.
 - Hold Alt (Option on a Mac) while dragging a task onto a calendar day to move it into that day's note. A plain drag still only reschedules it.
-- You can drag tasks onto the calendar straight from a note: select the task lines and drag the selection onto a day. A plain drop schedules them for that day, Alt moves them there, and one undo brings them back.
 - The **Move task to note puts it at** setting is now **Moved tasks go at**, and it applies to every way of moving a task.
 
 ## 2026.10.25
