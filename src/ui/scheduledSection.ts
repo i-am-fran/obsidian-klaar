@@ -9,6 +9,7 @@ import { periodOfFile } from '../obsidian/periodNotes';
 import type { TaskIndex } from '../obsidian/taskIndex';
 import type { KlaarSettings } from '../settings';
 import { renderAccordion } from './accordion';
+import { openReviewModal } from './reviewModal';
 import { renderTaskRow } from './taskRow';
 
 export interface ScheduledSectionDeps {
@@ -111,6 +112,10 @@ export class ScheduledSection {
 			});
 			// Ticked tasks (only a day's own group has them) go in a Done group at the bottom, closed to start.
 			const { open, done } = splitDone(group.tasks);
+			if (id === 'overdue') {
+				const review = acc.body.createEl('button', { text: 'Review overdue…', cls: 'klaar-review-link mod-muted' });
+				review.addEventListener('click', () => openReviewModal(this.app, settings, this.deps.index.all()));
+			}
 			this.renderNotes(acc.body, open, sectionKey, settings);
 			if (done.length > 0) {
 				const doneKey = stateKey(period.kind, 'done');

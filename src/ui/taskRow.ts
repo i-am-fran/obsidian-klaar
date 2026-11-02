@@ -2,13 +2,13 @@ import type { EditorView } from '@codemirror/view';
 import { App, Keymap, MarkdownView, Notice, setIcon, type PaneType } from 'obsidian';
 import { todayIso } from '../core/dates';
 import { TASK_DRAG_MIME, encodeDragPayload } from '../core/dragPayload';
-import { setChecked, setSchedule, taskMarker } from '../core/taskLine';
+import { setChecked, taskMarker } from '../core/taskLine';
 import type { TaskRef } from '../core/tasks';
 import { editTask } from '../obsidian/editTask';
 import type { KlaarSettings } from '../settings';
 import { flashLine } from './flashLine';
-import { openScheduleModal } from './scheduleModal';
 import { renderTaskText } from './tagHighlight';
+import { showTaskMenu } from './taskMenu';
 
 /** Lets the element be dropped on a calendar day to reschedule the task. */
 export function makeDraggable(el: HTMLElement, ref: TaskRef): void {
@@ -79,20 +79,16 @@ export function renderSourceLink(el: HTMLElement, app: App, ref: TaskRef): HTMLE
 	return link;
 }
 
-/** "Schedule task" button that rewrites the task's schedule link. */
-export function renderMoveButton(el: HTMLElement, app: App, ref: TaskRef, settings: KlaarSettings): HTMLElement {
-	const move = el.createEl('button', { cls: 'klaar-task-move clickable-icon', attr: { 'aria-label': 'Schedule task' } });
-	setIcon(move, 'calendar-clock');
-	move.addEventListener('click', () => {
-		openScheduleModal(app, settings.periods, (key) => {
-			editTask(app, ref, (line) => setSchedule(line, key)).catch(() => new Notice("Couldn't update the task."));
-		});
-	});
+/** "Task actions" button: opens the task's menu (send to a period, move to a note, someday, cancel). */
+export function renderTaskMenuButton(el: HTMLElement, app: App, ref: TaskRef, settings: KlaarSettings): HTMLElement {
+	const move = el.createEl('button', { cls: 'klaar-task-move clickable-icon', attr: { 'aria-label': 'Task actions' } });
+	setIcon(move, 'more-horizontal');
+	move.addEventListener('click', (evt) => showTaskMenu(evt, app, ref, settings));
 	return move;
 }
 
 /**
- * One task row: checkbox, text, optional source link, "schedule task" button; draggable onto the calendar. Clicking the
+ * One task row: checkbox, text, optional source link, "task actions" button; draggable onto the calendar. Clicking the
  * text opens the task's note at its line.
  */
 export function renderTaskRow(el: HTMLElement, app: App, ref: TaskRef, settings: KlaarSettings, opts: { showSource: boolean }): void {
@@ -105,5 +101,5 @@ export function renderTaskRow(el: HTMLElement, app: App, ref: TaskRef, settings:
 	makeOpenable(text, app, ref);
 	renderTaskText(text, ref.text, settings.tags, app, ref.path);
 	if (opts.showSource) renderSourceLink(row, app, ref);
-	renderMoveButton(row, app, ref, settings);
+	renderTaskMenuButton(row, app, ref, settings);
 }

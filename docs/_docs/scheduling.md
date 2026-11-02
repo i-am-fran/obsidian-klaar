@@ -7,6 +7,10 @@ headings:
     label: The > picker
   - id: move-task
     label: Schedule task…
+  - id: send-task
+    label: Sending tasks on
+  - id: review-overdue
+    label: Review overdue
   - id: schedule-keys
     label: Schedule keys
   - id: date-chips
@@ -34,11 +38,44 @@ Keep typing to filter the list, for example `>fri` or `>next`. Typing a full key
 
 **Schedule task…** opens the same list from the command palette or the editor's right-click menu, and replaces the task's existing link. To reschedule from elsewhere:
 
-- Click the calendar button on a task in a journal note, a Klaar Table or a Klaar Board.
+- Use the ⋯ menu on a task in a journal note, a Klaar Table or a Klaar Board (see [Sending tasks on](#send-task)).
 - Drag a task onto a day in the [calendar](#calendar).
 - Drag a card to Today or This week on a [board by date](#board).
 
-To put a task in a different note instead, use **Move task to note…** from the command palette or the right-click menu. Pick a note and Klaar moves the task, with its subtasks, to the end of it. To put it at the top instead (below any frontmatter), change **Move task to note puts it at** in Settings → Klaar. Its schedule link stays as it is.
+To put a task in a different note instead, use **Move task to note…** from the command palette or the right-click menu. Pick a note and Klaar moves the task, with its subtasks, to the end of it. To put it at the top instead (below any frontmatter), change **Moved tasks go at** in Settings → Klaar. Its schedule link stays as it is.
+
+### Sending tasks on {#send-task}
+
+The ⋯ menu on a task offers Today, Tomorrow, This week, Next week, This month, Next month and Pick a date…, plus Move to note…, Someday and Cancel task. **Send task to…** does the same from the command palette or the right-click menu, for the task under the cursor or every task in a selection.
+
+What happens depends on where the task lives:
+
+- **In a journal note**, the task moves into the target note, with its subtasks, and loses its old `>` link: the note it's in is now its date. If that note doesn't exist yet, Klaar creates it.
+- **In any other note**, such as a project note, the task stays where it is and gets a `>` link to the new period, so the project keeps its tasks.
+
+A notice says where the task went and has an Undo button. From the editor, ordinary undo brings the tasks back.
+
+**Move open tasks to…** (command palette and the note's ⋯ menu, in journal notes) moves every unfinished task in the note, with its subtasks, in one go. Use it to carry last week forward. Holding Alt (Option on a Mac) while dragging a task onto a calendar day also moves it into that day's note, where a plain drag only reschedules it.
+
+### Review overdue {#review-overdue}
+
+**Review overdue tasks** goes through your overdue tasks one at a time, oldest first, and sends each one on with a single key:
+
+| Key | Does |
+| --- | --- |
+| T | Today |
+| M | Tomorrow |
+| W | This week |
+| N | Next week |
+| O | This month |
+| X | Next month |
+| D | Pick a date… |
+| S | Someday |
+| C | Cancel task |
+| Enter | Skip |
+| Backspace | Undo the last one |
+
+Tasks move or get a new link by the same rule as the ⋯ menu. Run it from the command palette or the **Review overdue…** button at the top of the Overdue section in today's note.
 
 ### Schedule keys {#schedule-keys}
 

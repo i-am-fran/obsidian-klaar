@@ -12,7 +12,7 @@ import { renderScheduleChip } from '../ui/dateChips';
 import { openScheduleModal } from '../ui/scheduleModal';
 import { renderAccordion } from '../ui/accordion';
 import { renderTaskText } from '../ui/tagHighlight';
-import { makeDraggable, makeOpenable, renderCheckbox, renderMoveButton, renderSourceLink } from '../ui/taskRow';
+import { makeDraggable, makeOpenable, renderCheckbox, renderTaskMenuButton, renderSourceLink } from '../ui/taskRow';
 import { filterOptions, sortOptions } from './labels';
 import { TaskBasesView, type TasksViewDeps } from './taskBasesView';
 
@@ -126,7 +126,7 @@ class BoardView extends TaskBasesView {
 		const meta = card.createDiv({ cls: 'klaar-board-card-meta' });
 		if (task.scheduleKey) meta.appendChild(renderScheduleChip(this.app, settings, task.scheduleKey, isOpen(task)));
 		renderSourceLink(meta, this.app, task);
-		renderMoveButton(meta, this.app, task, settings);
+		renderTaskMenuButton(meta, this.app, task, settings);
 	}
 }
 

@@ -7,6 +7,7 @@ import { periodOf } from '../core/periods';
 import { scheduleStatus } from '../core/query';
 import { setSchedule } from '../core/taskLine';
 import { editTask } from '../obsidian/editTask';
+import { sendTaskWithNotice } from '../obsidian/moveTask';
 import { openPeriodNote, periodNotePath, periodOfFile } from '../obsidian/periodNotes';
 import type { TaskIndex } from '../obsidian/taskIndex';
 import type { KlaarSettings } from '../settings';
@@ -184,6 +185,8 @@ export class CalendarView extends ItemView {
 		cell.addEventListener('dragover', (e) => {
 			if (!e.dataTransfer?.types.includes(TASK_DRAG_MIME)) return;
 			e.preventDefault();
+			// Alt (Option) moves the task into the day's note; a plain drop only reschedules it.
+			e.dataTransfer.dropEffect = e.altKey ? 'move' : 'link';
 			cell.addClass('is-drop-target');
 		});
 		// dragleave also fires when moving onto the cell's own children; only clear on really leaving.
@@ -195,6 +198,10 @@ export class CalendarView extends ItemView {
 			const ref = parseDragPayload(e.dataTransfer?.getData(TASK_DRAG_MIME) ?? '');
 			if (!ref) return;
 			e.preventDefault();
+			if (e.altKey) {
+				sendTaskWithNotice(this.app, this.deps.getSettings(), ref, day.date).catch(() => new Notice("Couldn't move the task."));
+				return;
+			}
 			editTask(this.app, ref, (line) => setSchedule(line, day.date)).catch(() => new Notice("Couldn't update the task."));
 		});
 	}

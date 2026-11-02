@@ -1136,3 +1136,79 @@ body {
 	font-size: var(--font-ui-smaller);
 	color: var(--text-muted);
 }
+
+/* Review overdue */
+.klaar-review .klaar-review-head {
+	display: flex;
+	justify-content: flex-end;
+	color: var(--text-muted);
+	font-size: var(--font-ui-small);
+}
+
+.klaar-review .klaar-review-bar {
+	height: 4px;
+	margin: var(--size-4-2) 0 var(--size-4-4);
+	border-radius: 2px;
+	background: var(--background-modifier-border);
+}
+
+.klaar-review .klaar-review-bar > div {
+	height: 100%;
+	border-radius: 2px;
+	background: var(--interactive-accent);
+	transition: width var(--klaar-fast) ease-out;
+}
+
+.klaar-review .klaar-review-task {
+	padding: var(--size-4-3) var(--size-4-4);
+	margin-bottom: var(--size-4-4);
+	border: var(--border-width) solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+}
+
+.klaar-review .klaar-review-meta {
+	margin-top: var(--size-4-1);
+	color: var(--text-muted);
+	font-size: var(--font-ui-small);
+}
+
+.klaar-review .klaar-review-overdue {
+	color: var(--text-error);
+}
+
+.klaar-review .klaar-review-actions {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	gap: var(--size-4-2);
+}
+
+.klaar-review button {
+	justify-content: space-between;
+	gap: var(--size-4-2);
+}
+
+.klaar-review kbd {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+}
+
+.klaar-review .klaar-review-undo {
+	margin-top: var(--size-4-4);
+}
+
+.klaar-review .klaar-review-done {
+	padding: var(--size-4-6) 0;
+	text-align: center;
+	color: var(--text-muted);
+}
+
+.klaar-scheduled .klaar-review-link {
+	margin: 0 0 var(--size-4-2);
+	font-size: var(--font-ui-small);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.klaar-review .klaar-review-bar > div {
+		transition: none;
+	}
+}

@@ -38,7 +38,7 @@ export async function addTaskToPeriodNote(app: App, settings: KlaarSettings, key
 }
 
 /** The period note for `key`, created (with its folder) as an empty file if missing. */
-async function ensurePeriodNote(app: App, settings: KlaarSettings, key: string): Promise<TFile> {
+export async function ensurePeriodNote(app: App, settings: KlaarSettings, key: string): Promise<TFile> {
 	const path = periodNotePath(settings.periodFolder, key);
 	const existing = app.vault.getFileByPath(path);
 	if (existing) return existing;

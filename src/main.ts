@@ -1,11 +1,13 @@
 import type { Extension } from '@codemirror/state';
-import { Editor, EditorChange, MarkdownView, Notice, Plugin, WorkspaceLeaf, debounce } from 'obsidian';
+import { Editor, EditorChange, MarkdownView, Notice, Plugin, TFile, WorkspaceLeaf, debounce } from 'obsidian';
 import { CURRENT_PERIOD_LABELS } from './core/dateOptions';
 import { todayIso } from './core/dates';
 import { PERIOD_ORDER, adjacentPeriod, periodOf, type Period, type PeriodKind } from './core/periods';
 import { DEFAULT_SETTINGS, KlaarSettings, KlaarSettingTab } from './settings';
 import { TaskIndex } from './obsidian/taskIndex';
-import { openPeriodNote, periodOfFile } from './obsidian/periodNotes';
+import { openPeriodNote, periodNotePath, periodOfFile } from './obsidian/periodNotes';
+import { movesPhysically, placeInPeriodNote } from './obsidian/moveTask';
+import { blockForPeriodNote, blocksForLines, openTopLevelBlocks, type TaskBlock } from './core/taskMove';
 import { DEFAULT_TAG_RULES, canMarkInProgress, cyclePriorityTag, normaliseTagRules, toggleInProgress } from './core/tagRules';
 import { appendBlock, markersOf, moveDoneToSection, outdentBlock, parseTaskLine, prependBlock, setSchedule, taskBlockEnd, toggleCancelled, toggleNext, toggleSomeday } from './core/taskLine';
 import { flashLineExtension } from './ui/flashLine';
@@ -13,6 +15,7 @@ import { DateSuggest } from './ui/dateSuggest';
 import { dateChipsExtension, dateChipsPostProcessor } from './ui/dateChips';
 import { HOVER_SOURCE, tagHighlightExtension, tagHighlightPostProcessor } from './ui/tagHighlight';
 import { openNoteModal } from './ui/noteModal';
+import { openReviewModal } from './ui/reviewModal';
 import { openScheduleModal } from './ui/scheduleModal';
 import { CalendarView, VIEW_TYPE_CALENDAR } from './ui/calendarView';
 import { ScheduledSection } from './ui/scheduledSection';
@@ -75,6 +78,24 @@ export default class KlaarPlugin extends Plugin {
 			},
 		});
 		this.addCommand({
+			id: 'send-task',
+			name: 'Send task to…',
+			icon: 'calendar-arrow-right',
+			editorCheckCallback: (checking, editor, ctx) => {
+				if (!ctx.file) return false;
+				const blocks = blocksForLines(this.editorLines(editor), this.selectedLines(editor), markersOf(this.settings));
+				if (blocks.length === 0) return false;
+				if (!checking) this.pickAndSend(editor, ctx.file, blocks);
+				return true;
+			},
+		});
+		this.addCommand({
+			id: 'move-open-tasks',
+			name: 'Move open tasks to…',
+			icon: 'calendar-arrow-right',
+			editorCheckCallback: (checking, editor, ctx) => this.moveOpenTasks(editor, ctx.file, checking),
+		});
+		this.addCommand({
 			id: 'toggle-in-progress',
 			name: 'Toggle in progress',
 			icon: 'circle-dashed',
@@ -118,10 +139,17 @@ export default class KlaarPlugin extends Plugin {
 		this.registerEvent(
 			this.app.workspace.on('file-menu', (menu, file, _source, leaf) => {
 				const view = leaf?.view ?? this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (!(view instanceof MarkdownView) || view.file !== file || !this.moveDoneTasks(view.editor, true)) return;
-				menu.addItem((item) =>
-					item.setTitle('Move done tasks to the bottom').setIcon('list-checks').onClick(() => this.moveDoneTasks(view.editor, false)),
-				);
+				if (!(view instanceof MarkdownView) || view.file !== file) return;
+				if (this.moveOpenTasks(view.editor, view.file, true)) {
+					menu.addItem((item) =>
+						item.setTitle('Move open tasks to…').setIcon('calendar-arrow-right').onClick(() => this.moveOpenTasks(view.editor, view.file, false)),
+					);
+				}
+				if (this.moveDoneTasks(view.editor, true)) {
+					menu.addItem((item) =>
+						item.setTitle('Move done tasks to the bottom').setIcon('list-checks').onClick(() => this.moveDoneTasks(view.editor, false)),
+					);
+				}
 			}),
 		);
 		this.registerEvent(
@@ -132,6 +160,15 @@ export default class KlaarPlugin extends Plugin {
 					);
 				}
 				if (!this.cursorOnTask(editor)) return;
+				const file = ctx.file;
+				if (file) {
+					menu.addItem((item) =>
+						item.setTitle('Send task to…').setIcon('calendar-arrow-right').onClick(() => {
+							const blocks = blocksForLines(this.editorLines(editor), this.selectedLines(editor), markersOf(this.settings));
+							this.pickAndSend(editor, file, blocks);
+						}),
+					);
+				}
 				menu.addItem((item) =>
 					item.setTitle('Schedule task…').setIcon('calendar-arrow-up').onClick(() => this.scheduleTaskUnderCursor(editor)),
 				);
@@ -154,6 +191,12 @@ export default class KlaarPlugin extends Plugin {
 		this.index = new TaskIndex(this.app, () => this.settings);
 		this.registerView(VIEW_TYPE_CALENDAR, (leaf: WorkspaceLeaf) => new CalendarView(leaf, { index: this.index, getSettings: () => this.settings }));
 		this.addRibbonIcon('calendar', 'Open calendar', () => void this.activateCalendar());
+		this.addCommand({
+			id: 'review-overdue',
+			name: 'Review overdue tasks',
+			icon: 'calendar-x',
+			callback: () => openReviewModal(this.app, this.settings, this.index.all()),
+		});
 		this.addCommand({ id: 'open-calendar', name: 'Open calendar', icon: 'calendar', callback: () => void this.activateCalendar() });
 		// No default hotkeys, as Obsidian asks of plugins: people set their own under Settings → Hotkeys.
 		for (const kind of PERIOD_ORDER) {
@@ -250,20 +293,77 @@ export default class KlaarPlugin extends Plugin {
 	 * there are none to move.
 	 */
 	private moveDoneTasks(editor: Editor, checking: boolean): boolean {
-		const lines = Array.from({ length: editor.lineCount() }, (_, i) => editor.getLine(i));
+		const lines = this.editorLines(editor);
 		const next = moveDoneToSection(lines, markersOf(this.settings));
 		if (!next) return false;
 		if (checking) return true;
-		// Only rewrite from the first line that changes, so the text above keeps its place.
+		this.replaceLines(editor, lines, next);
+		return true;
+	}
+
+	private editorLines(editor: Editor): string[] {
+		return Array.from({ length: editor.lineCount() }, (_, i) => editor.getLine(i));
+	}
+
+	/** Swaps the editor's `lines` for `next` as one undo step, from the first line that changes, so the text above keeps its place. */
+	private replaceLines(editor: Editor, lines: string[], next: string[]): void {
 		let first = 0;
-		while (lines[first] === next[first]) first++;
+		while (first < lines.length && lines[first] === next[first]) first++;
+		if (first === lines.length && next.length === lines.length) return;
 		const cursor = editor.getCursor();
 		const last = lines.length - 1;
-		editor.transaction({
-			changes: [{ from: { line: first, ch: 0 }, to: { line: last, ch: lines[last]?.length ?? 0 }, text: next.slice(first).join('\n') }],
-		});
+		// Past the end of `next` (lines removed at the bottom) the change starts at the end of the line above, so no
+		// empty line is left behind; past the end of `lines` it appends.
+		const tail = first >= next.length && first > 0;
+		const from = first < lines.length && !tail ? { line: first, ch: 0 } : { line: first - 1, ch: lines[first - 1]?.length ?? 0 };
+		const text = tail ? '' : first < lines.length ? next.slice(first).join('\n') : `\n${next.slice(first).join('\n')}`;
+		editor.transaction({ changes: [{ from, to: { line: last, ch: lines[last]?.length ?? 0 }, text }] });
 		editor.setCursor(Math.min(cursor.line, editor.lineCount() - 1), 0);
+	}
+
+	/**
+	 * Moves the open top-level tasks of a journal note, with their subtasks, to a picked period. False when the note isn't
+	 * a journal note or has none.
+	 */
+	private moveOpenTasks(editor: Editor, file: TFile | null, checking: boolean): boolean {
+		if (!file || !movesPhysically(file, this.settings)) return false;
+		const blocks = openTopLevelBlocks(this.editorLines(editor), markersOf(this.settings));
+		if (blocks.length === 0) return false;
+		if (!checking) this.pickAndSend(editor, file, blocks);
 		return true;
+	}
+
+	private pickAndSend(editor: Editor, file: TFile, blocks: TaskBlock[]): void {
+		if (blocks.length === 0) return;
+		openScheduleModal(this.app, this.settings.periods, (key) => {
+			this.sendBlocks(editor, file, blocks, key).catch(() => new Notice("Couldn't move the tasks."));
+		});
+	}
+
+	/**
+	 * Sends the editor's task blocks to the period `key` (see `sendTask`): out of a journal note they move, with their
+	 * subtasks and without their schedule links; in any other note they only get the link. The target is written first;
+	 * the source changes through the editor, so one undo brings them back.
+	 */
+	private async sendBlocks(editor: Editor, file: TFile, blocks: TaskBlock[], key: string): Promise<void> {
+		const lines = this.editorLines(editor);
+		// The note may have changed while the picker was open.
+		if (blocks.some((b) => b.lines.some((line, i) => lines[b.start + i] !== line))) {
+			new Notice('Those tasks changed. Try again.');
+			return;
+		}
+		const sameNote = periodNotePath(this.settings.periodFolder, key) === file.path;
+		if (sameNote || !movesPhysically(file, this.settings)) {
+			const next = [...lines];
+			for (const b of blocks) next[b.start] = setSchedule(b.lines[0] as string, sameNote ? null : key);
+			this.replaceLines(editor, lines, next);
+			return;
+		}
+		const target = await placeInPeriodNote(this.app, this.settings, key, blocks.map((b) => blockForPeriodNote(b.lines)));
+		const moved = new Set(blocks.flatMap((b) => b.lines.map((_, i) => b.start + i)));
+		const kept = lines.filter((_, i) => !moved.has(i));
+		this.replaceLines(editor, lines, kept.length > 0 ? kept : ['']);
+		new Notice(blocks.length === 1 ? `Moved to ${target.basename}.` : `Moved ${blocks.length} tasks to ${target.basename}.`);
 	}
 
 	/**

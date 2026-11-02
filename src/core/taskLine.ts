@@ -280,7 +280,7 @@ export function appendTaskLine(content: string, text: string): string {
 }
 
 /** How far a line is indented, a tab counting as four spaces. */
-function indentWidth(line: string): number {
+export function indentWidth(line: string): number {
 	return (/^[ \t]*/.exec(line)?.[0] ?? '').replace(/\t/g, '    ').length;
 }
 

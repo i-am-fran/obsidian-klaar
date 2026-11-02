@@ -41,6 +41,8 @@ Open the week note `Daily/2026-W43.md` and the task is listed above your own tex
 
 <img src="assets/screenshots/calendar.webp" alt="The Klaar calendar for October 2026 with week numbers, today highlighted, and rings, checks and dots under the days and weeks" width="360">
 
+**Send tasks on.** Every task has a ⋯ menu: Today, Tomorrow, This week, Next week, This month, Next month or any date. A task in a journal note moves into that day's or week's note, with its subtasks, and Klaar creates the note if it isn't there yet. A task in a project note stays put and gets a `>` link instead. Back after a break? **Review overdue tasks** goes through what's overdue one task at a time, with a single key for each: T today, W this week, X next month, S someday, C cancel. **Move open tasks to…** carries everything unfinished in an old note forward at once, and holding Alt (Option) while dragging a task onto the calendar moves it there instead of only rescheduling it.
+
 **Tables and boards in Bases.** Klaar Table and Klaar Board show the tasks of any base, so a base for a project folder gives you that project's tasks. Drag a card to Done, In progress, a priority or a date column and Klaar changes just that line. A board by date puts everything without a date in its own Undated column.
 
 <img src="assets/screenshots/board.webp" alt="A Klaar Board by status with To do, Next, In progress, Someday and Done columns, each card showing its date chip and note">

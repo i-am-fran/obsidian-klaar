@@ -25,7 +25,12 @@ headings:
 - Type a full key, like `2026-W45`, to pick that exact period
 - **Schedule task…** from the command palette, the right-click menu or the note's ⋯ menu
 - **Move task to note…** moves a task and its subtasks to the end or top of another note
-- Drag a task onto a calendar day to reschedule it
+- ⋯ menu on every task: Today, Tomorrow, This week, Next week, This month, Next month, Pick a date…, Move to note…, Someday, Cancel task
+- Tasks in journal notes move into the target note (created if missing); tasks in other notes get a link instead
+- **Send task to…** for the task under the cursor or a whole selection
+- **Review overdue tasks**: one task at a time, one key each, Backspace to undo
+- **Move open tasks to…** carries a journal note's unfinished tasks forward
+- Drag a task onto a calendar day to reschedule it; hold Alt (Option) to move it into that day's note
 - Tasks in a journal note belong to that note's period without a link
 - Date chips: Today, Tomorrow, Yesterday, `Fri 23 Oct`, `Week 43`, `Oct 2026`, `Q4 2026`, `2026`
 - Red chips for overdue tasks, accent chips for the current period

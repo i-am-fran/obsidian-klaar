@@ -26,7 +26,7 @@ export interface KlaarSettings {
 	dateLabels: DateLabelStyle;
 	/** How the `(@done [[DATE]])` stamp shows in live preview and reading mode. */
 	doneStamp: DoneStampStyle;
-	/** Where "Move task to note…" puts the task in the other note. */
+	/** Where a moved task goes in the other note ("Move task to note…", "Send task to…", Review overdue). */
 	moveTo: MovePosition;
 }
 
@@ -99,8 +99,8 @@ export class KlaarSettingTab extends PluginSettingTab {
 						control: { type: 'toggle', key: 'somedayMarker' },
 					},
 					{
-						name: 'Move task to note puts it at',
-						desc: 'Where "Move task to note…" adds the task in the other note. The top is just below any frontmatter.',
+						name: 'Moved tasks go at',
+						desc: 'Where a moved task lands in the other note: "Move task to note…", "Send task to…" and Review overdue. The top is just below any frontmatter.',
 						control: { type: 'dropdown', key: 'moveTo', options: { end: 'The end of the note', start: 'The top of the note' } },
 					},
 				],

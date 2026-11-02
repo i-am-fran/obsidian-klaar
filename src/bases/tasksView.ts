@@ -8,7 +8,7 @@ import type { TaskRef } from '../core/tasks';
 import type { KlaarSettings } from '../settings';
 import { renderScheduleChip } from '../ui/dateChips';
 import { renderTag, renderTaskText } from '../ui/tagHighlight';
-import { makeDraggable, makeOpenable, renderCheckbox, renderMoveButton, renderSourceLink } from '../ui/taskRow';
+import { makeDraggable, makeOpenable, renderCheckbox, renderTaskMenuButton, renderSourceLink } from '../ui/taskRow';
 import { filterOptions, sortOptions } from './labels';
 import { TaskBasesView, type TasksViewDeps } from './taskBasesView';
 
@@ -109,7 +109,7 @@ class TasksView extends TaskBasesView {
 			} },
 			{ name: '', render: (cell, task) => {
 				cell.addClass('klaar-col-move');
-				renderMoveButton(cell, this.app, task, settings);
+				renderTaskMenuButton(cell, this.app, task, settings);
 			} },
 		];
 		return all.filter((c) => c.optional === undefined || shown[c.optional]);
