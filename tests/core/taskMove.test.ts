@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { blockAt, blockForPeriodNote, blocksForLines, findBlock, insertLines, openTopLevelBlocks, removeLines } from '../../src/core/taskMove';
+import { blockAt, blockForPeriodNote, blocksForLines, findBlock, insertLines, openTopLevelBlocks, removeLines, scheduleBlocks } from '../../src/core/taskMove';
 
 const note = ['# Day', '- [ ] Call Sam >[[2026-08-14]]', '\t- [x] Find number', '\t- [ ] Book table', '- [ ] Other', ''];
 
@@ -65,6 +65,31 @@ describe('blocksForLines', () => {
 
 	test('a selected subtask on its own is its own block; non-task lines are skipped', () => {
 		expect(blocksForLines(note, [0, 3]).map((b) => [b.start, b.end])).toEqual([[3, 4]]);
+	});
+});
+
+describe('scheduleBlocks', () => {
+	const blocks = blocksForLines(note, [1, 2, 3, 4]);
+
+	test('sets the link on each block\'s task line, leaving subtasks and other lines alone', () => {
+		expect(scheduleBlocks(note, blocks, '2026-11-05')).toEqual([
+			'# Day',
+			'- [ ] Call Sam >[[2026-11-05]]',
+			'\t- [x] Find number',
+			'\t- [ ] Book table',
+			'- [ ] Other >[[2026-11-05]]',
+			'',
+		]);
+	});
+
+	test('null removes the link', () => {
+		expect(scheduleBlocks(note, blocks, null)[1]).toBe('- [ ] Call Sam');
+	});
+
+	test('leaves the input alone', () => {
+		const copy = [...note];
+		scheduleBlocks(note, blocks, '2026-11-05');
+		expect(note).toEqual(copy);
 	});
 });
 

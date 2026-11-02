@@ -7,7 +7,8 @@ import { DEFAULT_SETTINGS, KlaarSettings, KlaarSettingTab } from './settings';
 import { TaskIndex } from './obsidian/taskIndex';
 import { openPeriodNote, periodNotePath, periodOfFile } from './obsidian/periodNotes';
 import { movesPhysically, placeInPeriodNote } from './obsidian/moveTask';
-import { blockForPeriodNote, blocksForLines, openTopLevelBlocks, type TaskBlock } from './core/taskMove';
+import { EDITOR_DRAG_MIME } from './core/dragPayload';
+import { blockForPeriodNote, blocksForLines, openTopLevelBlocks, scheduleBlocks, type TaskBlock } from './core/taskMove';
 import { DEFAULT_TAG_RULES, canMarkInProgress, cyclePriorityTag, normaliseTagRules, toggleInProgress } from './core/tagRules';
 import { appendBlock, markersOf, moveDoneToSection, outdentBlock, parseTaskLine, prependBlock, setSchedule, taskBlockEnd, toggleCancelled, toggleNext, toggleSomeday } from './core/taskLine';
 import { flashLineExtension } from './ui/flashLine';
@@ -31,6 +32,11 @@ const PERIOD_ICONS: Record<PeriodKind, string> = {
 	year: 'calendar-fold',
 };
 
+/** Whether any of `blocks` no longer matches the note's `lines`. */
+function blocksChanged(lines: string[], blocks: TaskBlock[]): boolean {
+	return blocks.some((b) => b.lines.some((line, i) => lines[b.start + i] !== line));
+}
+
 export default class KlaarPlugin extends Plugin {
 	settings: KlaarSettings = { ...DEFAULT_SETTINGS };
 	index!: TaskIndex;
@@ -39,6 +45,8 @@ export default class KlaarPlugin extends Plugin {
 	readonly rebuildIndex = debounce(() => void this.index.build(), 500, true);
 	/** Registered once; its contents are swapped when display settings change (new plugin instances, so editors redraw). */
 	private readonly editorExtensions: Extension[] = [];
+	/** The task lines of an editor selection being dragged, for a drop on the calendar; null between drags. */
+	private editorDrag: { editor: Editor; file: TFile; blocks: TaskBlock[] } | null = null;
 	private readonly refreshEditors = debounce(() => {
 		this.editorExtensions.splice(0, this.editorExtensions.length, ...this.buildEditorExtensions());
 		this.app.workspace.updateOptions();
@@ -189,7 +197,13 @@ export default class KlaarPlugin extends Plugin {
 		);
 
 		this.index = new TaskIndex(this.app, () => this.settings);
-		this.registerView(VIEW_TYPE_CALENDAR, (leaf: WorkspaceLeaf) => new CalendarView(leaf, { index: this.index, getSettings: () => this.settings }));
+		this.registerView(
+			VIEW_TYPE_CALENDAR,
+			(leaf: WorkspaceLeaf) => new CalendarView(leaf, { index: this.index, getSettings: () => this.settings, dropEditorTasks: (key, move) => this.dropEditorTasks(key, move) }),
+		);
+		// Bubble phase, so CodeMirror has started its own drag of the selected text first.
+		this.registerDomEvent(document, 'dragstart', (e) => this.startEditorDrag(e));
+		this.registerDomEvent(document, 'dragend', () => (this.editorDrag = null));
 		this.addRibbonIcon('calendar', 'Open calendar', () => void this.activateCalendar());
 		this.addCommand({
 			id: 'review-overdue',
@@ -341,6 +355,44 @@ export default class KlaarPlugin extends Plugin {
 	}
 
 	/**
+	 * When the user drags selected text in a note's editor and the selection holds task lines, remembers them and marks
+	 * the drag so the calendar takes it. Any other drag is left as it is.
+	 */
+	private startEditorDrag(e: DragEvent): void {
+		this.editorDrag = null;
+		const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+		const target = e.target instanceof Node ? e.target : null;
+		const el = target instanceof Element ? target : target?.parentElement;
+		if (!view?.file || view.getMode() !== 'source' || !el?.closest('.cm-content') || !view.contentEl.contains(el)) return;
+		const editor = view.editor;
+		const blocks = blocksForLines(this.editorLines(editor), this.selectedLines(editor), markersOf(this.settings));
+		if (blocks.length === 0) return;
+		this.editorDrag = { editor, file: view.file, blocks };
+		e.dataTransfer?.setData(EDITOR_DRAG_MIME, '');
+	}
+
+	/**
+	 * The dragged editor tasks were dropped on the calendar day `key`. A plain drop reschedules them; with `move` (Alt)
+	 * they are sent there like "Send task to…". Both go through the editor, as one undo step.
+	 */
+	private dropEditorTasks(key: string, move: boolean): void {
+		const drag = this.editorDrag;
+		this.editorDrag = null;
+		if (!drag) return;
+		const { editor, file, blocks } = drag;
+		if (move) {
+			this.sendBlocks(editor, file, blocks, key).catch(() => new Notice("Couldn't move the tasks."));
+			return;
+		}
+		const lines = this.editorLines(editor);
+		if (blocksChanged(lines, blocks)) {
+			new Notice('Those tasks changed. Try again.');
+			return;
+		}
+		this.replaceLines(editor, lines, scheduleBlocks(lines, blocks, key));
+	}
+
+	/**
 	 * Sends the editor's task blocks to the period `key` (see `sendTask`): out of a journal note they move, with their
 	 * subtasks and without their schedule links; in any other note they only get the link. The target is written first;
 	 * the source changes through the editor, so one undo brings them back.
@@ -348,15 +400,13 @@ export default class KlaarPlugin extends Plugin {
 	private async sendBlocks(editor: Editor, file: TFile, blocks: TaskBlock[], key: string): Promise<void> {
 		const lines = this.editorLines(editor);
 		// The note may have changed while the picker was open.
-		if (blocks.some((b) => b.lines.some((line, i) => lines[b.start + i] !== line))) {
+		if (blocksChanged(lines, blocks)) {
 			new Notice('Those tasks changed. Try again.');
 			return;
 		}
 		const sameNote = periodNotePath(this.settings.periodFolder, key) === file.path;
 		if (sameNote || !movesPhysically(file, this.settings)) {
-			const next = [...lines];
-			for (const b of blocks) next[b.start] = setSchedule(b.lines[0] as string, sameNote ? null : key);
-			this.replaceLines(editor, lines, next);
+			this.replaceLines(editor, lines, scheduleBlocks(lines, blocks, sameNote ? null : key));
 			return;
 		}
 		const target = await placeInPeriodNote(this.app, this.settings, key, blocks.map((b) => blockForPeriodNote(b.lines)));

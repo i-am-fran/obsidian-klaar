@@ -37,7 +37,7 @@ Open the week note `Daily/2026-W43.md` and the task is listed above your own tex
 
 <img src="assets/screenshots/day-note.webp" alt="A day note with Klaar: three tasks scheduled for the day, grouped by note and heading, a closed Scheduled this week section above the note's own text, and the calendar in the sidebar">
 
-**A calendar in the sidebar.** A month view with week numbers. Click a day or a week to open its note, and drag a task onto a day to move it. A ring marks days with open tasks, a check marks days where everything is done.
+**A calendar in the sidebar.** A month view with week numbers. Click a day or a week to open its note, and drag a task onto a day to move it. That works from a note too: select the task lines and drag the selection onto a day. A ring marks days with open tasks, a check marks days where everything is done.
 
 <img src="assets/screenshots/calendar.webp" alt="The Klaar calendar for October 2026 with week numbers, today highlighted, and rings, checks and dots under the days and weeks" width="360">
 

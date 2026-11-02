@@ -3,6 +3,12 @@ import type { TaskRef } from './tasks';
 /** MIME type for a task dragged between Klaar views. */
 export const TASK_DRAG_MIME = 'application/x-klaar-task';
 
+/**
+ * Marks a drag of editor text whose selection holds task lines. The tasks themselves stay with the plugin: `dragover`
+ * can only see a drag's types, not its data.
+ */
+export const EDITOR_DRAG_MIME = 'application/x-klaar-editor-tasks';
+
 export interface DragPayload {
 	path: string;
 	line: number;
