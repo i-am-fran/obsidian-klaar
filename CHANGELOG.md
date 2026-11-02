@@ -1,9 +1,5 @@
 # Changelog
 
-## 2026.11.2
-
-- **Experimental: questions and ideas.** Under Settings → Experimental you can turn on two more markers: `- [?]` for a question and `- [I]` (capital I) for an idea. Like someday tasks, they stay out of the scheduled sections, Overdue, the calendar and the open-task filters. Find them under Status → Questions or Ideas in a Klaar Table, or in the Question and Idea columns of a status board, where dragging a card in sets the marker. Tick one when it's answered or done with. Both are off by default, and with them off Klaar leaves those lines alone as before.
-
 ## 2026.11.1
 
 - **Send tasks to another day, week or month.** The calendar button on each task (in journal notes, the Klaar Table and the Klaar Board) is now a ⋯ menu: Today, Tomorrow, This week, Next week, This month, Next month, Pick a date…, Move to note…, Someday and Cancel task. A task that lives in a journal note moves into the target note, with its subtasks and without its old `>` link, and Klaar creates the note if it doesn't exist yet. A task in any other note stays in its note and gets the new link instead. The notice that follows has an Undo button.
@@ -12,6 +8,7 @@
 - New command: **Move open tasks to…** moves every unfinished task in a journal note, with its subtasks, to another day, week or month in one go. It's in the command palette and the note's ⋯ menu.
 - Hold Alt (Option on a Mac) while dragging a task onto a calendar day to move it into that day's note. A plain drag still only reschedules it.
 - The **Move task to note puts it at** setting is now **Moved tasks go at**, and it applies to every way of moving a task.
+- **Experimental: questions and ideas.** Under Settings → Experimental you can turn on two more markers: `- [?]` for a question and `- [I]` (capital I) for an idea. Like someday tasks, they stay out of the scheduled sections, Overdue, the calendar and the open-task filters. Find them under Status → Questions or Ideas in a Klaar Table, or in the Question and Idea columns of a status board, where dragging a card in sets the marker. Tick one when it's answered or done with. Both are off by default, and with them off Klaar leaves those lines alone as before.
 
 ## 2026.10.25
 

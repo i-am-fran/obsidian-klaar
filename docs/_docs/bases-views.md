@@ -41,7 +41,7 @@ Turn off **Show search** to hide the bar.
 A table with the Task, Date and Note columns. Under **Configure view**:
 
 - **Columns**: add Status, Priority, Tags or Heading. A Priority or Tags column takes those pills out of the task text.
-- **Filters**: Status, When, Marker, Tag and **Show subtasks**. **Tag** lists every tag on a task in your vault, so `#claude` shows only tasks tagged `#claude` or a tag nested under it, like `#claude/review`.
+- **Filters**: Status, When, Marker, Tag and **Show subtasks**. Status has Questions and Ideas too while those markers are on. **Tag** lists every tag on a task in your vault, so `#claude` shows only tasks tagged `#claude` or a tag nested under it, like `#claude/review`.
 - **Sort and group**: sort by Date, Priority, Note or Task, **Reverse sort**, and group by date, note, priority, tag or not at all. Grouped by tag, a task with two tags shows under both, and untagged tasks come last under No tag.
 
 The default sort is by date, with priority tasks first within each date. Tick a task, click its text to open it at its line, use the calendar button to reschedule it, or drag the row onto the calendar.
@@ -54,13 +54,13 @@ Columns of cards. Choose what the columns are under **Configure view** → **Col
 
 | Columns | The board shows |
 | --- | --- |
-| Status | To do, Next, In progress, any tag columns, Someday, Done |
+| Status | To do, Next, In progress, any tag columns, Someday, Question and Idea (if turned on), Done |
 | Priority | High, Medium, Low, No priority |
 | Date | Overdue, Today, This week, Later, Undated |
 
 Drag a card to another column and Klaar rewrites just that task's line:
 
-- **Done** ticks it, with the completed date if that's on. **To do**, **Next**, **In progress** and **Someday** set its marker.
+- **Done** ticks it, with the completed date if that's on. **To do**, **Next**, **In progress**, **Someday**, **Question** and **Idea** set its marker.
 - A priority column swaps its priority tag.
 - **Today** and **This week** set its link, **Undated** removes it, and **Later** opens the date picker. Overdue doesn't take drops.
 

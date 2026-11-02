@@ -22,6 +22,7 @@ Under Settings → Klaar:
 | Mark in progress with [/] | on |
 | Mark next with [>] | on |
 | Mark someday with [<] | on |
+| Moved tasks go at | The end of the note |
 | Schedule labels | Friendly (Fri 23 Oct) |
 | Completed date | Small and muted |
 | Tags | `#p1`, `#p2`, `#p3`, `#bugs` |
