@@ -7,7 +7,7 @@ import type { BoardBy } from '../../src/core/taskBoard';
 import type { TaskRef } from '../../src/core/tasks';
 
 function task(text: string, scheduleKey: string | null, extra: Partial<TaskRef> = {}): TaskRef {
-	return { path: 'Other.md', line: 0, raw: `- [ ] ${text}`, checked: false, cancelled: false, someday: false, next: false, text, scheduleKey, explicit: true, doneDate: null, inProgress: false, priority: 0, tags: [], heading: null, subtask: false, ...extra };
+	return { path: 'Other.md', line: 0, raw: `- [ ] ${text}`, checked: false, cancelled: false, someday: false, question: false, idea: false, next: false, text, scheduleKey, explicit: true, doneDate: null, inProgress: false, priority: 0, tags: [], heading: null, subtask: false, ...extra };
 }
 
 const today = '2026-10-21';
@@ -60,10 +60,10 @@ describe('boardColumns by status', () => {
 		expect(texts(tasks, 'status', 'in-progress')).toEqual(['b']);
 		expect(texts(tasks, 'status', 'done')).toEqual(['c']);
 	});
-	test('labels', () => expect(cols(tasks, 'status').map(c => c.label)).toEqual(['To do', 'Next', 'In progress', 'Someday', 'Done']));
-	test('showDone false hides done', () => expect(ids(tasks, 'status', rules, false)).toEqual(['todo', 'next', 'in-progress', 'someday']));
-	test('no in-progress rule', () => expect(ids(tasks, 'status', DEFAULT_TAG_RULES)).toEqual(['todo', 'next', 'someday', 'done']));
-	test('no in-progress rule but the [/] marker in use', () => expect(ids(tasks, 'status', DEFAULT_TAG_RULES, true, true)).toEqual(['todo', 'next', 'in-progress', 'someday', 'done']));
+	test('labels', () => expect(cols(tasks, 'status').map(c => c.label)).toEqual(['To do', 'Next', 'In progress', 'Someday', 'Question', 'Idea', 'Done']));
+	test('showDone false hides done', () => expect(ids(tasks, 'status', rules, false)).toEqual(['todo', 'next', 'in-progress', 'someday', 'question', 'idea']));
+	test('no in-progress rule', () => expect(ids(tasks, 'status', DEFAULT_TAG_RULES)).toEqual(['todo', 'next', 'someday', 'question', 'idea', 'done']));
+	test('no in-progress rule but the [/] marker in use', () => expect(ids(tasks, 'status', DEFAULT_TAG_RULES, true, true)).toEqual(['todo', 'next', 'in-progress', 'someday', 'question', 'idea', 'done']));
 	test('in-progress task without the rule goes to todo', () => {
 		expect(boardColumns(tasks, 'status', today, DEFAULT_TAG_RULES, true, false).find(c => c.id === 'todo')?.tasks.map(t => t.text)).toEqual(['a', 'b']);
 	});
@@ -81,13 +81,31 @@ describe('boardColumns with next and someday', () => {
 	});
 	test('in progress wins over next', () => expect(texts(tasks, 'status', 'in-progress')).toEqual(['np']));
 	test('markers off: no columns, next tasks go to todo', () => {
-		const off = boardColumns(tasks, 'status', today, rules, true, false, { next: false, someday: false });
+		const off = boardColumns(tasks, 'status', today, rules, true, false, { ...ALL_MARKERS, next: false, someday: false, question: false, idea: false });
 		expect(off.map(c => c.id)).toEqual(['todo', 'in-progress', 'done']);
 		expect(off[0]?.tasks.map(t => t.text)).toEqual(['a', 'n']);
 	});
 	test('someday tasks stay off the priority and date boards', () => {
 		expect(cols(tasks, 'priority').flatMap(c => c.tasks.map(t => t.text))).not.toContain('s');
 		expect(cols(tasks, 'date').flatMap(c => c.tasks.map(t => t.text))).not.toContain('s');
+	});
+});
+
+describe('boardColumns with questions and ideas', () => {
+	const tasks = [task('a', null), task('q', '2026-10-01', { question: true }), task('i', null, { idea: true }), task('d', null, { checked: true })];
+	test('they get their own columns after Someday', () => {
+		expect(ids(tasks, 'status')).toEqual(['todo', 'next', 'in-progress', 'someday', 'question', 'idea', 'done']);
+		expect(cols(tasks, 'status').map(c => c.label)).toEqual(['To do', 'Next', 'In progress', 'Someday', 'Question', 'Idea', 'Done']);
+		expect(texts(tasks, 'status', 'todo')).toEqual(['a']);
+		expect(texts(tasks, 'status', 'question')).toEqual(['q']);
+		expect(texts(tasks, 'status', 'idea')).toEqual(['i']);
+	});
+	test('markers off: no columns', () => {
+		const off = boardColumns(tasks, 'status', today, rules, true, false, { ...ALL_MARKERS, question: false, idea: false });
+		expect(off.map(c => c.id)).toEqual(['todo', 'next', 'in-progress', 'someday', 'done']);
+	});
+	test('they stay off the priority and date boards', () => {
+		for (const by of ['priority', 'date'] as const) expect(cols(tasks, by).flatMap(c => c.tasks.map(t => t.text))).toEqual(['a']);
 	});
 });
 
@@ -135,8 +153,8 @@ describe('boardColumns with tag columns', () => {
 	const status = boardColumns(tasks, 'status', today, rules, true, false, ALL_MARKERS, tagColumns);
 	const col = (id: string) => status.find(c => c.id === id)?.tasks.map(t => t.text);
 	test('a column each, after In progress, titled as typed', () => {
-		expect(status.map(c => c.id)).toEqual(['todo', 'next', 'in-progress', 'tag:waiting', 'tag:blocked', 'someday', 'done']);
-		expect(status.map(c => c.label)).toEqual(['To do', 'Next', 'In progress', 'Waiting', 'Blocked', 'Someday', 'Done']);
+		expect(status.map(c => c.id)).toEqual(['todo', 'next', 'in-progress', 'tag:waiting', 'tag:blocked', 'someday', 'question', 'idea', 'done']);
+		expect(status.map(c => c.label)).toEqual(['To do', 'Next', 'In progress', 'Waiting', 'Blocked', 'Someday', 'Question', 'Idea', 'Done']);
 	});
 	test('the first listed tag wins, over To do, Next and In progress', () => {
 		expect(col('tag:waiting')).toEqual(['w', 'both', 'nw', 'pw']);
@@ -150,7 +168,7 @@ describe('boardColumns with tag columns', () => {
 		expect(col('someday')).toEqual(['sw']);
 	});
 	test('no tag columns without a list, or on other boards', () => {
-		expect(ids(tasks, 'status')).toEqual(['todo', 'next', 'in-progress', 'someday', 'done']);
+		expect(ids(tasks, 'status')).toEqual(['todo', 'next', 'in-progress', 'someday', 'question', 'idea', 'done']);
 		expect(boardColumns(tasks, 'priority', today, rules, true, false, ALL_MARKERS, tagColumns).some(c => c.id.startsWith('tag:'))).toBe(false);
 	});
 });
@@ -222,6 +240,13 @@ describe('rewriteForColumn with the [/] marker', () => {
 	test('someday writes [<]', () => {
 		expect(rw('- [>] A', 'someday')).toBe('- [<] A');
 		expect(rw('- [-] A', 'someday')).toBe('- [<] A');
+	});
+	test('question writes [?] and idea writes [I]', () => {
+		expect(rw('- [ ] A', 'question')).toBe('- [?] A');
+		expect(rw('- [x] A (@done [[2026-10-01]])', 'question')).toBe('- [?] A');
+		expect(rw('- [?] A', 'idea')).toBe('- [I] A');
+		expect(rw('- [I] A', 'todo')).toBe('- [ ] A');
+		expect(rw('- [?] A', 'done')).toBe('- [x] A (@done [[2026-10-21]])');
 	});
 	test('todo clears [>] and [<]', () => {
 		expect(rw('- [>] A', 'todo')).toBe('- [ ] A');

@@ -3,6 +3,7 @@ import { todayIso } from '../core/dates';
 import { isOpen } from '../core/query';
 import { ruleFor } from '../core/tagRules';
 import { withoutTags } from '../core/taskFields';
+import { markersOf } from '../core/taskLine';
 import { COLUMN_KEYS, TOOLBAR_KEY, filterTasks, groupTasks, legacyKeysToSave, readColumns, readTableState, taskTags, type OptionalColumn } from '../core/taskTable';
 import type { TaskRef } from '../core/tasks';
 import type { KlaarSettings } from '../settings';
@@ -27,6 +28,8 @@ function statusText(t: TaskRef): string {
 	if (t.checked) return 'Done';
 	if (t.cancelled) return 'Cancelled';
 	if (t.someday) return 'Someday';
+	if (t.question) return 'Question';
+	if (t.idea) return 'Idea';
 	if (t.inProgress) return 'In progress';
 	return t.next ? 'Next' : '';
 }
@@ -126,7 +129,7 @@ function viewOptions(config: BasesViewConfig, deps: TasksViewDeps): BasesAllOpti
 			displayName: 'Columns',
 			items: (Object.keys(COLUMN_LABELS) as OptionalColumn[]).map((c) => ({ type: 'toggle', key: COLUMN_KEYS[c], displayName: COLUMN_LABELS[c], default: false })),
 		},
-		{ type: 'group', displayName: 'Filters', items: filterOptions(true, taskTags(deps.index.all()), savedTag) },
+		{ type: 'group', displayName: 'Filters', items: filterOptions(true, taskTags(deps.index.all()), savedTag, markersOf(deps.getSettings())) },
 		{ type: 'group', displayName: 'Sort and group', items: sortOptions(true) },
 	];
 }

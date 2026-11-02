@@ -4,7 +4,7 @@ import { type App, type MarkdownPostProcessor, editorLivePreviewField, setIcon }
 import { doneLabel, scheduleLabel, scheduleTiming } from '../core/dateLabels';
 import { todayIso } from '../core/dates';
 import { parsePeriodKey } from '../core/periods';
-import { lineSpans, markersOf, parseTaskLine } from '../core/taskLine';
+import { isParked, isParkedMarker, lineSpans, markersOf, parseTaskLine } from '../core/taskLine';
 import { openPeriodNote } from '../obsidian/periodNotes';
 import type { KlaarSettings } from '../settings';
 
@@ -68,7 +68,7 @@ function buildDecorations(view: EditorView, app: App, settings: KlaarSettings): 
 			if (!line.text.includes('[[')) continue;
 			const parsed = parseTaskLine(line.text, markersOf(settings));
 			if (!parsed) continue;
-			const open = !parsed.checked && !parsed.cancelled && !parsed.someday;
+			const open = !parsed.checked && !parsed.cancelled && !isParked(parsed);
 			const spans = lineSpans(line.text);
 			for (const s of spans.schedule) {
 				const a = line.from + s.from;
@@ -120,7 +120,7 @@ export function dateChipsPostProcessor(app: App, getSettings: () => KlaarSetting
 		const settings = getSettings();
 		for (const li of Array.from(el.querySelectorAll<HTMLElement>('li.task-list-item'))) {
 			const state = li.dataset.task ?? ' ';
-			const open = state !== 'x' && state !== 'X' && state !== '-' && !(state === '<' && settings.somedayMarker);
+			const open = state !== 'x' && state !== 'X' && state !== '-' && !isParkedMarker(state, markersOf(settings));
 			for (const link of Array.from(li.querySelectorAll<HTMLElement>('a.internal-link'))) {
 				if (link.closest('li') !== li) continue;
 				const key = link.getAttr('data-href') ?? '';

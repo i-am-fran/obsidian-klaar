@@ -68,7 +68,7 @@ headings:
 
 ### Tasks {#features-tasks}
 
-- In progress `[/]`, next `[>]`, someday `[<]` and cancelled `[-]`
+- In progress `[/]`, next `[>]`, someday `[<]` and cancelled `[-]`; questions `[?]` and ideas `[I]` as an experimental option
 - Each extra marker can be turned off
 - Someday tasks leave the scheduled lists and the calendar
 - Completed date stamp `(@done [[2026-10-23]])`, shown muted, as a chip or hidden

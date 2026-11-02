@@ -3,6 +3,7 @@ import { parsePeriodKey } from '../../src/core/periods';
 import { DEFAULT_TAG_RULES, type TagRule } from '../../src/core/tagRules';
 
 const withTag: TagRule[] = [...DEFAULT_TAG_RULES, { tag: 'in-progress', color: '#30a46c', role: 'in-progress' }];
+import { ALL_MARKERS } from '../../src/core/taskLine';
 import { extractTasks, locateTaskLine } from '../../src/core/tasks';
 
 const lines = ['# 2026-W43', '- [ ] Plan budget', '```', '- [ ] not a task', '```', '- [ ] Call >[[2026-10-22]]'];
@@ -28,7 +29,13 @@ describe('extractTasks', () => {
 		expect(extractTasks('x.md', lines, [0, 1], null, [], DEFAULT_TAG_RULES, true).map(x => x.inProgress)).toEqual([true, false]);
 	});
 	test('lines with other markers are not tasks', () => {
-		expect(extractTasks('x.md', ['- [!] A', '- [?] B', '- [ ] C'], [0, 1, 2], null).map(x => x.text)).toEqual(['C']);
+		expect(extractTasks('x.md', ['- [!] A', '- [i] B', '- [ ] C'], [0, 1, 2], null).map(x => x.text)).toEqual(['C']);
+	});
+	test('[?] is a question and [I] an idea; skipped when switched off', () => {
+		const lines = ['- [?] A', '- [I] B', '- [ ] C'];
+		expect(extractTasks('x.md', lines, [0, 1, 2], null).map(x => [x.question, x.idea])).toEqual([[true, false], [false, true], [false, false]]);
+		const off = { ...ALL_MARKERS, question: false, idea: false };
+		expect(extractTasks('x.md', lines, [0, 1, 2], null, [], [], false, off).map(x => x.text)).toEqual(['C']);
 	});
 	test('[>] is next and [<] is someday', () => {
 		const t = extractTasks('x.md', ['- [>] A', '- [<] B'], [0, 1], null);
@@ -36,8 +43,8 @@ describe('extractTasks', () => {
 	});
 	test('[>] and [<] are skipped when switched off', () => {
 		const lines = ['- [>] A', '- [<] B', '- [ ] C'];
-		expect(extractTasks('x.md', lines, [0, 1, 2], null, [], [], false, { next: false, someday: true }).map(x => x.text)).toEqual(['B', 'C']);
-		expect(extractTasks('x.md', lines, [0, 1, 2], null, [], [], false, { next: true, someday: false }).map(x => x.text)).toEqual(['A', 'C']);
+		expect(extractTasks('x.md', lines, [0, 1, 2], null, [], [], false, { ...ALL_MARKERS, next: false }).map(x => x.text)).toEqual(['B', 'C']);
+		expect(extractTasks('x.md', lines, [0, 1, 2], null, [], [], false, { ...ALL_MARKERS, someday: false }).map(x => x.text)).toEqual(['A', 'C']);
 	});
 	test('no rules: tags carry no meaning', () => {
 		expect(extractTasks('x.md', ['- [ ] A #p1'], [0], null)[0]).toMatchObject({ priority: 0, inProgress: false });

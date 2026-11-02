@@ -26,6 +26,8 @@ Under Settings → Klaar:
 | Completed date | Small and muted |
 | Tags | `#p1`, `#p2`, `#p3`, `#bugs` |
 | Period types | Daily, Weekly, Monthly, Yearly on; Quarterly off |
+| Experimental: Questions with [?] | off |
+| Experimental: Ideas with [I] | off |
 
 <!-- Screenshot: Settings → Klaar, showing the Tags list with colours and roles. Save as docs/assets/settings.png -->
 

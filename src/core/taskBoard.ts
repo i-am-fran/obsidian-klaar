@@ -12,7 +12,7 @@ import type { TaskGroup } from './query';
 import type { TaskRef } from './tasks';
 
 export type BoardBy = 'status' | 'priority' | 'date';
-type FixedColumnId = 'todo' | 'next' | 'in-progress' | 'someday' | 'done' | 'high' | 'medium' | 'low' | 'none' | 'overdue' | 'today' | 'this-week' | 'later' | 'undated';
+type FixedColumnId = 'todo' | 'next' | 'in-progress' | 'someday' | 'question' | 'idea' | 'done' | 'high' | 'medium' | 'low' | 'none' | 'overdue' | 'today' | 'this-week' | 'later' | 'undated';
 /** A fixed column, or `tag:<tag>` for one of the view's tag columns (tag in lower case, no `#`). */
 export type ColumnId = FixedColumnId | `tag:${string}`;
 
@@ -51,7 +51,7 @@ const MIN_WIDTH = 200;
 const MAX_WIDTH = 480;
 
 const LABELS: Record<FixedColumnId, string> = {
-	'todo': 'To do', 'next': 'Next', 'in-progress': 'In progress', 'someday': 'Someday', 'done': 'Done',
+	'todo': 'To do', 'next': 'Next', 'in-progress': 'In progress', 'someday': 'Someday', 'question': 'Question', 'idea': 'Idea', 'done': 'Done',
 	'high': 'High', 'medium': 'Medium', 'low': 'Low', 'none': 'No priority',
 	'overdue': 'Overdue', 'today': 'Today', 'this-week': 'This week', 'later': 'Later', 'undated': 'Undated',
 };
@@ -114,7 +114,8 @@ function dateBucket(t: TaskRef, today: IsoDate): ColumnId {
 
 /**
  * The board's columns in display order, empty ones included so they can take drops. Cancelled tasks never show, and
- * someday tasks only in their own column. `useMarker`: `[/]` means in progress; `markers`: whether `[>]` and `[<]` are in use.
+ * someday, question and idea tasks only in their own column. `useMarker`: `[/]` means in progress; `markers`: whether `[>]`,
+ * `[<]`, `[?]` and `[I]` are in use.
  * `tagColumns`: the view's tags that get a column each on the status board, after In progress; an open task with one goes
  * there (the first listed wins) rather than To do, Next or In progress.
  */
@@ -135,6 +136,8 @@ export function boardColumns(tasks: TaskRef[], by: BoardBy, today: IsoDate, rule
 				columns.push({ id: `${TAG_PREFIX}${key}`, label: tag.charAt(0).toUpperCase() + tag.slice(1), tasks: tasks.filter(t => tagged.get(t) === key) });
 			}
 			if (markers.someday) columns.push(column('someday', tasks.filter(t => t.someday)));
+			if (markers.question) columns.push(column('question', tasks.filter(t => t.question)));
+			if (markers.idea) columns.push(column('idea', tasks.filter(t => t.idea)));
 			if (showDone) columns.push(column('done', tasks.filter(t => t.checked)));
 			return columns;
 		}
@@ -213,6 +216,10 @@ export function rewriteForColumn(line: string, by: BoardBy, id: ColumnId, ctx: {
 			return setOpenMarker(clear(reopenTask(untagged)), '>');
 		case 'someday':
 			return setOpenMarker(clear(reopenTask(untagged)), '<');
+		case 'question':
+			return setOpenMarker(clear(reopenTask(untagged)), '?');
+		case 'idea':
+			return setOpenMarker(clear(reopenTask(untagged)), 'I');
 		case 'in-progress':
 			return setInProgress(untagged, true, rules, useMarker);
 		default:

@@ -1,12 +1,12 @@
 import { describe, expect, test } from 'vitest';
 import { ALL_PERIODS, parsePeriodKey } from '../../src/core/periods';
 import type { Period } from '../../src/core/periods';
-import { matchesMarker, scheduleStatus, scheduledFor, sortByMarkers, splitDone } from '../../src/core/query';
+import { isOpen, matchesMarker, scheduleStatus, scheduledFor, sortByMarkers, splitDone } from '../../src/core/query';
 import type { MarkerFilter } from '../../src/core/query';
 import type { TaskRef } from '../../src/core/tasks';
 
 function task(text: string, scheduleKey: string | null, extra: Partial<TaskRef> = {}): TaskRef {
-	return { path: 'Other.md', line: 0, raw: `- [ ] ${text}`, checked: false, cancelled: false, someday: false, next: false, text, scheduleKey, explicit: true, doneDate: null, inProgress: false, priority: 0, tags: [], heading: null, subtask: false, ...extra };
+	return { path: 'Other.md', line: 0, raw: `- [ ] ${text}`, checked: false, cancelled: false, someday: false, question: false, idea: false, next: false, text, scheduleKey, explicit: true, doneDate: null, inProgress: false, priority: 0, tags: [], heading: null, subtask: false, ...extra };
 }
 
 const day19 = task('day19', '2026-10-19');
@@ -168,6 +168,14 @@ describe('next and someday', () => {
 	test('the calendar ignores someday tasks', () => {
 		expect(scheduleStatus([someday], '2026-10-19')).toBeNull();
 		expect(scheduleStatus([someday, next], '2026-10-19')).toBe('open');
+	});
+	test('questions and ideas stay out like someday', () => {
+		const question = task('question', '2026-10-01', { question: true });
+		const idea = task('idea', '2026-10-19', { idea: true });
+		expect(texts(scheduledFor([next, question, idea], p('2026-10-19'), '2026-10-19', 'Notes/2026-10-19.md'))).toEqual([['Scheduled', ['next']]]);
+		expect(isOpen(question)).toBe(false);
+		expect(isOpen(idea)).toBe(false);
+		expect(scheduleStatus([question, idea], '2026-10-19')).toBeNull();
 	});
 	test('marker filter and rank', () => {
 		expect(matchesMarker(next, 'next')).toBe(true);

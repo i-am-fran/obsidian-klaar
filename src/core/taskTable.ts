@@ -2,9 +2,10 @@ import type { IsoDate } from './dates';
 import { contains, periodOf } from './periods';
 import { groupByDate, isOpen, isOverdue, markerRank, matchesMarker, taskPeriod } from './query';
 import type { MarkerFilter, TaskGroup } from './query';
+import type { MarkerSettings } from './taskLine';
 import type { TaskRef } from './tasks';
 
-export type StatusFilter = 'open' | 'done' | 'someday' | 'cancelled' | 'all';
+export type StatusFilter = 'open' | 'done' | 'someday' | 'questions' | 'ideas' | 'cancelled' | 'all';
 export type WhenFilter = 'any' | 'overdue' | 'today' | 'this-week' | 'undated';
 export type SortKey = 'date' | 'priority' | 'note' | 'task';
 export type GroupKey = 'date' | 'note' | 'priority' | 'tag' | 'none';
@@ -42,7 +43,12 @@ export function readColumns(get: (key: string) => unknown): Record<OptionalColum
 	return { status: on('status'), priority: on('priority'), tags: on('tags'), heading: on('heading') };
 }
 
-const STATUSES: StatusFilter[] = ['open', 'done', 'someday', 'cancelled', 'all'];
+const STATUSES: StatusFilter[] = ['open', 'done', 'someday', 'questions', 'ideas', 'cancelled', 'all'];
+
+/** The Status filter's choices, leaving out Questions and Ideas while their marker is off. */
+export function statusFilters(markers: MarkerSettings): StatusFilter[] {
+	return STATUSES.filter(s => (s !== 'questions' || markers.question) && (s !== 'ideas' || markers.idea));
+}
 const WHENS: WhenFilter[] = ['any', 'overdue', 'today', 'this-week', 'undated'];
 const MARKERS: MarkerFilter[] = ['any', 'in-progress', 'next', 'priority'];
 const SORTS: SortKey[] = ['date', 'priority', 'note', 'task'];
@@ -101,6 +107,10 @@ export function matchesStatus(t: TaskRef, s: StatusFilter): boolean {
 			return t.checked;
 		case 'someday':
 			return t.someday;
+		case 'questions':
+			return t.question;
+		case 'ideas':
+			return t.idea;
 		case 'cancelled':
 			return t.cancelled;
 		case 'all':

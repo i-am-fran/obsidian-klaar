@@ -1,5 +1,5 @@
 import { tagsOf } from './taskFields';
-import { addTag, parseTaskLine, removeTags, reopenTask, setInProgressMarker, type ParsedLine, type Priority } from './taskLine';
+import { addTag, isParked, parseTaskLine, removeTags, reopenTask, setInProgressMarker, type ParsedLine, type Priority } from './taskLine';
 
 export type TagRole = 'label' | 'priority-high' | 'priority-medium' | 'priority-low' | 'in-progress';
 
@@ -108,7 +108,7 @@ export function canMarkInProgress(rules: TagRule[], useMarker: boolean): boolean
 
 /** Open and already in progress. */
 function openInProgress(parsed: ParsedLine, rules: TagRule[], useMarker: boolean): boolean {
-	return !parsed.checked && !parsed.cancelled && !parsed.someday && isInProgress(parsed, meaningOf(tagsOf(parsed.text), rules), useMarker);
+	return !parsed.checked && !parsed.cancelled && !isParked(parsed) && isInProgress(parsed, meaningOf(tagsOf(parsed.text), rules), useMarker);
 }
 
 function applyInProgress(line: string, parsed: ParsedLine, on: boolean, rules: TagRule[], useMarker: boolean): string {

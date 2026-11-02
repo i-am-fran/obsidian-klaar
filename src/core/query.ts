@@ -2,6 +2,7 @@ import { addDays } from './dates';
 import type { IsoDate } from './dates';
 import { ALL_PERIODS, PERIOD_ORDER, childKindIn, contains, parentKind, parsePeriodKey, periodOf } from './periods';
 import type { EnabledPeriods, Period } from './periods';
+import { isParked } from './taskLine';
 import type { TaskRef } from './tasks';
 
 export interface TaskGroup {
@@ -21,9 +22,9 @@ function enclosing(kind: Period['kind'], inner: Period): Period {
 	return periodOf(kind, inner.kind === 'week' ? addDays(inner.start, 3) : inner.start);
 }
 
-/** Neither checked, cancelled nor parked for someday. */
+/** Neither checked, cancelled nor parked (someday, question, idea). */
 export function isOpen(t: TaskRef): boolean {
-	return !t.checked && !t.cancelled && !t.someday;
+	return !t.checked && !t.cancelled && !isParked(t);
 }
 
 /** A group's tasks split into those still to do and the ticked ones, each in its original order. */
@@ -46,7 +47,7 @@ export function scheduledFor(all: TaskRef[], period: Period, today: IsoDate, not
 	const groups: TaskGroup[] = [];
 
 	// A day keeps its completed tasks listed so a finished day can be looked back on; wider periods and the other groups are open work only.
-	const own = (period.kind === 'day' ? all.filter(t => !t.cancelled && !t.someday) : open).filter(t => t.scheduleKey === period.key && t.path !== notePath);
+	const own = (period.kind === 'day' ? all.filter(t => !t.cancelled && !isParked(t)) : open).filter(t => t.scheduleKey === period.key && t.path !== notePath);
 	if (own.length > 0) groups.push({ label: 'Scheduled', key: period.key, tasks: own });
 
 	const parent = parentKind(period.kind, enabled);
@@ -104,11 +105,11 @@ export function sortByMarkers(tasks: TaskRef[]): TaskRef[] {
 	return [...tasks].sort((a, b) => markerRank(b) - markerRank(a));
 }
 
-/** What the calendar shows for a period: open tasks win over done ones; cancelled and someday tasks don't count. Rollups from other periods are ignored. */
+/** What the calendar shows for a period: open tasks win over done ones; cancelled and parked (someday, question, idea) tasks don't count. Rollups from other periods are ignored. */
 export function scheduleStatus(all: TaskRef[], key: string): 'open' | 'done' | null {
 	let status: 'open' | 'done' | null = null;
 	for (const t of all) {
-		if (t.scheduleKey !== key || t.cancelled || t.someday) continue;
+		if (t.scheduleKey !== key || t.cancelled || isParked(t)) continue;
 		if (!t.checked) return 'open';
 		status = 'done';
 	}

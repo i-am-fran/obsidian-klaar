@@ -20,6 +20,10 @@ export interface KlaarSettings {
 	nextMarker: boolean;
 	/** `[<]` is a task parked for someday; off, Klaar ignores `[<]` lines. */
 	somedayMarker: boolean;
+	/** Experimental: `[?]` is a question, parked like someday; off, Klaar ignores `[?]` lines. */
+	questionMarker: boolean;
+	/** Experimental: `[I]` is an idea, parked like someday; off, Klaar ignores `[I]` lines. */
+	ideaMarker: boolean;
 	/** Tags with a colour and a meaning (priority, in progress or just a label). */
 	tags: TagRule[];
 	/** How schedule chips read: `Fri 23 Oct` or the raw key. */
@@ -42,6 +46,8 @@ export const DEFAULT_SETTINGS: KlaarSettings = {
 	slashInProgress: true,
 	nextMarker: true,
 	somedayMarker: true,
+	questionMarker: false,
+	ideaMarker: false,
 	tags: DEFAULT_TAG_RULES.map((r) => ({ ...r })),
 	dateLabels: 'friendly',
 	doneStamp: 'muted',
@@ -59,7 +65,7 @@ const PERIOD_TOGGLES: { kind: PeriodKind; name: string }[] = [
 /** Control keys for the period toggles: `periods.day`, `periods.week`... */
 const PERIOD_KEY = 'periods.';
 /** Settings that change what counts as a task or its meaning, so they re-read the index (`saveTagSettings`). */
-const TAG_KEYS = new Set(['slashInProgress', 'nextMarker', 'somedayMarker']);
+const TAG_KEYS = new Set(['slashInProgress', 'nextMarker', 'somedayMarker', 'questionMarker', 'ideaMarker']);
 /** Settings that only change how chips look (`saveDisplaySettings`). */
 const DISPLAY_KEYS = new Set(['dateLabels', 'doneStamp']);
 
@@ -130,6 +136,22 @@ export class KlaarSettingTab extends PluginSettingTab {
 					desc: `Use ${name.toLowerCase()} notes in the calendar, date picker and scheduled sections.`,
 					control: { type: 'toggle', key: `${PERIOD_KEY}${kind}` },
 				})),
+			},
+			{
+				type: 'group',
+				heading: 'Experimental',
+				items: [
+					{
+						name: 'Questions with [?]',
+						desc: 'A [?] task is a question to think about, not to do today: it stays out of the scheduled sections, Overdue, the calendar and the open-task filters. Find your questions under Status → Questions in a Klaar Table, or in the Question column of a status board. Tick it when it is answered. Turn off to leave [?] lines alone.',
+						control: { type: 'toggle', key: 'questionMarker' },
+					},
+					{
+						name: 'Ideas with [I]',
+						desc: 'A [I] task (capital I) is an idea parked for later: it stays out of the scheduled sections, Overdue, the calendar and the open-task filters. Find your ideas under Status → Ideas in a Klaar Table, or in the Idea column of a status board. Tick it when it is done with. Turn off to leave [I] lines alone.',
+						control: { type: 'toggle', key: 'ideaMarker' },
+					},
+				],
 			},
 		];
 	}

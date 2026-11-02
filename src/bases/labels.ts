@@ -1,9 +1,10 @@
 import type { BasesOptions } from 'obsidian';
 import type { MarkerFilter } from '../core/query';
-import { DEFAULT_TABLE_STATE, TABLE_KEYS, type GroupKey, type SortKey, type StatusFilter, type WhenFilter } from '../core/taskTable';
+import { ALL_MARKERS, type MarkerSettings } from '../core/taskLine';
+import { DEFAULT_TABLE_STATE, TABLE_KEYS, statusFilters, type GroupKey, type SortKey, type StatusFilter, type WhenFilter } from '../core/taskTable';
 
 /** Picker labels shared by the Bases views' toolbars and menus. The first entry of each is its default. */
-export const STATUS_LABELS: Record<StatusFilter, string> = { open: 'Open tasks', done: 'Done', someday: 'Someday', cancelled: 'Cancelled', all: 'All tasks' };
+export const STATUS_LABELS: Record<StatusFilter, string> = { open: 'Open tasks', done: 'Done', someday: 'Someday', questions: 'Questions', ideas: 'Ideas', cancelled: 'Cancelled', all: 'All tasks' };
 export const WHEN_LABELS: Record<WhenFilter, string> = { any: 'Any date', overdue: 'Overdue', today: 'Today', 'this-week': 'This week', undated: 'Undated' };
 export const MARKER_LABELS: Record<MarkerFilter, string> = { any: 'Any marker', 'in-progress': 'In progress', next: 'Next', priority: 'Priority' };
 export const SORT_LABELS: Record<SortKey, string> = { date: 'Date', priority: 'Priority', note: 'Note', task: 'Task' };
@@ -19,11 +20,12 @@ function tagChoices(tags: string[], saved: string): Record<string, string> {
 
 /**
  * Menu entries for the When, Marker and Tag filters, with Status first when the view uses it, and Show subtasks last.
- * `tags`: what the Tag filter offers; `savedTag`: the view's current choice.
+ * `tags`: what the Tag filter offers; `savedTag`: the view's current choice; `markers`: which markers the Status filter offers.
  */
-export function filterOptions(withStatus: boolean, tags: string[], savedTag: string): BasesOptions[] {
+export function filterOptions(withStatus: boolean, tags: string[], savedTag: string, markers: MarkerSettings = ALL_MARKERS): BasesOptions[] {
 	const d = DEFAULT_TABLE_STATE;
-	const status: BasesOptions[] = withStatus ? [{ type: 'dropdown', key: TABLE_KEYS.status, displayName: 'Status', default: d.status, options: STATUS_LABELS }] : [];
+	const statusLabels = Object.fromEntries(statusFilters(markers).map(s => [s, STATUS_LABELS[s]]));
+	const status: BasesOptions[] = withStatus ? [{ type: 'dropdown', key: TABLE_KEYS.status, displayName: 'Status', default: d.status, options: statusLabels }] : [];
 	return [
 		...status,
 		{ type: 'dropdown', key: TABLE_KEYS.when, displayName: 'When', default: d.when, options: WHEN_LABELS },

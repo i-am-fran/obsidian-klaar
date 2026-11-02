@@ -25,14 +25,18 @@ Klaar reads ordinary Markdown tasks. Everything it understands is something you 
 | `- [>] text` | next |
 | `- [<] text` | someday |
 | `- [-] text` | cancelled |
+| `- [?] text` | question (experimental) |
+| `- [I] text` | idea (experimental) |
 
-Any other marker, such as `[!]`, isn't a Klaar task and is left alone.
+Any other marker, such as `[!]` or a lower-case `[i]`, isn't a Klaar task and is left alone.
 
 - **In progress** `[/]`: turn off **Mark in progress with [/]** to use a tag instead (see below).
 - **Next** `[>]`: an open task to pick up next, with its own column on the board.
 - **Someday** `[<]`: parked. It leaves the scheduled sections, the calendar and the open-task filters until you bring it back.
 
-Each of the three can be turned off in settings. Klaar then leaves those lines alone.
+- **Question** `[?]` and **Idea** `[I]` (capital I): experimental, and off until you turn them on under Settings → Experimental. Like someday tasks, they stay out of the scheduled sections, Overdue, the calendar and the open-task filters. A Klaar Table finds them under Status → Questions or Ideas, and a status board gives each its own column. Tick one when it's answered or done with; it becomes an ordinary `[x]` task.
+
+Each of these can be turned off in settings. Klaar then leaves those lines alone.
 
 A task nested under another task is a subtask. Subtasks show everywhere, and the Bases views can hide them with **Show subtasks**.
 

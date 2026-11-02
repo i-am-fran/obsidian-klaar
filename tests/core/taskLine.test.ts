@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { addTag, appendBlock, appendTaskLine, moveDoneToSection, prependBlock, outdentBlock, taskBlockEnd, lineSpans, parseTaskLine, removeDoneStamp, removeTags, reopenTask, setChecked, setInProgressMarker, setOpenMarker, setSchedule, taskMarker, toggleCancelled, toggleNext, toggleSomeday } from '../../src/core/taskLine';
+import { ALL_MARKERS, addTag, appendBlock, appendTaskLine, isParkedMarker, moveDoneToSection, prependBlock, outdentBlock, taskBlockEnd, lineSpans, parseTaskLine, removeDoneStamp, removeTags, reopenTask, setChecked, setInProgressMarker, setOpenMarker, setSchedule, taskMarker, toggleCancelled, toggleNext, toggleSomeday } from '../../src/core/taskLine';
 
 describe('parseTaskLine', () => {
 	test('schedule link must be > plus a valid period', () => {
@@ -16,13 +16,15 @@ describe('parseTaskLine', () => {
 	});
 
 	test('reads checked state, text and done stamp', () => {
-		expect(parseTaskLine('- [ ] Open')).toEqual({ checked: false, cancelled: false, inProgress: false, next: false, someday: false, text: 'Open', scheduleKey: null, doneDate: null });
+		expect(parseTaskLine('- [ ] Open')).toEqual({ checked: false, cancelled: false, inProgress: false, next: false, someday: false, question: false, idea: false, text: 'Open', scheduleKey: null, doneDate: null });
 		expect(parseTaskLine('  * [x] Done >[[2026-10-23]] (@done [[2026-10-19]])')).toEqual({
 			checked: true,
 			cancelled: false,
 			inProgress: false,
 			next: false,
 			someday: false,
+			question: false,
+			idea: false,
 			text: 'Done',
 			scheduleKey: '2026-10-23',
 			doneDate: '2026-10-19',
@@ -41,13 +43,28 @@ describe('parseTaskLine', () => {
 	});
 
 	test('a > or < marker that is switched off is not a task', () => {
-		expect(parseTaskLine('- [>] Soon', { next: false, someday: true })).toBeNull();
-		expect(parseTaskLine('- [<] Later', { next: true, someday: false })).toBeNull();
-		expect(parseTaskLine('- [ ] Plain', { next: false, someday: false })).not.toBeNull();
+		expect(parseTaskLine('- [>] Soon', { ...ALL_MARKERS, next: false })).toBeNull();
+		expect(parseTaskLine('- [<] Later', { ...ALL_MARKERS, someday: false })).toBeNull();
+		expect(parseTaskLine('- [ ] Plain', { next: false, someday: false, question: false, idea: false })).not.toBeNull();
+	});
+
+	test('? is a question; I is an idea', () => {
+		expect(parseTaskLine('- [?] Why')).toMatchObject({ checked: false, cancelled: false, someday: false, question: true, idea: false, text: 'Why' });
+		expect(parseTaskLine('- [I] Habit view')).toMatchObject({ checked: false, cancelled: false, someday: false, question: false, idea: true });
+		expect(parseTaskLine('- [ ] Plain')).toMatchObject({ question: false, idea: false });
+	});
+
+	test('a ? or I marker that is switched off is not a task', () => {
+		expect(parseTaskLine('- [?] Why', { ...ALL_MARKERS, question: false })).toBeNull();
+		expect(parseTaskLine('- [I] Habit view', { ...ALL_MARKERS, idea: false })).toBeNull();
+	});
+
+	test('a lower-case i is not an idea', () => {
+		expect(parseTaskLine('- [i] Info')).toBeNull();
 	});
 
 	test('any other marker is not a task', () => {
-		for (const m of ['!', '?', '*']) expect(parseTaskLine(`- [${m}] Other`)).toBeNull();
+		for (const m of ['!', '*', '"', 'i']) expect(parseTaskLine(`- [${m}] Other`)).toBeNull();
 	});
 });
 
@@ -178,7 +195,38 @@ describe('unknown markers are left alone', () => {
 		expect(setSchedule('- [!] A', '2026-10-23')).toBe('- [!] A');
 		expect(setChecked('- [!] A', true, '2026-10-21', true)).toBe('- [!] A');
 		expect(addTag('- [!] A', 'p1')).toBe('- [!] A');
-		expect(lineSpans('- [?] A >[[2026-10-23]]')).toEqual({ schedule: [], done: null });
+		expect(lineSpans('- [!] A >[[2026-10-23]]')).toEqual({ schedule: [], done: null });
+	});
+});
+
+describe('question and idea markers', () => {
+	test('ticking writes [x]; unticking gives [ ]', () => {
+		expect(setChecked('- [?] A', true, '2026-10-21', true)).toBe('- [x] A (@done [[2026-10-21]])');
+		expect(setChecked('- [I] A', true, '2026-10-21', false)).toBe('- [x] A');
+		expect(setChecked('- [x] A (@done [[2026-10-21]])', false, '2026-10-21', true)).toBe('- [ ] A');
+	});
+	test('reopenTask turns them into [ ]', () => {
+		expect(reopenTask('- [?] A')).toBe('- [ ] A');
+		expect(reopenTask('- [I] A')).toBe('- [ ] A');
+	});
+	test('setOpenMarker swaps to and from them', () => {
+		expect(setOpenMarker('- [ ] A', '?')).toBe('- [?] A');
+		expect(setOpenMarker('- [<] A', 'I')).toBe('- [I] A');
+		expect(setOpenMarker('- [?] A', '>')).toBe('- [>] A');
+		expect(setOpenMarker('- [x] A', '?')).toBe('- [x] A');
+	});
+	test('rewrites keep the marker', () => {
+		expect(setSchedule('- [?] A', '2026-10-23')).toBe('- [?] A >[[2026-10-23]]');
+		expect(toggleSomeday('- [I] A')).toBe('- [<] A');
+		expect(toggleCancelled('- [?] A')).toBe('- [-] A');
+	});
+	test('isParked: someday, question and idea, when in use', () => {
+		expect(isParkedMarker('<', ALL_MARKERS)).toBe(true);
+		expect(isParkedMarker('?', ALL_MARKERS)).toBe(true);
+		expect(isParkedMarker('I', ALL_MARKERS)).toBe(true);
+		expect(isParkedMarker('?', { ...ALL_MARKERS, question: false })).toBe(false);
+		expect(isParkedMarker(' ', ALL_MARKERS)).toBe(false);
+		expect(isParkedMarker('>', ALL_MARKERS)).toBe(false);
 	});
 });
 

@@ -12,6 +12,10 @@ export interface ParsedLine {
 	next: boolean;
 	/** `[<]`: parked for someday, neither open nor done. */
 	someday: boolean;
+	/** `[?]`: a question, parked like someday. */
+	question: boolean;
+	/** `[I]`: an idea, parked like someday. */
+	idea: boolean;
 	/** Task text without the marker, the schedule link and the done stamp. */
 	text: string;
 	scheduleKey: string | null;
@@ -27,17 +31,21 @@ export interface MarkerSettings {
 	next: boolean;
 	/** `[<]` is someday. */
 	someday: boolean;
+	/** `[?]` is a question. */
+	question: boolean;
+	/** `[I]` is an idea. */
+	idea: boolean;
 }
 
-export const ALL_MARKERS: MarkerSettings = { next: true, someday: true };
+export const ALL_MARKERS: MarkerSettings = { next: true, someday: true, question: true, idea: true };
 
 /** The marker settings out of the plugin settings. */
-export function markersOf(settings: { nextMarker: boolean; somedayMarker: boolean }): MarkerSettings {
-	return { next: settings.nextMarker, someday: settings.somedayMarker };
+export function markersOf(settings: { nextMarker: boolean; somedayMarker: boolean; questionMarker: boolean; ideaMarker: boolean }): MarkerSettings {
+	return { next: settings.nextMarker, someday: settings.somedayMarker, question: settings.questionMarker, idea: settings.ideaMarker };
 }
 
-/** The only markers Klaar treats as tasks; any other (`[!]`, `[?]`...) is left alone, like a plain bullet. */
-const MARKER = /^(\s*[-*+] \[)([ xX\-/<>])(\] )/;
+/** The only markers Klaar treats as tasks; any other (`[!]`, `[i]`...) is left alone, like a plain bullet. */
+const MARKER = /^(\s*[-*+] \[)([ xX\-/<>?I])(\] )/;
 const DONE_STAMP = / \(@done \[\[(\d{4}-\d{2}-\d{2})\]\]\)\s*$/;
 const SCHEDULE_LINK = />\[\[([^\]]*)\]\]/g;
 
@@ -95,10 +103,22 @@ function removeLinks(body: string, links: LinkMatch[]): string {
 function markerInUse(c: string, markers: MarkerSettings): boolean {
 	if (c === '>') return markers.next;
 	if (c === '<') return markers.someday;
+	if (c === '?') return markers.question;
+	if (c === 'I') return markers.idea;
 	return true;
 }
 
-/** Null for a line that is not a task, including one whose `[>]` or `[<]` marker is switched off in `markers`. */
+/** Someday, question or idea, with that marker in use: a task parked out of the scheduled sections and open filters. */
+export function isParkedMarker(c: string, markers: MarkerSettings): boolean {
+	return (c === '<' || c === '?' || c === 'I') && markerInUse(c, markers);
+}
+
+/** Someday, question or idea: neither open nor done, out of the scheduled sections, the calendar and the open filters. */
+export function isParked(t: { someday: boolean; question: boolean; idea: boolean }): boolean {
+	return t.someday || t.question || t.idea;
+}
+
+/** Null for a line that is not a task, including one whose `[>]`, `[<]`, `[?]` or `[I]` marker is switched off in `markers`. */
 export function parseTaskLine(line: string, markers: MarkerSettings = ALL_MARKERS): ParsedLine | null {
 	const parts = split(line);
 	if (!parts || !markerInUse(parts.stateChar, markers)) return null;
@@ -111,13 +131,15 @@ export function parseTaskLine(line: string, markers: MarkerSettings = ALL_MARKER
 		inProgress: parts.stateChar === '/',
 		next: parts.stateChar === '>',
 		someday: parts.stateChar === '<',
+		question: parts.stateChar === '?',
+		idea: parts.stateChar === 'I',
 		text: text.replace(/\s+/g, ' ').trim(),
 		scheduleKey: link ? link.key : null,
 		doneDate: parts.doneDate,
 	};
 }
 
-/** The character between the brackets (`' '`, `x`, `X`, `-`, `/`, `>`, `<`), or null for a line that is not a task. */
+/** The character between the brackets (`' '`, `x`, `X`, `-`, `/`, `>`, `<`, `?`, `I`), or null for a line that is not a task. */
 export function taskMarker(line: string): string | null {
 	return split(line)?.stateChar ?? null;
 }
@@ -174,11 +196,11 @@ export function setChecked(line: string, checked: boolean, today: IsoDate, stamp
 	return parts.prefix + state + parts.suffix + parts.body.trimEnd() + stamp + parts.eol;
 }
 
-/** Markers of a task that is not finished: to do, in progress, next and someday. */
-export type OpenMarker = ' ' | '/' | '>' | '<';
+/** Markers of a task that is not finished: to do, in progress, next, someday, question and idea. */
+export type OpenMarker = ' ' | '/' | '>' | '<' | '?' | 'I';
 
 function isOpenChar(c: string): c is OpenMarker {
-	return c === ' ' || c === '/' || c === '>' || c === '<';
+	return c === ' ' || c === '/' || c === '>' || c === '<' || c === '?' || c === 'I';
 }
 
 /** Swaps one unfinished marker for another; done and cancelled tasks and non-task lines are returned unchanged. */
@@ -196,7 +218,7 @@ export function setInProgressMarker(line: string, on: boolean): string {
 	return setOpenMarker(line, on ? '/' : ' ');
 }
 
-/** Unticks a done, cancelled or someday task, dropping the done stamp; open tasks (`[ ]`, `[/]`, `[>]`) and non-task lines are returned unchanged. */
+/** Unticks a done, cancelled, someday, question or idea task, dropping the done stamp; open tasks (`[ ]`, `[/]`, `[>]`) and non-task lines are returned unchanged. */
 export function reopenTask(line: string): string {
 	const parts = split(line);
 	if (!parts || parts.stateChar === ' ' || parts.stateChar === '/' || parts.stateChar === '>') return line;

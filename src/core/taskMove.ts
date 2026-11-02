@@ -1,5 +1,5 @@
 import { locateTaskLine, type TaskRef } from './tasks';
-import { ALL_MARKERS, indentWidth, outdentBlock, parseTaskLine, setSchedule, taskBlockEnd, type MarkerSettings } from './taskLine';
+import { ALL_MARKERS, indentWidth, isParked, outdentBlock, parseTaskLine, setSchedule, taskBlockEnd, type MarkerSettings } from './taskLine';
 
 /** A task line and its subtasks: lines `start` up to (not including) `end`. */
 export interface TaskBlock {
@@ -57,7 +57,7 @@ export function blocksForLines(lines: string[], lineNumbers: number[], markers: 
 	return blocks;
 }
 
-/** Every open (not done, cancelled or someday) task at the margin, with its subtasks; tasks in code blocks are skipped. */
+/** Every open (not done, cancelled or parked: someday, question, idea) task at the margin, with its subtasks; tasks in code blocks are skipped. */
 export function openTopLevelBlocks(lines: string[], markers: MarkerSettings = ALL_MARKERS): TaskBlock[] {
 	const blocks: TaskBlock[] = [];
 	let inFence = false;
@@ -69,7 +69,7 @@ export function openTopLevelBlocks(lines: string[], markers: MarkerSettings = AL
 		}
 		if (inFence || indentWidth(line) !== 0) continue;
 		const task = parseTaskLine(line, markers);
-		if (!task || task.checked || task.cancelled || task.someday) continue;
+		if (!task || task.checked || task.cancelled || isParked(task)) continue;
 		const end = taskBlockEnd(lines, i);
 		blocks.push({ start: i, end, lines: lines.slice(i, end) });
 		i = end - 1;

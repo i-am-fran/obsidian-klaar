@@ -1,10 +1,11 @@
 import { describe, expect, test } from 'vitest';
-import { DEFAULT_TABLE_STATE, filterTasks, groupTasks, legacyKeysToSave, matchesSearch, matchesStatus, matchesTag, matchesWhen, readColumns, readTableState, sortTasks, taskTags } from '../../src/core/taskTable';
+import { DEFAULT_TABLE_STATE, filterTasks, groupTasks, legacyKeysToSave, matchesSearch, matchesStatus, matchesTag, matchesWhen, readColumns, readTableState, sortTasks, statusFilters, taskTags } from '../../src/core/taskTable';
+import { ALL_MARKERS } from '../../src/core/taskLine';
 import type { StatusFilter, TableState, WhenFilter } from '../../src/core/taskTable';
 import type { TaskRef } from '../../src/core/tasks';
 
 function task(text: string, scheduleKey: string | null, extra: Partial<TaskRef> = {}): TaskRef {
-	return { path: 'Other.md', line: 0, raw: `- [ ] ${text}`, checked: false, cancelled: false, someday: false, next: false, text, scheduleKey, explicit: true, doneDate: null, inProgress: false, priority: 0, tags: [], heading: null, subtask: false, ...extra };
+	return { path: 'Other.md', line: 0, raw: `- [ ] ${text}`, checked: false, cancelled: false, someday: false, question: false, idea: false, next: false, text, scheduleKey, explicit: true, doneDate: null, inProgress: false, priority: 0, tags: [], heading: null, subtask: false, ...extra };
 }
 
 const today = '2026-10-21';
@@ -23,6 +24,18 @@ describe('matchesStatus', () => {
 		const next = task('next', null, { next: true });
 		expect([someday, next].filter(t => matchesStatus(t, 'open')).map(t => t.text)).toEqual(['next']);
 		expect([someday, next].filter(t => matchesStatus(t, 'someday')).map(t => t.text)).toEqual(['someday']);
+	});
+	test('questions and ideas are their own statuses, out of open', () => {
+		const question = task('question', null, { question: true });
+		const idea = task('idea', null, { idea: true });
+		const all = [question, idea, open];
+		expect(all.filter(t => matchesStatus(t, 'open')).map(t => t.text)).toEqual(['open']);
+		expect(all.filter(t => matchesStatus(t, 'questions')).map(t => t.text)).toEqual(['question']);
+		expect(all.filter(t => matchesStatus(t, 'ideas')).map(t => t.text)).toEqual(['idea']);
+	});
+	test('status choices leave out the markers that are off', () => {
+		expect(statusFilters(ALL_MARKERS)).toEqual(['open', 'done', 'someday', 'questions', 'ideas', 'cancelled', 'all']);
+		expect(statusFilters({ ...ALL_MARKERS, question: false, idea: false })).toEqual(['open', 'done', 'someday', 'cancelled', 'all']);
 	});
 });
 

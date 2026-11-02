@@ -16,6 +16,10 @@ export interface TaskRef {
 	cancelled: boolean;
 	/** `[<]`: parked for someday, neither open nor done. */
 	someday: boolean;
+	/** `[?]`: a question, parked like someday. */
+	question: boolean;
+	/** `[I]`: an idea, parked like someday. */
+	idea: boolean;
 	/** `[>]`: open, to pick up next. */
 	next: boolean;
 	text: string;
@@ -37,7 +41,7 @@ export interface TaskRef {
 
 /**
  * Builds task records for the listed lines; lines that are not tasks are skipped. `useMarker`: `[/]` means in progress.
- * `markers`: whether `[>]` and `[<]` are tasks. `parents`: each list item's line to its parent item's line (none, or
+ * `markers`: whether `[>]`, `[<]`, `[?]` and `[I]` are tasks. `parents`: each list item's line to its parent item's line (none, or
  * negative, at the top of a list), so a task under another task, even through plain bullets, is a subtask.
  */
 export function extractTasks(path: string, lines: string[], taskLines: number[], notePeriod: Period | null, headings: HeadingPos[] = [], rules: TagRule[] = [], useMarker = false, markers: MarkerSettings = ALL_MARKERS, parents: ReadonlyMap<number, number> = new Map()): TaskRef[] {
@@ -57,6 +61,8 @@ export function extractTasks(path: string, lines: string[], taskLines: number[],
 			checked: parsed.checked,
 			cancelled: parsed.cancelled,
 			someday: parsed.someday,
+			question: parsed.question,
+			idea: parsed.idea,
 			next: parsed.next,
 			text: parsed.text,
 			scheduleKey: explicit ? parsed.scheduleKey : (notePeriod?.key ?? null),

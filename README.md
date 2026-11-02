@@ -58,7 +58,7 @@ Open the week note `Daily/2026-W43.md` and the task is listed above your own tex
 | `- [<]` | someday |
 | `- [-]` | cancelled |
 
-Anything else, like `[!]`, isn't a Klaar task and is left alone. A task you write straight into a journal note, without a `>` link, belongs to that note's day, week or month.
+Two more are experimental and off until you turn them on under Settings → Experimental: `[?]` for a question and `[I]` for an idea. Both stay out of your day like someday tasks, and you find them under their own status in a Klaar Table or column on a board. Anything else, like `[!]`, isn't a Klaar task and is left alone. A task you write straight into a journal note, without a `>` link, belongs to that note's day, week or month.
 
 The documentation has [every feature, including the little ones](https://i-am-fran.github.io/obsidian-klaar/docs.html#all-features).
 

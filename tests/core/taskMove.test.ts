@@ -69,13 +69,15 @@ describe('blocksForLines', () => {
 });
 
 describe('openTopLevelBlocks', () => {
-	test('open top-level tasks with their subtasks; done, cancelled, someday and fenced ones stay', () => {
+	test('open top-level tasks with their subtasks; done, cancelled, someday, question, idea and fenced ones stay', () => {
 		const lines = [
 			'- [ ] Open',
 			'\t- [x] Done child',
 			'- [x] Done',
 			'- [-] Cancelled',
 			'- [<] Someday',
+			'- [?] Question',
+			'- [I] Idea',
 			'- [/] Started',
 			'```',
 			'- [ ] In code',
@@ -84,7 +86,7 @@ describe('openTopLevelBlocks', () => {
 		];
 		expect(openTopLevelBlocks(lines).map((b) => [b.start, b.end])).toEqual([
 			[0, 2],
-			[5, 6],
+			[7, 8],
 		]);
 	});
 });
