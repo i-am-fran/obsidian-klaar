@@ -61,6 +61,17 @@ describe('sortTaskLists', () => {
 		expect(sort('- [x] A\n```\n- [ ] B\n```')).toBe(null);
 	});
 
+	test('a fence closes only on the same character, at least as long, with nothing after it', () => {
+		expect(sort('````md\n```\n- [x] A\n- [ ] B\n```\n````')).toBe(null);
+		expect(sort('```\n~~~\n- [x] A\n- [ ] B\n```')).toBe(null);
+		expect(sort('```npm run build``` is it\n- [x] A\n- [ ] B')).toBe('```npm run build``` is it\n- [ ] B\n- [x] A');
+	});
+
+	test('a fence opened inside a subtask still counts', () => {
+		expect(sort('- [x] A\n    ```\n    x\n\n    ```\n- [x] C\n- [ ] D')).toBe('- [x] A\n    ```\n    x\n\n    ```\n- [ ] D\n- [x] C');
+		expect(sort('- [x] Z\n- [ ] A\n    ```\n    x\n\n    ```')).toBe(null);
+	});
+
 	test('keeps CRLF endings', () => {
 		expect(sort('- [x] A\r\n- [ ] B\r\n')).toBe('- [ ] B\r\n- [x] A\r\n');
 	});

@@ -345,7 +345,21 @@ export function prependBlock(content: string, block: string[]): string {
 
 const DONE_HEADING = /^##\s+done\s*$/i;
 const SECTION_END = /^#{1,2}\s/;
-const FENCE = /^\s*(```|~~~)/;
+const FENCE = /^\s*(`{3,}|~{3,})(.*)$/;
+
+/**
+ * The code fence open after `line`, given the one open before it (null outside a code block). A fence closes only on
+ * the same character, at least as long, with nothing after it; a backtick line with another backtick after the fence
+ * is inline code, not a fence.
+ */
+export function fenceAfter(open: string | null, line: string): string | null {
+	const m = FENCE.exec(line.replace(/\r$/, ''));
+	if (!m) return open;
+	const fence = m[1] as string;
+	const rest = m[2] as string;
+	if (open !== null) return fence[0] === open[0] && fence.length >= open.length && rest.trim() === '' ? null : open;
+	return fence[0] === '`' && rest.includes('`') ? null : fence;
+}
 
 /**
  * Moves every done top-level task, with its subtasks, to the end of the note's `## Done` section, adding the section at
@@ -357,19 +371,23 @@ export function moveDoneToSection(lines: string[], markers: MarkerSettings = ALL
 	const moved: string[] = [];
 	let doneAt = -1;
 	let inDone = false;
-	let inFence = false;
+	let fence: string | null = null;
 	for (let i = 0; i < lines.length; i++) {
 		const line = lines[i] as string;
-		if (FENCE.test(line)) inFence = !inFence;
-		else if (!inFence && SECTION_END.test(line)) {
+		if (fence === null && SECTION_END.test(line)) {
 			inDone = doneAt === -1 && DONE_HEADING.test(line);
 			if (inDone) doneAt = kept.length;
-		} else if (!inFence && !inDone && indentWidth(line) === 0 && parseTaskLine(line, markers)?.checked) {
+		} else if (fence === null && !inDone && indentWidth(line) === 0 && parseTaskLine(line, markers)?.checked) {
 			const end = taskBlockEnd(lines, i);
-			moved.push(...lines.slice(i, end));
-			i = end - 1;
-			continue;
+			const block = lines.slice(i, end);
+			// A block that leaves a code block open (a blank line inside a subtask's code) stays, so the code isn't split.
+			if (block.reduce(fenceAfter, null) === null) {
+				moved.push(...block);
+				i = end - 1;
+				continue;
+			}
 		}
+		fence = fenceAfter(fence, line);
 		kept.push(line);
 	}
 	if (moved.length === 0) return null;

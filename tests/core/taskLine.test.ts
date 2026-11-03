@@ -405,6 +405,13 @@ describe('moveDoneToSection', () => {
 		expect(move('```\n- [x] code\n```\n- [ ] A\n')).toBe(null);
 	});
 
+	test('a fence closes only on its own kind, and a subtask with open code stays', () => {
+		expect(move('````md\n```\n- [x] code\n```\n````\n- [ ] A')).toBe(null);
+		expect(move('```\n~~~\n- [x] code\n```\n- [ ] A')).toBe(null);
+		expect(move('```npm run build``` is it\n- [x] A\n- [ ] B')).toBe('```npm run build``` is it\n- [ ] B\n\n## Done\n- [x] A');
+		expect(move('- [x] A\n    ```\n    x\n\n    ```\n- [ ] B')).toBe(null);
+	});
+
 	test('a note without a trailing newline', () => {
 		expect(move('- [x] A\n- [ ] B')).toBe('- [ ] B\n\n## Done\n- [x] A');
 	});
