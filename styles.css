@@ -1253,7 +1253,10 @@ body {
 	color: var(--text-muted);
 }
 
-/* On a phone the review is a bottom sheet: the buttons sit in thumb reach, one per row, tall enough to tap. */
+/*
+ * On a phone the review is a bottom sheet with the buttons in thumb reach, tall enough to tap. The targets pair up
+ * (today/tomorrow, this/next week, this/next month), one pair per row; picking a date and the footer stay quiet.
+ */
 .is-phone .klaar-review-container {
 	align-items: flex-end;
 }
@@ -1268,13 +1271,12 @@ body {
 	font-size: var(--font-ui-large);
 }
 
-.is-mobile .klaar-review .klaar-review-label {
-	margin-left: 0;
+.is-mobile .klaar-review .klaar-review-task {
+	margin-bottom: var(--size-4-8);
 }
 
-.is-phone .klaar-review .klaar-review-targets {
-	grid-template-columns: minmax(0, 1fr);
-	row-gap: var(--size-4-2);
+.is-mobile .klaar-review .klaar-review-label {
+	margin-left: 0;
 }
 
 .is-mobile .klaar-review .klaar-review-targets {
@@ -1298,9 +1300,14 @@ body {
 	gap: var(--size-4-2);
 }
 
+.is-mobile .klaar-review button.klaar-review-target.klaar-review-pick {
+	grid-column: 1 / -1;
+	background: transparent;
+	color: var(--text-muted);
+}
+
 .is-mobile .klaar-review button.klaar-review-quiet {
 	flex: 1 1 0;
-	background: var(--background-modifier-hover);
 }
 
 .is-mobile .klaar-review button.klaar-review-undo {

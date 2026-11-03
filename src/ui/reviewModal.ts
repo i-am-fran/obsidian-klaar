@@ -105,7 +105,7 @@ class ReviewModal extends Modal {
 		const targets = this.actions.filter((a) => !SECONDARY.has(a.key));
 		el.createDiv({ cls: 'klaar-review-label', text: 'Send to' });
 		const list = el.createDiv({ cls: 'klaar-review-targets' });
-		for (const action of targets) this.renderAction(list, action, 'klaar-review-target');
+		for (const action of targets) this.renderAction(list, action, action.key === 'd' ? 'klaar-review-target klaar-review-pick' : 'klaar-review-target');
 		this.renderFooter(el, this.actions.filter((a) => SECONDARY.has(a.key)));
 	}
 

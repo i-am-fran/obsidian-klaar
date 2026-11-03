@@ -2,7 +2,7 @@
 
 ## 2026.11.4
 
-- On a phone, **Review overdue tasks** opens as a sheet at the bottom of the screen, with one large button per row so each one is easy to tap. On tablets the buttons are larger too, and the keyboard hints are hidden on both.
+- On phones and tablets, **Review overdue tasks** has larger buttons that are easier to tap, paired by period (Today and Tomorrow, This week and Next week, This month and Next month), and the keyboard hints are hidden. On a phone it opens as a sheet at the bottom of the screen.
 
 ## 2026.11.3
 
