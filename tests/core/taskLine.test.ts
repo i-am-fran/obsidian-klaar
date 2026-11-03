@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { ALL_MARKERS, addTag, appendBlock, addTaskLine, isParkedMarker, moveDoneToSection, prependBlock, outdentBlock, taskBlockEnd, lineSpans, parseTaskLine, removeDoneStamp, removeTags, reopenTask, setChecked, setInProgressMarker, setOpenMarker, setSchedule, taskMarker, toggleCancelled, toggleNext, toggleSomeday } from '../../src/core/taskLine';
+import { ALL_MARKERS, addTag, appendBlock, addTaskLine, isParkedMarker, moveDoneToSection, prependBlock, outdentBlock, taskBlockEnd, lineSpans, parseTaskLine, removeDoneStamp, removeTags, reopenTask, setChecked, setInProgressMarker, setOpenMarker, setSchedule, taskMarker, toggleCancelled, toggleIdea, toggleNext, toggleQuestion, toggleSomeday } from '../../src/core/taskLine';
 
 describe('parseTaskLine', () => {
 	test('schedule link must be > plus a valid period', () => {
@@ -246,6 +246,18 @@ describe('next and someday markers', () => {
 		expect(toggleSomeday('- [<] A')).toBe('- [ ] A');
 		expect(toggleSomeday('- [>] A\r')).toBe('- [<] A\r');
 		expect(toggleSomeday('- [X] A (@done [[2026-10-21]])')).toBe('- [<] A');
+	});
+	test('toggleQuestion switches [ ] and [?]', () => {
+		expect(toggleQuestion('- [ ] A')).toBe('- [?] A');
+		expect(toggleQuestion('- [?] A')).toBe('- [ ] A');
+		expect(toggleQuestion('- [I] A')).toBe('- [?] A');
+		expect(toggleQuestion('- [x] A (@done [[2026-10-21]])')).toBe('- [?] A');
+	});
+	test('toggleIdea switches [ ] and [I]', () => {
+		expect(toggleIdea('- [ ] A')).toBe('- [I] A');
+		expect(toggleIdea('- [I] A')).toBe('- [ ] A');
+		expect(toggleIdea('- [<] A\r')).toBe('- [I] A\r');
+		expect(toggleIdea('- [-] A')).toBe('- [I] A');
 	});
 	test('toggles leave non-task lines alone', () => {
 		expect(toggleNext('- [!] A')).toBe('- [!] A');

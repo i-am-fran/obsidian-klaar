@@ -226,7 +226,7 @@ export function reopenTask(line: string): string {
 }
 
 /** `[ ]` when the task already has `marker`, otherwise `marker`, reopening a done or cancelled task first. */
-function toggleMarker(line: string, marker: '>' | '<'): string {
+function toggleMarker(line: string, marker: '>' | '<' | '?' | 'I'): string {
 	const parts = split(line);
 	if (!parts) return line;
 	if (parts.stateChar === marker) return setOpenMarker(line, ' ');
@@ -241,6 +241,16 @@ export function toggleNext(line: string): string {
 /** `[ ]` ↔ `[<]`; any other task (in progress, next, done, cancelled) becomes `[<]`, losing its done stamp. */
 export function toggleSomeday(line: string): string {
 	return toggleMarker(line, '<');
+}
+
+/** `[ ]` ↔ `[?]`; any other task (in progress, next, someday, idea, done, cancelled) becomes `[?]`, losing its done stamp. */
+export function toggleQuestion(line: string): string {
+	return toggleMarker(line, '?');
+}
+
+/** `[ ]` ↔ `[I]`; any other task (in progress, next, someday, question, done, cancelled) becomes `[I]`, losing its done stamp. */
+export function toggleIdea(line: string): string {
+	return toggleMarker(line, 'I');
 }
 
 /** `[-]` ↔ `[ ]`; any other task (in progress, next, someday, done) becomes `[-]`, losing its done stamp. */

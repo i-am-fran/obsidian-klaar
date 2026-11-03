@@ -9,7 +9,7 @@ import { openPeriodNote, periodNotePath, periodOfFile } from './obsidian/periodN
 import { movesPhysically, placeInPeriodNote } from './obsidian/moveTask';
 import { blockForPeriodNote, blocksForLines, openTopLevelBlocks, type TaskBlock } from './core/taskMove';
 import { DEFAULT_TAG_RULES, canMarkInProgress, cyclePriorityTag, normaliseTagRules, toggleInProgress } from './core/tagRules';
-import { appendBlock, markersOf, moveDoneToSection, outdentBlock, parseTaskLine, prependBlock, setSchedule, taskBlockEnd, toggleCancelled, toggleNext, toggleSomeday } from './core/taskLine';
+import { appendBlock, markersOf, moveDoneToSection, outdentBlock, parseTaskLine, prependBlock, setSchedule, taskBlockEnd, toggleCancelled, toggleIdea, toggleNext, toggleQuestion, toggleSomeday } from './core/taskLine';
 import { flashLineExtension } from './ui/flashLine';
 import { DateSuggest } from './ui/dateSuggest';
 import { dateChipsExtension, dateChipsPostProcessor } from './ui/dateChips';
@@ -115,6 +115,18 @@ export default class KlaarPlugin extends Plugin {
 			name: 'Toggle someday',
 			icon: 'circle-arrow-left',
 			editorCheckCallback: (checking, editor) => this.settings.somedayMarker && this.rewriteSelectedTasks(editor, checking, toggleSomeday),
+		});
+		this.addCommand({
+			id: 'toggle-question',
+			name: 'Toggle question',
+			icon: 'circle-help',
+			editorCheckCallback: (checking, editor) => this.settings.questionMarker && this.rewriteSelectedTasks(editor, checking, toggleQuestion),
+		});
+		this.addCommand({
+			id: 'toggle-idea',
+			name: 'Toggle idea',
+			icon: 'lightbulb',
+			editorCheckCallback: (checking, editor) => this.settings.ideaMarker && this.rewriteSelectedTasks(editor, checking, toggleIdea),
 		});
 		this.addCommand({
 			id: 'toggle-cancelled',

@@ -69,6 +69,8 @@ The roles are Label, High priority, Medium priority, Low priority and In progres
 | Toggle in progress | Switch between open and in progress. |
 | Toggle next | Switch between open and `[>]`. |
 | Toggle someday | Switch between open and `[<]`. |
+| Toggle question | Switch between open and `[?]`. Only while questions are turned on under Settings → Experimental. |
+| Toggle idea | Switch between open and `[I]`. Only while ideas are turned on under Settings → Experimental. |
 | Toggle cancelled | Switch between open and `[-]`. A done task loses its done stamp. Also in the right-click menu as **Cancel task** / **Reopen task**. |
 | Cycle priority | Step `#p3` → `#p2` → `#p1` → no priority. |
 | Move done tasks to the bottom | Move every done task in the note, with its subtasks, under a `## Done` heading at the bottom. Klaar adds the heading if the note has none. Also in the right-click menu and the note's ⋯ menu. |
