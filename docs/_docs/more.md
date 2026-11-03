@@ -5,6 +5,8 @@ order: 9
 headings:
   - id: faq
     label: FAQ
+  - id: roadmap
+    label: Roadmap
   - id: support
     label: Support
 ---
@@ -20,6 +22,19 @@ To delete a task for good, click its text to open the note at that line, then de
 **Will there be a calendar view for Bases?**
 
 Not yet. Rather than design its own, Klaar will wait for Obsidian to release an official calendar view for Bases and then build on it. The Klaar Board was made the same way: it follows the look and behaviour of Obsidian's own board view, so it feels at home next to the rest of your vault. In the meantime, the calendar in the sidebar shows your scheduled tasks, and you can drag tasks from a Klaar Table or Board onto a day.
+
+### Roadmap {#roadmap}
+
+What's planned next, in no particular order. Plans change, so nothing here has a date.
+
+- **Quick add.** Add a task from anywhere, without opening a note first. Handy on mobile.
+- **Navigation from the ribbon.** Jump to the previous or next day, week or month.
+- **Week strip.** A compact seven-day agenda in the sidebar, next to the month calendar, with drag between days.
+- **Add tasks from other apps.** An `obsidian://` link so Shortcuts, Raycast and Alfred can send tasks in.
+- **List view for Bases.** A plain list next to the Klaar Table and Klaar Board.
+- **Import from other plugins.** Bring tasks over from the Tasks plugin and similar.
+
+Have an idea or a request? [Open an issue](https://github.com/i-am-fran/obsidian-klaar/issues).
 
 ### Support {#support}
 
