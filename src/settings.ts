@@ -144,11 +144,12 @@ export class KlaarSettingTab extends PluginSettingTab {
 						name,
 						control: { type: 'toggle', key: `${PERIOD_KEY}${kind}` },
 					})),
-					// Template pickers below the toggles, one per period type in use.
+					// Template pickers below the toggles, one per period type in use, introduced by a row of their own so
+					// each picker reads the same. The picker's own empty text says "No file selected".
+					{ name: 'Note templates', desc: 'A new journal note starts from its template, with {{title}}, {{date}} and {{date:FORMAT}} filled in.' },
 					...PERIOD_TOGGLES.filter(({ kind }) => this.plugin.settings.periods[kind]).map(({ kind, name }): SettingDefinition => ({
 						name: `${name} note template`,
-						desc: kind === 'day' ? 'A new note starts from it. {{title}}, {{date}} and {{date:FORMAT}} are filled in.' : undefined,
-						control: { type: 'file', key: `${TEMPLATE_KEY}${kind}`, placeholder: 'Templates/Note.md', filter: (file) => file.extension === 'md' },
+						control: { type: 'file', key: `${TEMPLATE_KEY}${kind}`, filter: (file) => file.extension === 'md' },
 					})),
 				],
 			},
