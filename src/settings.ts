@@ -99,12 +99,12 @@ export class KlaarSettingTab extends PluginSettingTab {
 					},
 					{
 						name: 'Mark next with [>]',
-						desc: 'Tasks to pick up next. Off: [>] is plain text.',
+						desc: 'Tasks to pick up next.',
 						control: { type: 'toggle', key: 'nextMarker' },
 					},
 					{
 						name: 'Mark someday with [<]',
-						desc: 'Parked tasks, kept out of scheduled sections and the calendar. Off: [<] is plain text.',
+						desc: 'Parked tasks, kept out of scheduled sections and the calendar.',
 						control: { type: 'toggle', key: 'somedayMarker' },
 					},
 					{
@@ -145,12 +145,12 @@ export class KlaarSettingTab extends PluginSettingTab {
 				items: [
 					{
 						name: 'Questions with [?]',
-						desc: 'Questions to think about, kept out of scheduled sections and the calendar, with their own status and board column. Off: [?] is plain text.',
+						desc: 'Questions to think about, kept out of scheduled sections and the calendar, with their own status and board column.',
 						control: { type: 'toggle', key: 'questionMarker' },
 					},
 					{
 						name: 'Ideas with [I]',
-						desc: 'Ideas for later (capital I), kept out of scheduled sections and the calendar, with their own status and board column. Off: [I] is plain text.',
+						desc: 'Ideas for later (capital I), kept out of scheduled sections and the calendar, with their own status and board column.',
 						control: { type: 'toggle', key: 'ideaMarker' },
 					},
 				],
