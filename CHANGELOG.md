@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026.11.4
+
+- On a phone, **Review overdue tasks** opens as a sheet at the bottom of the screen, with one large button per row so each one is easy to tap. On tablets the buttons are larger too, and the keyboard hints are hidden on both.
+
 ## 2026.11.3
 
 - Sorting and grouping by date now go by deadline, so a task due today comes before one due this week, then this month, this quarter and this year.

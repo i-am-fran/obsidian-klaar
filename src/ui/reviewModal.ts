@@ -57,6 +57,7 @@ class ReviewModal extends Modal {
 
 	onOpen(): void {
 		this.modalEl.addClass('klaar-review');
+		this.containerEl.addClass('klaar-review-container');
 		for (const action of this.actions) {
 			this.scope.register([], action.key, (e) => {
 				e.preventDefault();

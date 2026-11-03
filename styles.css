@@ -1253,6 +1253,65 @@ body {
 	color: var(--text-muted);
 }
 
+/* On a phone the review is a bottom sheet: the buttons sit in thumb reach, one per row, tall enough to tap. */
+.is-phone .klaar-review-container {
+	align-items: flex-end;
+}
+
+.is-phone .klaar-review {
+	--modal-radius: var(--touch-radius-s) var(--touch-radius-s) 0 0;
+	margin-top: auto;
+	padding-bottom: var(--safe-area-inset-bottom);
+}
+
+.is-mobile .klaar-review .klaar-review-text {
+	font-size: var(--font-ui-large);
+}
+
+.is-mobile .klaar-review .klaar-review-label {
+	margin-left: 0;
+}
+
+.is-phone .klaar-review .klaar-review-targets {
+	grid-template-columns: minmax(0, 1fr);
+	row-gap: var(--size-4-2);
+}
+
+.is-mobile .klaar-review .klaar-review-targets {
+	row-gap: var(--size-4-2);
+}
+
+.is-mobile .klaar-review button.klaar-review-target,
+.is-mobile .klaar-review button.klaar-review-quiet {
+	justify-content: center;
+	min-height: 48px;
+	padding: var(--size-4-2) var(--size-4-4);
+	border-radius: var(--touch-radius-s, var(--radius-m));
+	font-size: var(--font-ui-medium);
+}
+
+.is-mobile .klaar-review button.klaar-review-target {
+	background: var(--interactive-normal);
+}
+
+.is-mobile .klaar-review .klaar-review-footer {
+	gap: var(--size-4-2);
+}
+
+.is-mobile .klaar-review button.klaar-review-quiet {
+	flex: 1 1 0;
+	background: var(--background-modifier-hover);
+}
+
+.is-mobile .klaar-review button.klaar-review-undo {
+	margin-left: 0;
+}
+
+/* No keyboard to press them with. */
+.is-mobile .klaar-review kbd {
+	display: none;
+}
+
 .klaar-acc.has-action {
 	position: relative;
 }
