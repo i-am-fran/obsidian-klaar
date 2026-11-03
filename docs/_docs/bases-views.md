@@ -60,7 +60,7 @@ Columns of cards. Choose what the columns are under **Configure view** → **Col
 
 Drag a card to another column and Klaar rewrites just that task's line:
 
-- **Done** ticks it, with the completed date if that's on. **To do**, **Next**, **In progress**, **Someday**, **Question** and **Idea** set its marker.
+- **Done** ticks it, with the done date if that's on. **To do**, **Next**, **In progress**, **Someday**, **Question** and **Idea** set its marker.
 - A priority column swaps its priority tag.
 - **Today** and **This week** set its link, **Undated** removes it, and **Later** opens the date picker. Overdue doesn't take drops.
 

@@ -71,7 +71,7 @@ headings:
 - In progress `[/]`, next `[>]`, someday `[<]` and cancelled `[-]`; questions `[?]` and ideas `[I]` as an experimental option
 - Each extra marker can be turned off
 - Someday tasks leave the scheduled lists and the calendar
-- Completed date stamp `(@done [[2026-10-23]])`, shown muted, as a chip or hidden
+- Done date stamp `(@done [[2026-10-23]])`, shown muted, as a chip or hidden
 - **Toggle in progress**, **Toggle next**, **Toggle someday**, **Toggle question**, **Toggle idea** (while those are on), **Toggle cancelled** and **Cycle priority** commands; **Cancel task** in the right-click menu
 - **Move done tasks to the bottom** gathers a note's done tasks under `## Done`, from the command palette or the right-click menu
 - Commands work on every task in a selection

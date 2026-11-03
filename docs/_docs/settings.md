@@ -18,13 +18,13 @@ Under Settings → Klaar:
 | Setting | Default |
 | --- | --- |
 | Journal notes folder | `Daily` |
-| Add completed date | on |
+| Add done date | on |
 | Mark in progress with [/] | on |
 | Mark next with [>] | on |
 | Mark someday with [<] | on |
 | New and moved tasks go at | The end of the note |
 | Schedule labels | Friendly (Fri 23 Oct) |
-| Completed date | Small and muted |
+| Done date | Small and muted |
 | Tags | `#p1`, `#p2`, `#p3`, `#bugs` |
 | Period types | Daily, Weekly, Monthly, Yearly on; Quarterly off |
 | Experimental: Questions with [?] | off |

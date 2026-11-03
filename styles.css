@@ -50,7 +50,7 @@ settings:
     -
         id: klaar-dates-heading
         title: Dates
-        description: Label style and the completed date are set in Klaar's own settings. Chips share the pill tint above.
+        description: Label style and the done date are set in Klaar's own settings. Chips share the pill tint above.
         type: heading
         level: 2
     -

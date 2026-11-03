@@ -50,7 +50,7 @@ Klaar never writes generated content into a note. It only changes a task line yo
 
 ### Working from a note {#working-in-a-note}
 
-- Tick a task and its line in its own note is updated, with the completed date if that's on.
+- Tick a task and its line in its own note is updated, with the done date if that's on.
 - Click a task's text to open its note at that line. The line flashes so you can find it.
 - Click a note's name to open the note. The arrow next to it folds the group.
 - Cmd-click (Ctrl-click on Windows and Linux) opens a new tab.

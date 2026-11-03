@@ -85,8 +85,8 @@ export class KlaarSettingTab extends PluginSettingTab {
 						control: { type: 'folder', key: 'periodFolder', placeholder: DEFAULT_SETTINGS.periodFolder, includeRoot: true },
 					},
 					{
-						name: 'Add completed date',
-						desc: 'Stamp a completed date on tasks when you tick them.',
+						name: 'Add done date',
+						desc: 'Stamp a done date on tasks when you tick them.',
 						control: { type: 'toggle', key: 'stampDone' },
 					},
 					{
@@ -121,8 +121,8 @@ export class KlaarSettingTab extends PluginSettingTab {
 						control: { type: 'dropdown', key: 'dateLabels', options: { friendly: 'Friendly (Fri 23 Oct)', key: 'Date as written (2026-10-23)' } },
 					},
 					{
-						name: 'Completed date',
-						desc: 'How the completed date shows in live preview and reading mode. The note text is unchanged.',
+						name: 'Done date',
+						desc: 'How the done date shows in live preview and reading mode. The note text is unchanged.',
 						control: { type: 'dropdown', key: 'doneStamp', options: { muted: 'Small and muted', chip: 'Chip', hidden: 'Hidden' } },
 					},
 				],

@@ -46,7 +46,7 @@ export function scheduledFor(all: TaskRef[], period: Period, today: IsoDate, not
 	const open = all.filter(t => isOpen(t) && t.path !== notePath);
 	const groups: TaskGroup[] = [];
 
-	// A day keeps its completed tasks listed so a finished day can be looked back on; wider periods and the other groups are open work only.
+	// A day keeps its done tasks listed so a finished day can be looked back on; wider periods and the other groups are open work only.
 	const own = (period.kind === 'day' ? all.filter(t => !t.cancelled && !isParked(t)) : open).filter(t => t.scheduleKey === period.key && t.path !== notePath);
 	if (own.length > 0) groups.push({ label: 'Scheduled', key: period.key, tasks: own });
 

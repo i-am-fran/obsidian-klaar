@@ -28,7 +28,7 @@ export function renderScheduleChip(app: App, settings: KlaarSettings, key: strin
 /** The done stamp as small muted text or a chip; null when it is hidden. */
 export function renderDoneStamp(settings: KlaarSettings, date: string): HTMLElement | null {
 	if (settings.doneStamp === 'hidden') return null;
-	const el = createSpan({ cls: settings.doneStamp === 'chip' ? 'klaar-chip klaar-done-chip' : 'klaar-done-muted', attr: { 'aria-label': `Completed ${date}` } });
+	const el = createSpan({ cls: settings.doneStamp === 'chip' ? 'klaar-chip klaar-done-chip' : 'klaar-done-muted', attr: { 'aria-label': `Done ${date}` } });
 	setIcon(el.createSpan({ cls: 'klaar-chip-icon' }), 'check');
 	el.createSpan({ text: doneLabel(date, todayIso()) });
 	return el;

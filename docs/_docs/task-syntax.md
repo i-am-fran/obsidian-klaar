@@ -6,7 +6,7 @@ headings:
   - id: markers
     label: Markers
   - id: done-stamp
-    label: Completed date
+    label: Done date
   - id: tags
     label: Tags and priority
   - id: commands
@@ -40,9 +40,9 @@ Each of these can be turned off in settings. Klaar then leaves those lines alone
 
 A task nested under another task is a subtask. Subtasks show everywhere, and the Bases views can hide them with **Show subtasks**.
 
-### Completed date {#done-stamp}
+### Done date {#done-stamp}
 
-When you tick a task, Klaar adds ` (@done [[2026-10-23]])` to the line. Turn this off with **Add completed date**. Under **Completed date** you choose whether the stamp shows small and muted, as a chip, or hidden. The note text is the same either way.
+When you tick a task, Klaar adds ` (@done [[2026-10-23]])` to the line. Turn this off with **Add done date**. Under **Done date** you choose whether the stamp shows small and muted, as a chip, or hidden. The note text is the same either way.
 
 ### Tags and priority {#tags}
 
