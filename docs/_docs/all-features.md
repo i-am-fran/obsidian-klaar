@@ -74,6 +74,7 @@ headings:
 - Done date stamp `(@done [[2026-10-23]])`, shown muted, as a chip or hidden
 - **Toggle in progress**, **Toggle next**, **Toggle someday**, **Toggle question**, **Toggle idea** (while those are on), **Toggle cancelled** and **Cycle priority** commands; **Cancel task** in the right-click menu
 - **Move done tasks to the bottom** gathers a note's done tasks under `## Done`, from the command palette or the right-click menu
+- **Sort tasks** orders each task list in a note by status, then priority
 - Commands work on every task in a selection
 - Coloured tag pills in the editor, reading mode and Klaar's views
 - Tag roles: label, high, medium or low priority, in progress

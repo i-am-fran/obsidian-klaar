@@ -2,6 +2,7 @@
 
 ## 2026.11.4
 
+- New command: **Sort tasks** puts every task list in the note in order: in progress, next, to do, someday, questions, ideas, then done and cancelled at the bottom. Within each group, `#p1` comes before `#p2` and `#p3`. Subtasks move with their task, and each list under a heading is sorted on its own. It's also in the right-click menu and the note's ⋯ menu, and one undo puts everything back.
 - New commands: **Toggle question** and **Toggle idea** switch a task (or every task in a selection) between open and `[?]` or `[I]`. Like the other toggles they can have a hotkey or go on the mobile toolbar, and they only show up while questions or ideas are turned on under Settings → Experimental.
 - On phones and tablets, **Review overdue tasks** has larger buttons that are easier to tap, paired by period (Today and Tomorrow, This week and Next week, This month and Next month), and the keyboard hints are hidden. On a phone it opens as a sheet at the bottom of the screen.
 - The **New task** button in the Klaar Table and Board now follows the placement setting too, so with "The top of the note" chosen a new task goes at the top of today's note. The setting is now called **New and moved tasks go at**.

@@ -10,6 +10,7 @@ import { movesPhysically, placeInPeriodNote } from './obsidian/moveTask';
 import { blockForPeriodNote, blocksForLines, openTopLevelBlocks, type TaskBlock } from './core/taskMove';
 import { DEFAULT_TAG_RULES, canMarkInProgress, cyclePriorityTag, normaliseTagRules, toggleInProgress } from './core/tagRules';
 import { appendBlock, markersOf, moveDoneToSection, outdentBlock, parseTaskLine, prependBlock, setSchedule, taskBlockEnd, toggleCancelled, toggleIdea, toggleNext, toggleQuestion, toggleSomeday } from './core/taskLine';
+import { sortTaskLists } from './core/taskSort';
 import { flashLineExtension } from './ui/flashLine';
 import { DateSuggest } from './ui/dateSuggest';
 import { dateChipsExtension, dateChipsPostProcessor } from './ui/dateChips';
@@ -146,6 +147,12 @@ export default class KlaarPlugin extends Plugin {
 			icon: 'list-checks',
 			editorCheckCallback: (checking, editor) => this.moveDoneTasks(editor, checking),
 		});
+		this.addCommand({
+			id: 'sort-tasks',
+			name: 'Sort tasks',
+			icon: 'arrow-down-wide-narrow',
+			editorCheckCallback: (checking, editor) => this.sortTasks(editor, checking),
+		});
 		// The note's "⋯" menu (desktop and mobile); only for an open note, so the move goes through its editor and can be
 		// undone there. No section, so it sits with other plugins' items near the bottom. Without a leaf, the active note.
 		this.registerEvent(
@@ -162,6 +169,9 @@ export default class KlaarPlugin extends Plugin {
 						item.setTitle('Move done tasks to the bottom').setIcon('list-checks').onClick(() => this.moveDoneTasks(view.editor, false)),
 					);
 				}
+				if (this.sortTasks(view.editor, true)) {
+					menu.addItem((item) => item.setTitle('Sort tasks').setIcon('arrow-down-wide-narrow').onClick(() => this.sortTasks(view.editor, false)));
+				}
 			}),
 		);
 		this.registerEvent(
@@ -170,6 +180,9 @@ export default class KlaarPlugin extends Plugin {
 					menu.addItem((item) =>
 						item.setTitle('Move done tasks to the bottom').setIcon('list-checks').onClick(() => this.moveDoneTasks(editor, false)),
 					);
+				}
+				if (this.sortTasks(editor, true)) {
+					menu.addItem((item) => item.setTitle('Sort tasks').setIcon('arrow-down-wide-narrow').onClick(() => this.sortTasks(editor, false)));
 				}
 				if (!this.cursorOnTask(editor)) return;
 				const file = ctx.file;
@@ -307,6 +320,16 @@ export default class KlaarPlugin extends Plugin {
 	private moveDoneTasks(editor: Editor, checking: boolean): boolean {
 		const lines = this.editorLines(editor);
 		const next = moveDoneToSection(lines, markersOf(this.settings));
+		if (!next) return false;
+		if (checking) return true;
+		this.replaceLines(editor, lines, next);
+		return true;
+	}
+
+	/** Sorts every task list in the note (see `sortTaskLists`), as one undo step. False when they are already in order. */
+	private sortTasks(editor: Editor, checking: boolean): boolean {
+		const lines = this.editorLines(editor);
+		const next = sortTaskLists(lines, { markers: markersOf(this.settings), rules: this.settings.tags, slashInProgress: this.settings.slashInProgress });
 		if (!next) return false;
 		if (checking) return true;
 		this.replaceLines(editor, lines, next);
