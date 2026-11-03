@@ -8,6 +8,8 @@ Klaar is a small task manager that lives in your Obsidian journal notes. You wri
 - **[Documentation](https://i-am-fran.github.io/obsidian-klaar/)**
 - **[Report a bug](https://github.com/i-am-fran/obsidian-klaar/issues)**
 
+<a href="https://www.buymeacoffee.com/iamfran" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" height="41" width="148"></a>
+
 Klaar is minimal on purpose. Your tasks stay plain Markdown checkboxes in your own notes. Klaar shows its lists when you open a journal note, and the file itself stays exactly as you wrote it. If you stop using Klaar tomorrow, nothing breaks. You'll just see a few links like `>[[2026-W43]]` at the end of some lines.
 
 It feels like part of Obsidian rather than an app inside an app. Journal notes are just notes and the calendar is a simple sidebar. When you want a table or a board of your tasks, Klaar plugs into Bases with two views, Klaar Table and Klaar Board, instead of inventing its own query language.
