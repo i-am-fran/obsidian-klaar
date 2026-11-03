@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { ALL_MARKERS, addTag, appendBlock, appendTaskLine, isParkedMarker, moveDoneToSection, prependBlock, outdentBlock, taskBlockEnd, lineSpans, parseTaskLine, removeDoneStamp, removeTags, reopenTask, setChecked, setInProgressMarker, setOpenMarker, setSchedule, taskMarker, toggleCancelled, toggleNext, toggleSomeday } from '../../src/core/taskLine';
+import { ALL_MARKERS, addTag, appendBlock, addTaskLine, isParkedMarker, moveDoneToSection, prependBlock, outdentBlock, taskBlockEnd, lineSpans, parseTaskLine, removeDoneStamp, removeTags, reopenTask, setChecked, setInProgressMarker, setOpenMarker, setSchedule, taskMarker, toggleCancelled, toggleNext, toggleSomeday } from '../../src/core/taskLine';
 
 describe('parseTaskLine', () => {
 	test('schedule link must be > plus a valid period', () => {
@@ -312,15 +312,20 @@ describe('taskMarker', () => {
 	});
 });
 
-describe('appendTaskLine', () => {
+describe('addTaskLine', () => {
 	test('adds an open task on its own line at the end', () => {
-		expect(appendTaskLine('', 'Call Sam')).toBe('- [ ] Call Sam\n');
-		expect(appendTaskLine('# Notes\n', 'Call Sam')).toBe('# Notes\n- [ ] Call Sam\n');
-		expect(appendTaskLine('# Notes', 'Call Sam')).toBe('# Notes\n- [ ] Call Sam\n');
+		expect(addTaskLine('', 'Call Sam', 'end')).toBe('- [ ] Call Sam\n');
+		expect(addTaskLine('# Notes\n', 'Call Sam', 'end')).toBe('# Notes\n- [ ] Call Sam\n');
+		expect(addTaskLine('# Notes', 'Call Sam', 'end')).toBe('# Notes\n- [ ] Call Sam\n');
+	});
+
+	test('adds it at the top, after the frontmatter', () => {
+		expect(addTaskLine('# Notes\n- [ ] B\n', 'Call Sam', 'start')).toBe('- [ ] Call Sam\n# Notes\n- [ ] B\n');
+		expect(addTaskLine('---\ntags: x\n---\n# Notes\n', 'Call Sam', 'start')).toBe('---\ntags: x\n---\n- [ ] Call Sam\n# Notes\n');
 	});
 
 	test('trims the text', () => {
-		expect(appendTaskLine('', '  Call Sam  ')).toBe('- [ ] Call Sam\n');
+		expect(addTaskLine('', '  Call Sam  ', 'end')).toBe('- [ ] Call Sam\n');
 	});
 });
 

@@ -42,7 +42,7 @@ Keep typing to filter the list, for example `>fri` or `>next`. Typing a full key
 - Drag a task onto a day in the [calendar](#calendar).
 - Drag a card to Today or This week on a [board by date](#board).
 
-To put a task in a different note instead, use **Move task to note…** from the command palette or the right-click menu. Pick a note and Klaar moves the task, with its subtasks, to the end of it. To put it at the top instead (below any frontmatter), change **Moved tasks go at** in Settings → Klaar; the same setting applies to **Send task to…** and Review overdue. Its schedule link stays as it is.
+To put a task in a different note instead, use **Move task to note…** from the command palette or the right-click menu. Pick a note and Klaar moves the task, with its subtasks, to the end of it. To put it at the top instead (below any frontmatter), change **New and moved tasks go at** in Settings → Klaar; the same setting applies to **Send task to…**, Review overdue and the New task button in the Klaar Table and Board. Its schedule link stays as it is.
 
 ### Sending tasks on {#send-task}
 

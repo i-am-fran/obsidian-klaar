@@ -105,8 +105,8 @@ export class KlaarSettingTab extends PluginSettingTab {
 						control: { type: 'toggle', key: 'somedayMarker' },
 					},
 					{
-						name: 'Moved tasks go at',
-						desc: 'Where a moved task lands in the other note: "Move task to note…", "Send task to…" and Review overdue. The top is just below any frontmatter.',
+						name: 'New and moved tasks go at',
+						desc: 'Where a task lands in the other note: "Move task to note…", "Send task to…", Review overdue and the New task button in the Klaar Table and Board. The top is just below any frontmatter.',
 						control: { type: 'dropdown', key: 'moveTo', options: { end: 'The end of the note', start: 'The top of the note' } },
 					},
 				],

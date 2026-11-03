@@ -3,6 +3,7 @@
 ## 2026.11.4
 
 - On phones and tablets, **Review overdue tasks** has larger buttons that are easier to tap, paired by period (Today and Tomorrow, This week and Next week, This month and Next month), and the keyboard hints are hidden. On a phone it opens as a sheet at the bottom of the screen.
+- The **New task** button in the Klaar Table and Board now follows the placement setting too, so with "The top of the note" chosen a new task goes at the top of today's note. The setting is now called **New and moved tasks go at**.
 
 ## 2026.11.3
 

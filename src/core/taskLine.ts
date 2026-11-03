@@ -295,10 +295,10 @@ export function removeTags(line: string, tags: string[]): string {
 	return parts.prefix + parts.stateChar + parts.suffix + body + parts.stamp + parts.eol;
 }
 
-/** Appends `text` as an open task on its own line at the end of a note's content. */
-export function appendTaskLine(content: string, text: string): string {
-	const sep = content === '' || content.endsWith('\n') ? '' : '\n';
-	return `${content}${sep}- [ ] ${text.trim()}\n`;
+/** Adds `text` as an open task on its own line at the end or the top (after any frontmatter) of a note's content. */
+export function addTaskLine(content: string, text: string, at: 'start' | 'end'): string {
+	const line = [`- [ ] ${text.trim()}`];
+	return at === 'start' ? prependBlock(content, line) : appendBlock(content, line);
 }
 
 /** How far a line is indented, a tab counting as four spaces. */

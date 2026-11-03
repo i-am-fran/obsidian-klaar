@@ -1,7 +1,7 @@
 import { App, Notice, TFile, type PaneType } from 'obsidian';
 import { cleanFolder, periodKeyForPath, periodNotePath } from '../core/periodPaths';
 import { parsePeriodKey, type Period } from '../core/periods';
-import { appendTaskLine } from '../core/taskLine';
+import { addTaskLine } from '../core/taskLine';
 import type { KlaarSettings } from '../settings';
 import { confirmCreate } from '../ui/confirmCreateModal';
 
@@ -30,10 +30,10 @@ export async function openPeriodNote(app: App, settings: KlaarSettings, key: str
 	await app.workspace.getLeaf(newLeaf).openFile(file);
 }
 
-/** Adds `text` as an open task at the end of the period note for `key`, creating the note if missing; returns its path. */
+/** Adds `text` as an open task at the end or top (setting `moveTo`) of the period note for `key`, creating the note if missing; returns its path. */
 export async function addTaskToPeriodNote(app: App, settings: KlaarSettings, key: string, text: string): Promise<string> {
 	const file = await ensurePeriodNote(app, settings, key);
-	await app.vault.process(file, (content) => appendTaskLine(content, text));
+	await app.vault.process(file, (content) => addTaskLine(content, text, settings.moveTo));
 	return file.path;
 }
 
