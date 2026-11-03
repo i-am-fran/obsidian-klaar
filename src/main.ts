@@ -473,6 +473,7 @@ export default class KlaarPlugin extends Plugin {
 		// Shallow merge, so `periods` and `sectionOpen` are merged on their own: older or partial data keeps the defaults.
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, data, {
 			periods: { ...DEFAULT_SETTINGS.periods, ...data?.periods },
+			templates: { ...DEFAULT_SETTINGS.templates, ...data?.templates },
 			sectionOpen: { ...data?.sectionOpen },
 			tags: normaliseTagRules(data?.tags ?? DEFAULT_TAG_RULES),
 		});

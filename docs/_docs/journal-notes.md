@@ -11,6 +11,8 @@ headings:
     label: Working from a note
   - id: period-types
     label: Period types
+  - id: templates
+    label: Templates
   - id: plan-a-week
     label: Planning a week
 ---
@@ -29,7 +31,7 @@ Each note is named after its schedule key and lives in the journal notes folder 
 - `Daily/2026-Q4.md`
 - `Daily/2026.md`
 
-When you open a note that doesn't exist yet, Klaar asks before creating it, as an empty file.
+When you open a note that doesn't exist yet, Klaar asks before creating it. It starts empty, or from your [template](#templates) for that kind of note.
 
 ### What a note shows {#what-shows}
 
@@ -58,6 +60,23 @@ Klaar never writes generated content into a note. It only changes a task line yo
 ### Period types {#period-types}
 
 Daily, weekly, monthly and yearly notes are on by default; quarterly is off. Turn any of them on or off under Settings → Klaar → Period types. A period type that's off disappears from the scheduled sections, the calendar and the date picker. With weekly off, a day note shows "Scheduled this month" instead.
+
+### Templates {#templates}
+
+Each period type can have its own template: any note in your vault, picked under Settings → Klaar → Templates. Whenever Klaar creates a note of that kind (from the calendar, when you send a task to a new week, or when you add a task from a base), the note starts with the template's text. Notes that already exist are never changed.
+
+Klaar fills in the same placeholders as Obsidian's core Templates plugin:
+
+| You write | It becomes |
+| --- | --- |
+| `{% raw %}{{title}}{% endraw %}` | the note's name, like `2026-W45` |
+| `{% raw %}{{date}}{% endraw %}` | the first day of the period, like `2026-11-02` for week 45 |
+| `{% raw %}{{date:dddd D MMMM}}{% endraw %}` | that day in your own [format](https://momentjs.com/docs/#/displaying/format/): `Monday 2 November` |
+| `{% raw %}{{time}}{% endraw %}` | the time the note was created, or `{% raw %}{{time:FORMAT}}{% endraw %}` |
+
+Anything else, like Templater's `<% %>` code, stays as written. If Templater's "Trigger on new file creation" is on, Templater fills it in.
+
+If the template file has been moved or deleted, Klaar creates the note empty and tells you.
 
 ### Planning a week {#plan-a-week}
 

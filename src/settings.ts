@@ -32,6 +32,8 @@ export interface KlaarSettings {
 	doneStamp: DoneStampStyle;
 	/** Where a moved task goes in the other note ("Move task to note…", "Send task to…", Review overdue). */
 	moveTo: MovePosition;
+	/** Vault path of the template a new period note of each kind starts from; '' starts it empty. */
+	templates: Record<PeriodKind, string>;
 }
 
 export type DoneStampStyle = 'muted' | 'hidden' | 'chip';
@@ -52,6 +54,7 @@ export const DEFAULT_SETTINGS: KlaarSettings = {
 	dateLabels: 'friendly',
 	doneStamp: 'muted',
 	moveTo: 'end',
+	templates: { day: '', week: '', month: '', quarter: '', year: '' },
 };
 
 const PERIOD_TOGGLES: { kind: PeriodKind; name: string }[] = [
@@ -64,6 +67,8 @@ const PERIOD_TOGGLES: { kind: PeriodKind; name: string }[] = [
 
 /** Control keys for the period toggles: `periods.day`, `periods.week`... */
 const PERIOD_KEY = 'periods.';
+/** Control keys for the template pickers: `templates.day`, `templates.week`... */
+const TEMPLATE_KEY = 'templates.';
 /** Settings that change what counts as a task or its meaning, so they re-read the index (`saveTagSettings`). */
 const TAG_KEYS = new Set(['slashInProgress', 'nextMarker', 'somedayMarker', 'questionMarker', 'ideaMarker']);
 /** Settings that only change how chips look (`saveDisplaySettings`). */
@@ -137,6 +142,15 @@ export class KlaarSettingTab extends PluginSettingTab {
 				items: PERIOD_TOGGLES.map(({ kind, name }) => ({
 					name,
 					control: { type: 'toggle', key: `${PERIOD_KEY}${kind}` },
+				})),
+			},
+			{
+				type: 'group',
+				heading: 'Templates',
+				items: PERIOD_TOGGLES.filter(({ kind }) => this.plugin.settings.periods[kind]).map(({ kind, name }) => ({
+					name: `${name} note template`,
+					desc: kind === 'day' ? 'A new note starts from it. {{title}}, {{date}} and {{date:FORMAT}} are filled in.' : undefined,
+					control: { type: 'file', key: `${TEMPLATE_KEY}${kind}`, placeholder: 'Templates/Note.md', filter: (file) => file.extension === 'md' },
 				})),
 			},
 			{
@@ -248,6 +262,7 @@ export class KlaarSettingTab extends PluginSettingTab {
 	getControlValue(key: string): unknown {
 		const settings = this.plugin.settings;
 		if (key.startsWith(PERIOD_KEY)) return settings.periods[key.slice(PERIOD_KEY.length) as PeriodKind];
+		if (key.startsWith(TEMPLATE_KEY)) return settings.templates[key.slice(TEMPLATE_KEY.length) as PeriodKind];
 		return settings[key as keyof KlaarSettings];
 	}
 
@@ -255,6 +270,7 @@ export class KlaarSettingTab extends PluginSettingTab {
 	async setControlValue(key: string, value: unknown): Promise<void> {
 		const settings = this.plugin.settings;
 		if (key.startsWith(PERIOD_KEY)) settings.periods[key.slice(PERIOD_KEY.length) as PeriodKind] = value as boolean;
+		else if (key.startsWith(TEMPLATE_KEY)) settings.templates[key.slice(TEMPLATE_KEY.length) as PeriodKind] = (value as string).trim();
 		else if (key === 'periodFolder') settings.periodFolder = cleanFolder(value as string);
 		else (settings as unknown as Record<string, unknown>)[key] = value;
 
@@ -266,6 +282,8 @@ export class KlaarSettingTab extends PluginSettingTab {
 		} else {
 			await this.plugin.saveSettings();
 			if (key === 'periodFolder' || key.startsWith(PERIOD_KEY)) this.plugin.rebuildIndex();
+			// The Templates group lists only the period types in use.
+			if (key.startsWith(PERIOD_KEY)) this.update();
 		}
 	}
 }

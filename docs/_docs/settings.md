@@ -27,6 +27,7 @@ Under Settings → Klaar:
 | Done date | Small and muted |
 | Tags | `#p1`, `#p2`, `#p3`, `#bugs` |
 | Period types | Daily, Weekly, Monthly, Yearly on; Quarterly off |
+| Templates | none: new notes start empty |
 | Experimental: Questions with [?] | off |
 | Experimental: Ideas with [I] | off |
 

@@ -1,4 +1,5 @@
-import { App, Notice, TFile, type PaneType } from 'obsidian';
+import { App, Notice, TFile, moment, type PaneType } from 'obsidian';
+import { fillTemplate } from '../core/noteTemplate';
 import { cleanFolder, periodKeyForPath, periodNotePath } from '../core/periodPaths';
 import { parsePeriodKey, type Period } from '../core/periods';
 import { addTaskLine } from '../core/taskLine';
@@ -37,12 +38,26 @@ export async function addTaskToPeriodNote(app: App, settings: KlaarSettings, key
 	return file.path;
 }
 
-/** The period note for `key`, created (with its folder) as an empty file if missing. */
+/** The period note for `key`, created (with its folder) from its kind's template, or empty, if missing. */
 export async function ensurePeriodNote(app: App, settings: KlaarSettings, key: string): Promise<TFile> {
 	const path = periodNotePath(settings.periodFolder, key);
 	const existing = app.vault.getFileByPath(path);
 	if (existing) return existing;
 	const folder = cleanFolder(settings.periodFolder);
 	if (folder !== '' && !app.vault.getFolderByPath(folder)) await app.vault.createFolder(folder);
-	return app.vault.create(path, '');
+	return app.vault.create(path, await initialContent(app, settings, key));
+}
+
+/** A new period note's text: its kind's template with the placeholders filled in, or '' with no template (a missing one also warns). */
+async function initialContent(app: App, settings: KlaarSettings, key: string): Promise<string> {
+	const period = parsePeriodKey(key);
+	const templatePath = period ? settings.templates[period.kind] : '';
+	if (!period || templatePath === '') return '';
+	const template = app.vault.getFileByPath(templatePath);
+	if (!template) {
+		new Notice(`Template "${templatePath}" not found. Klaar created ${key} empty.`);
+		return '';
+	}
+	const text = await app.vault.cachedRead(template);
+	return fillTemplate(text, period, new Date(), (date, format) => moment(date).format(format));
 }

@@ -77,7 +77,7 @@ Other ways to install:
 
 ## Settings
 
-Under Settings → Klaar you choose the **Journal notes folder** (`Daily` by default), which period types you use, the extra markers, your tags and colours, and how dates look. The documentation lists [every setting and its default](https://i-am-fran.github.io/obsidian-klaar/docs.html#settings).
+Under Settings → Klaar you choose the **Journal notes folder** (`Daily` by default), which period types you use, a template for each kind of new note, the extra markers, your tags and colours, and how dates look. The documentation lists [every setting and its default](https://i-am-fran.github.io/obsidian-klaar/docs.html#settings).
 
 ## Themes
 

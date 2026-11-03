@@ -52,6 +52,7 @@ headings:
 - Tick a task to update its own note
 - A schedule button on every task
 - Asks before creating a missing note
+- A template per period type for new notes
 - Nothing is written into your notes
 
 ### Calendar {#features-calendar}
