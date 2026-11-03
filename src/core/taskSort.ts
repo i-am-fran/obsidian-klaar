@@ -1,3 +1,4 @@
+import { compareDeadline, parsePeriodKey, type Period } from './periods';
 import { isInProgress, meaningOf, type TagRule } from './tagRules';
 import { tagsOf } from './taskFields';
 import { fenceAfter, indentWidth, parseTaskLine, taskBlockEnd, type MarkerSettings, type ParsedLine } from './taskLine';
@@ -23,6 +24,25 @@ function rank(parsed: ParsedLine, options: SortOptions): number {
 	return 20 + byPriority;
 }
 
+interface SortBlock {
+	rank: number;
+	date: Period | null;
+	lines: string[];
+}
+
+/** The schedule's period for the groups priority orders; null for done and cancelled tasks and when undated. */
+function dateOf(parsed: ParsedLine): Period | null {
+	if (parsed.checked || parsed.cancelled || parsed.scheduleKey === null) return null;
+	return parsePeriodKey(parsed.scheduleKey);
+}
+
+/** By rank, then earliest deadline (`compareDeadline`), undated last. */
+function compareBlocks(a: SortBlock, b: SortBlock): number {
+	if (a.rank !== b.rank) return a.rank - b.rank;
+	if (a.date && b.date) return compareDeadline(a.date, b.date);
+	return a.date ? -1 : b.date ? 1 : 0;
+}
+
 /** The groups `sortTaskLists` orders tasks into, first to last, for telling the user; markers turned off are left out. */
 export function sortOrderLabels(markers: MarkerSettings): string[] {
 	return [
@@ -38,15 +58,15 @@ export function sortOrderLabels(markers: MarkerSettings): string[] {
 }
 
 /**
- * The note's lines with each list of top-level tasks put in order (see `rank`), subtasks moving with their task and ties
+ * The note's lines with each list of top-level tasks put in order (see `rank`), then by schedule date, subtasks moving with their task and ties
  * keeping their place. A list is a run of top-level tasks with nothing between them, so headings, blank lines, plain
  * bullets, text and code blocks all end one. Null when every list is already in order.
  */
 export function sortTaskLists(lines: string[], options: SortOptions): string[] | null {
 	const out: string[] = [];
-	let list: { rank: number; lines: string[] }[] = [];
+	let list: SortBlock[] = [];
 	const flush = (sort: boolean) => {
-		const ordered = sort ? [...list].sort((a, b) => a.rank - b.rank) : list;
+		const ordered = sort ? [...list].sort(compareBlocks) : list;
 		out.push(...ordered.flatMap((block) => block.lines));
 		list = [];
 	};
@@ -57,7 +77,7 @@ export function sortTaskLists(lines: string[], options: SortOptions): string[] |
 		if (parsed) {
 			const end = taskBlockEnd(lines, i);
 			const block = lines.slice(i, end);
-			list.push({ rank: rank(parsed, options), lines: block });
+			list.push({ rank: rank(parsed, options), date: dateOf(parsed), lines: block });
 			i = end - 1;
 			fence = block.reduce(fenceAfter, null);
 			// A block that leaves a code block open (a blank line inside a subtask's code) ends its list unsorted, so

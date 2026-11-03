@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { ALL_MARKERS, addTag, appendBlock, addTaskLine, isParkedMarker, moveDoneToSection, prependBlock, outdentBlock, taskBlockEnd, lineSpans, parseTaskLine, removeDoneStamp, removeTags, reopenTask, setChecked, setInProgressMarker, setOpenMarker, setSchedule, taskMarker, toggleCancelled, toggleIdea, toggleNext, toggleQuestion, toggleSomeday } from '../../src/core/taskLine';
+import { ALL_MARKERS, addTag, appendBlock, addTaskLine, isParkedMarker, moveDoneToSection, prependBlock, outdentBlock, taskBlockEnd, lineSpans, parseTaskLine, plainLineToTask, removeDoneStamp, removeTags, reopenTask, setChecked, setInProgressMarker, setOpenMarker, setSchedule, taskMarker, toggleCancelled, toggleIdea, toggleNext, toggleQuestion, toggleSomeday } from '../../src/core/taskLine';
 
 describe('parseTaskLine', () => {
 	test('schedule link must be > plus a valid period', () => {
@@ -219,6 +219,18 @@ describe('question and idea markers', () => {
 		expect(setSchedule('- [?] A', '2026-10-23')).toBe('- [?] A >[[2026-10-23]]');
 		expect(toggleSomeday('- [I] A')).toBe('- [<] A');
 		expect(toggleCancelled('- [?] A')).toBe('- [-] A');
+	});
+	test('plainLineToTask turns a bullet or plain text into a question or idea', () => {
+		expect(plainLineToTask('- A', '?')).toBe('- [?] A');
+		expect(plainLineToTask('\t* A', 'I')).toBe('\t* [I] A');
+		expect(plainLineToTask('A thought', 'I')).toBe('- [I] A thought');
+		expect(plainLineToTask('  A thought\r', '?')).toBe('  - [?] A thought\r');
+		expect(plainLineToTask('#tag first', '?')).toBe('- [?] #tag first');
+	});
+	test('plainLineToTask leaves other lines alone', () => {
+		for (const line of ['', '   ', '## Heading', '> quote', '| a | b |', '```', '---', '1. A', '- [!] A', '- [I] A', '- [ ] A']) {
+			expect(plainLineToTask(line, '?')).toBeNull();
+		}
 	});
 	test('isParked: someday, question and idea, when in use', () => {
 		expect(isParkedMarker('<', ALL_MARKERS)).toBe(true);

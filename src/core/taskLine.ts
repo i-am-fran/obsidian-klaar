@@ -253,6 +253,27 @@ export function toggleIdea(line: string): string {
 	return toggleMarker(line, 'I');
 }
 
+const BULLET = /^(\s*[-*+] )(.*)$/;
+/** Lines that are not plain text: headings, quotes, tables, code fences, rules and numbered lists. */
+const NOT_PLAIN = /^(#{1,6}(\s|$)|>|\||```|~~~|---|\*\*\*|\d+[.)]\s)/;
+
+/** A bullet or a plain text line as a `[?]` or `[I]` task, keeping its indent; null for blank lines, other blocks and any line with a `[c]` box. */
+export function plainLineToTask(raw: string, marker: '?' | 'I'): string | null {
+	const eol = raw.endsWith('\r') ? '\r' : '';
+	const line = eol ? raw.slice(0, -1) : raw;
+	if (line.trim() === '') return null;
+	const bullet = BULLET.exec(line);
+	if (bullet) {
+		const rest = bullet[2] ?? '';
+		if (/^\[.\]/.test(rest)) return null;
+		return `${bullet[1] ?? ''}[${marker}] ${rest}${eol}`;
+	}
+	const indent = /^\s*/.exec(line)?.[0] ?? '';
+	const text = line.slice(indent.length);
+	if (NOT_PLAIN.test(text)) return null;
+	return `${indent}- [${marker}] ${text}${eol}`;
+}
+
 /** `[-]` ↔ `[ ]`; any other task (in progress, next, someday, done) becomes `[-]`, losing its done stamp. */
 export function toggleCancelled(line: string): string {
 	const parts = split(line);

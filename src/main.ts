@@ -9,7 +9,7 @@ import { openPeriodNote, periodNotePath, periodOfFile } from './obsidian/periodN
 import { movesPhysically, placeInPeriodNote } from './obsidian/moveTask';
 import { blockForPeriodNote, blocksForLines, openTopLevelBlocks, type TaskBlock } from './core/taskMove';
 import { DEFAULT_TAG_RULES, canMarkInProgress, cyclePriorityTag, normaliseTagRules, toggleInProgress } from './core/tagRules';
-import { appendBlock, markersOf, moveDoneToSection, outdentBlock, parseTaskLine, prependBlock, setSchedule, taskBlockEnd, toggleCancelled, toggleIdea, toggleNext, toggleQuestion, toggleSomeday } from './core/taskLine';
+import { appendBlock, markersOf, moveDoneToSection, outdentBlock, parseTaskLine, plainLineToTask, prependBlock, setSchedule, taskBlockEnd, toggleCancelled, toggleIdea, toggleNext, toggleQuestion, toggleSomeday } from './core/taskLine';
 import { sortOrderLabels, sortTaskLists } from './core/taskSort';
 import { confirm } from './ui/confirmModal';
 import { flashLineExtension } from './ui/flashLine';
@@ -122,13 +122,13 @@ export default class KlaarPlugin extends Plugin {
 			id: 'toggle-question',
 			name: 'Toggle question',
 			icon: 'circle-help',
-			editorCheckCallback: (checking, editor) => this.settings.questionMarker && this.rewriteSelectedTasks(editor, checking, toggleQuestion),
+			editorCheckCallback: (checking, editor) => this.settings.questionMarker && this.rewriteSelectedTasks(editor, checking, toggleQuestion, line => plainLineToTask(line, '?')),
 		});
 		this.addCommand({
 			id: 'toggle-idea',
 			name: 'Toggle idea',
 			icon: 'lightbulb',
-			editorCheckCallback: (checking, editor) => this.settings.ideaMarker && this.rewriteSelectedTasks(editor, checking, toggleIdea),
+			editorCheckCallback: (checking, editor) => this.settings.ideaMarker && this.rewriteSelectedTasks(editor, checking, toggleIdea, line => plainLineToTask(line, 'I')),
 		});
 		this.addCommand({
 			id: 'toggle-cancelled',
@@ -302,12 +302,14 @@ export default class KlaarPlugin extends Plugin {
 	}
 
 	/** Applies `rewrite` to every task line under the cursor or selection, as one undo step. */
-	private rewriteSelectedTasks(editor: Editor, checking: boolean, rewrite: (line: string) => string): boolean {
+	/** Rewrites each task line in the selection; `fromPlain`, when given, also turns lines that are not tasks into tasks (null leaves one alone). */
+	private rewriteSelectedTasks(editor: Editor, checking: boolean, rewrite: (line: string) => string, fromPlain?: (line: string) => string | null): boolean {
 		const changes: EditorChange[] = [];
 		for (const n of this.selectedLines(editor)) {
 			const line = editor.getLine(n);
-			if (!parseTaskLine(line, markersOf(this.settings))) continue;
-			changes.push({ from: { line: n, ch: 0 }, to: { line: n, ch: line.length }, text: rewrite(line) });
+			const text = parseTaskLine(line, markersOf(this.settings)) ? rewrite(line) : fromPlain?.(line) ?? null;
+			if (text === null) continue;
+			changes.push({ from: { line: n, ch: 0 }, to: { line: n, ch: line.length }, text });
 		}
 		if (changes.length === 0) return false;
 		if (!checking) editor.transaction({ changes });
@@ -333,7 +335,7 @@ export default class KlaarPlugin extends Plugin {
 		const rewrite = (lines: string[]) => sortTaskLists(lines, { markers, rules: this.settings.tags, slashInProgress: this.settings.slashInProgress });
 		return this.confirmRewrite(editor, checking, rewrite, {
 			title: 'Sort tasks?',
-			message: `Each task list in this note is ordered ${sortOrderLabels(markers).join(', ')}, higher priority first within each, subtasks moving with their task. Undo puts it back.`,
+			message: `Each task list in this note is ordered ${sortOrderLabels(markers).join(', ')}, higher priority first within each, then the earliest date, subtasks moving with their task. Undo puts it back.`,
 			action: 'Sort',
 		});
 	}

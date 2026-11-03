@@ -21,6 +21,16 @@ describe('sortTaskLists', () => {
 		expect(sort('- [<] S #p1\n- [ ] T')).toBe('- [ ] T\n- [<] S #p1');
 	});
 
+	test('schedule date breaks ties after priority, undated last', () => {
+		expect(sort('- [ ] A\n- [ ] B >[[2026-W45]]\n- [ ] C >[[2026-11-04]]\n- [ ] D >[[2026-11]]')).toBe('- [ ] C >[[2026-11-04]]\n- [ ] B >[[2026-W45]]\n- [ ] D >[[2026-11]]\n- [ ] A');
+		expect(sort('- [ ] A >[[2026-11-04]]\n- [ ] B #p1 >[[2026-12-01]]')).toBe('- [ ] B #p1 >[[2026-12-01]]\n- [ ] A >[[2026-11-04]]');
+		expect(sort('- [<] A >[[2026-12]]\n- [<] B >[[2026-11]]')).toBe('- [<] B >[[2026-11]]\n- [<] A >[[2026-12]]');
+	});
+
+	test('done and cancelled ignore dates', () => {
+		expect(sort('- [x] A >[[2026-12-01]]\n- [x] B >[[2026-11-01]]')).toBe(null);
+	});
+
 	test('done and cancelled ignore priority', () => {
 		expect(sort('- [x] A\n- [x] B #p1')).toBe(null);
 		expect(sort('- [-] A\n- [-] B #p1')).toBe(null);
