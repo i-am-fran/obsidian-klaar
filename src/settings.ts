@@ -69,6 +69,9 @@ const TAG_KEYS = new Set(['slashInProgress', 'nextMarker', 'somedayMarker', 'que
 /** Settings that only change how chips look (`saveDisplaySettings`). */
 const DISPLAY_KEYS = new Set(['dateLabels', 'doneStamp']);
 
+const FEEDBACK_URL = `mailto:iamfranrealm@icloud.com?subject=${encodeURIComponent('Klaar feedback')}`;
+const COFFEE_URL = 'https://www.buymeacoffee.com/iamfran';
+
 export class KlaarSettingTab extends PluginSettingTab {
 	constructor(app: App, private plugin: KlaarPlugin) {
 		super(app, plugin);
@@ -150,6 +153,26 @@ export class KlaarSettingTab extends PluginSettingTab {
 						name: 'Ideas with [I]',
 						desc: 'A [I] task (capital I) is an idea parked for later: it stays out of the scheduled sections, Overdue, the calendar and the open-task filters. Find your ideas under Status → Ideas in a Klaar Table, or in the Idea column of a status board. Tick it when it is done with. Turn off to leave [I] lines alone.',
 						control: { type: 'toggle', key: 'ideaMarker' },
+					},
+				],
+			},
+			{
+				type: 'group',
+				heading: 'Support',
+				items: [
+					{
+						name: 'Send feedback',
+						desc: 'Found a bug or missing something? Write me an email.',
+						render: (setting) => {
+							setting.addButton((button) => button.setButtonText('Send feedback').onClick(() => window.open(FEEDBACK_URL)));
+						},
+					},
+					{
+						name: 'Buy me a coffee',
+						desc: 'Klaar is free. If it helps you, a coffee helps me keep working on it.',
+						render: (setting) => {
+							setting.addButton((button) => button.setButtonText('Buy me a coffee').setCta().onClick(() => window.open(COFFEE_URL)));
+						},
 					},
 				],
 			},
