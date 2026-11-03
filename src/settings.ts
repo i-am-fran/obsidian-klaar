@@ -84,32 +84,32 @@ export class KlaarSettingTab extends PluginSettingTab {
 				items: [
 					{
 						name: 'Journal notes folder',
-						desc: 'Folder holding day, week, month, quarter and year notes.',
+						desc: 'Where your day, week, month, quarter and year notes live.',
 						control: { type: 'folder', key: 'periodFolder', placeholder: DEFAULT_SETTINGS.periodFolder, includeRoot: true },
 					},
 					{
 						name: 'Add done date',
-						desc: 'Stamp a done date on tasks when you tick them.',
+						desc: 'Add the date when you tick a task.',
 						control: { type: 'toggle', key: 'stampDone' },
 					},
 					{
 						name: 'Mark in progress with [/]',
-						desc: 'A [/] task is in progress, and marking a task in progress writes [/]. Turn off to use a tag with the in progress role instead.',
+						desc: 'Off: use a tag with the in progress role.',
 						control: { type: 'toggle', key: 'slashInProgress' },
 					},
 					{
 						name: 'Mark next with [>]',
-						desc: 'A [>] task is one to pick up next: open, with its own column on the board. Turn off to leave [>] lines alone.',
+						desc: 'Tasks to pick up next. Off: [>] is plain text.',
 						control: { type: 'toggle', key: 'nextMarker' },
 					},
 					{
 						name: 'Mark someday with [<]',
-						desc: 'A [<] task is parked for someday: it leaves the scheduled sections, the calendar and the open-task filters until you bring it back. Turn off to leave [<] lines alone.',
+						desc: 'Parked tasks, kept out of scheduled sections and the calendar. Off: [<] is plain text.',
 						control: { type: 'toggle', key: 'somedayMarker' },
 					},
 					{
 						name: 'New and moved tasks go at',
-						desc: 'Where a task lands in the other note: "Move task to note…", "Send task to…", Review overdue and the New task button in the Klaar Table and Board. The top is just below any frontmatter.',
+						desc: 'In the note a task is moved or added to. The top is below any frontmatter.',
 						control: { type: 'dropdown', key: 'moveTo', options: { end: 'The end of the note', start: 'The top of the note' } },
 					},
 				],
@@ -120,12 +120,12 @@ export class KlaarSettingTab extends PluginSettingTab {
 				items: [
 					{
 						name: 'Schedule labels',
-						desc: 'How a scheduled date reads in its chip. The raw date shows on hover either way.',
+						desc: 'Hover shows the date as written.',
 						control: { type: 'dropdown', key: 'dateLabels', options: { friendly: 'Friendly (Fri 23 Oct)', key: 'Date as written (2026-10-23)' } },
 					},
 					{
 						name: 'Done date',
-						desc: 'How the done date shows in live preview and reading mode. The note text is unchanged.',
+						desc: 'Display only; the note keeps the date.',
 						control: { type: 'dropdown', key: 'doneStamp', options: { muted: 'Small and muted', chip: 'Chip', hidden: 'Hidden' } },
 					},
 				],
@@ -136,7 +136,6 @@ export class KlaarSettingTab extends PluginSettingTab {
 				heading: 'Period types',
 				items: PERIOD_TOGGLES.map(({ kind, name }) => ({
 					name,
-					desc: `Use ${name.toLowerCase()} notes in the calendar, date picker and scheduled sections.`,
 					control: { type: 'toggle', key: `${PERIOD_KEY}${kind}` },
 				})),
 			},
@@ -146,12 +145,12 @@ export class KlaarSettingTab extends PluginSettingTab {
 				items: [
 					{
 						name: 'Questions with [?]',
-						desc: 'A [?] task is a question to think about, not to do today: it stays out of the scheduled sections, Overdue, the calendar and the open-task filters. Find your questions under Status → Questions in a Klaar Table, or in the Question column of a status board. Tick it when it is answered. Turn off to leave [?] lines alone.',
+						desc: 'Questions to think about, kept out of scheduled sections and the calendar, with their own status and board column. Off: [?] is plain text.',
 						control: { type: 'toggle', key: 'questionMarker' },
 					},
 					{
 						name: 'Ideas with [I]',
-						desc: 'A [I] task (capital I) is an idea parked for later: it stays out of the scheduled sections, Overdue, the calendar and the open-task filters. Find your ideas under Status → Ideas in a Klaar Table, or in the Idea column of a status board. Tick it when it is done with. Turn off to leave [I] lines alone.',
+						desc: 'Ideas for later (capital I), kept out of scheduled sections and the calendar, with their own status and board column. Off: [I] is plain text.',
 						control: { type: 'toggle', key: 'ideaMarker' },
 					},
 				],
@@ -162,14 +161,14 @@ export class KlaarSettingTab extends PluginSettingTab {
 				items: [
 					{
 						name: 'Send feedback',
-						desc: 'Found a bug or missing something? Write me an email.',
+						desc: 'Bug or missing feature? Email me.',
 						render: (setting) => {
 							setting.addButton((button) => button.setButtonText('Send feedback').onClick(() => window.open(FEEDBACK_URL)));
 						},
 					},
 					{
 						name: 'Buy me a coffee',
-						desc: 'Klaar is free. If it helps you, a coffee helps me keep working on it.',
+						desc: 'Klaar is free. A coffee helps me keep working on it.',
 						render: (setting) => {
 							setting.addButton((button) => button.setButtonText('Buy me a coffee').setCta().onClick(() => window.open(COFFEE_URL)));
 						},
@@ -212,7 +211,7 @@ export class KlaarSettingTab extends PluginSettingTab {
 			list,
 			{
 				type: 'group',
-				items: [{ name: 'Coloured tags', desc: 'Tags listed above are coloured everywhere. A role makes the tag set a task\'s priority or mark it in progress. A plain tag can also be a column on a Klaar Board: turn it on in the board\'s Configure view.' }],
+				items: [{ name: 'Coloured tags', desc: 'Listed tags are coloured everywhere. A role sets priority or in progress. Any tag can be a board column (Configure view).' }],
 			},
 		];
 	}

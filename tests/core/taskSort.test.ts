@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import { DEFAULT_TAG_RULES, type TagRule } from '../../src/core/tagRules';
 import { ALL_MARKERS } from '../../src/core/taskLine';
-import { sortTaskLists, type SortOptions } from '../../src/core/taskSort';
+import { sortOrderLabels, sortTaskLists, type SortOptions } from '../../src/core/taskSort';
 
 const sort = (text: string, opts: Partial<SortOptions> = {}) =>
 	sortTaskLists(text.split('\n'), { markers: ALL_MARKERS, rules: DEFAULT_TAG_RULES, slashInProgress: true, ...opts })?.join('\n') ?? null;
@@ -86,5 +86,15 @@ describe('sortTaskLists', () => {
 
 	test('a marker turned off splits the list', () => {
 		expect(sort('- [x] A\n- [ ] B\n- [?] Q\n- [x] C\n- [/] D', { markers: { ...ALL_MARKERS, question: false } })).toBe('- [ ] B\n- [x] A\n- [?] Q\n- [/] D\n- [x] C');
+	});
+});
+
+describe('sortOrderLabels', () => {
+	test('lists every group with all markers on', () => {
+		expect(sortOrderLabels(ALL_MARKERS)).toEqual(['in progress', 'next', 'to do', 'someday', 'questions', 'ideas', 'done', 'cancelled']);
+	});
+
+	test('leaves out the markers that are off', () => {
+		expect(sortOrderLabels({ next: false, someday: true, question: false, idea: false })).toEqual(['in progress', 'to do', 'someday', 'done', 'cancelled']);
 	});
 });

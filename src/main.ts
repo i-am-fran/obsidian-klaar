@@ -10,7 +10,8 @@ import { movesPhysically, placeInPeriodNote } from './obsidian/moveTask';
 import { blockForPeriodNote, blocksForLines, openTopLevelBlocks, type TaskBlock } from './core/taskMove';
 import { DEFAULT_TAG_RULES, canMarkInProgress, cyclePriorityTag, normaliseTagRules, toggleInProgress } from './core/tagRules';
 import { appendBlock, markersOf, moveDoneToSection, outdentBlock, parseTaskLine, prependBlock, setSchedule, taskBlockEnd, toggleCancelled, toggleIdea, toggleNext, toggleQuestion, toggleSomeday } from './core/taskLine';
-import { sortTaskLists } from './core/taskSort';
+import { sortOrderLabels, sortTaskLists } from './core/taskSort';
+import { confirm } from './ui/confirmModal';
 import { flashLineExtension } from './ui/flashLine';
 import { DateSuggest } from './ui/dateSuggest';
 import { dateChipsExtension, dateChipsPostProcessor } from './ui/dateChips';
@@ -23,13 +24,13 @@ import { ScheduledSection } from './ui/scheduledSection';
 import { BASES_VIEW_BOARD, boardViewRegistration } from './bases/boardView';
 import { BASES_VIEW_TASKS, tasksViewRegistration } from './bases/tasksView';
 
-/** Command icons for opening the current period's note; commands need an icon to show in the mobile toolbar. */
-const PERIOD_ICONS: Record<PeriodKind, string> = {
-	day: 'calendar-check',
-	week: 'calendar-range',
-	month: 'calendar-days',
-	quarter: 'calendar-clock',
-	year: 'calendar-fold',
+/** Command icons for opening a period's note (current, previous, next); commands need an icon to show in the mobile toolbar. */
+const PERIOD_ICONS: Record<PeriodKind, { current: string; previous: string; next: string }> = {
+	day: { current: 'clock', previous: 'chevron-left', next: 'chevron-right' },
+	week: { current: 'calendar', previous: 'chevrons-left', next: 'chevrons-right' },
+	month: { current: 'calendar-days', previous: 'chevron-first', next: 'chevron-last' },
+	quarter: { current: 'calendar-range', previous: 'arrow-left', next: 'arrow-right' },
+	year: { current: 'calendar-fold', previous: 'arrow-left-to-line', next: 'arrow-right-to-line' },
 };
 
 export default class KlaarPlugin extends Plugin {
@@ -229,7 +230,7 @@ export default class KlaarPlugin extends Plugin {
 			this.addCommand({
 				id: `open-${label.toLowerCase().replace(' ', '-')}`,
 				name: `Open ${label.toLowerCase()}'s note`,
-				icon: PERIOD_ICONS[kind],
+				icon: PERIOD_ICONS[kind].current,
 				// Hidden for period types turned off in settings.
 				checkCallback: (checking) => {
 					if (!this.settings.periods[kind]) return false;
@@ -241,7 +242,7 @@ export default class KlaarPlugin extends Plugin {
 				this.addCommand({
 					id: `open-${step}-${kind}`,
 					name: `Open ${step} ${kind}'s note`,
-					icon: delta < 0 ? 'chevron-left' : 'chevron-right',
+					icon: PERIOD_ICONS[kind][step],
 					checkCallback: (checking) => {
 						if (!this.settings.periods[kind]) return false;
 						if (!checking) void openPeriodNote(this.app, this.settings, adjacentPeriod(kind, this.browseAnchor(kind), delta).key);
@@ -318,21 +319,38 @@ export default class KlaarPlugin extends Plugin {
 	 * there are none to move.
 	 */
 	private moveDoneTasks(editor: Editor, checking: boolean): boolean {
-		const lines = this.editorLines(editor);
-		const next = moveDoneToSection(lines, markersOf(this.settings));
-		if (!next) return false;
-		if (checking) return true;
-		this.replaceLines(editor, lines, next);
-		return true;
+		const rewrite = (lines: string[]) => moveDoneToSection(lines, markersOf(this.settings));
+		return this.confirmRewrite(editor, checking, rewrite, {
+			title: 'Move done tasks to the bottom?',
+			message: 'Done tasks and their subtasks go to the end of the ## Done section, which is added if missing. Undo puts them back.',
+			action: 'Move',
+		});
 	}
 
 	/** Sorts every task list in the note (see `sortTaskLists`), as one undo step. False when they are already in order. */
 	private sortTasks(editor: Editor, checking: boolean): boolean {
-		const lines = this.editorLines(editor);
-		const next = sortTaskLists(lines, { markers: markersOf(this.settings), rules: this.settings.tags, slashInProgress: this.settings.slashInProgress });
-		if (!next) return false;
+		const markers = markersOf(this.settings);
+		const rewrite = (lines: string[]) => sortTaskLists(lines, { markers, rules: this.settings.tags, slashInProgress: this.settings.slashInProgress });
+		return this.confirmRewrite(editor, checking, rewrite, {
+			title: 'Sort tasks?',
+			message: `Each task list in this note is ordered ${sortOrderLabels(markers).join(', ')}, higher priority first within each, subtasks moving with their task. Undo puts it back.`,
+			action: 'Sort',
+		});
+	}
+
+	/**
+	 * Applies `rewrite` to the whole note after the user confirms, as one undo step. False when it changes nothing. The
+	 * note is read again after the answer, so edits made while the prompt was open are not lost.
+	 */
+	private confirmRewrite(editor: Editor, checking: boolean, rewrite: (lines: string[]) => string[] | null, question: Parameters<typeof confirm>[1]): boolean {
+		if (!rewrite(this.editorLines(editor))) return false;
 		if (checking) return true;
-		this.replaceLines(editor, lines, next);
+		void confirm(this.app, question).then((yes) => {
+			if (!yes) return;
+			const lines = this.editorLines(editor);
+			const next = rewrite(lines);
+			if (next) this.replaceLines(editor, lines, next);
+		});
 		return true;
 	}
 

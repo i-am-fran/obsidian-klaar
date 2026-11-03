@@ -3,7 +3,7 @@ import { cleanFolder, periodKeyForPath, periodNotePath } from '../core/periodPat
 import { parsePeriodKey, type Period } from '../core/periods';
 import { addTaskLine } from '../core/taskLine';
 import type { KlaarSettings } from '../settings';
-import { confirmCreate } from '../ui/confirmCreateModal';
+import { confirmCreate } from '../ui/confirmModal';
 
 export { periodNotePath };
 

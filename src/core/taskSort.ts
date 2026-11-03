@@ -23,6 +23,20 @@ function rank(parsed: ParsedLine, options: SortOptions): number {
 	return 20 + byPriority;
 }
 
+/** The groups `sortTaskLists` orders tasks into, first to last, for telling the user; markers turned off are left out. */
+export function sortOrderLabels(markers: MarkerSettings): string[] {
+	return [
+		'in progress',
+		...(markers.next ? ['next'] : []),
+		'to do',
+		...(markers.someday ? ['someday'] : []),
+		...(markers.question ? ['questions'] : []),
+		...(markers.idea ? ['ideas'] : []),
+		'done',
+		'cancelled',
+	];
+}
+
 /**
  * The note's lines with each list of top-level tasks put in order (see `rank`), subtasks moving with their task and ties
  * keeping their place. A list is a run of top-level tasks with nothing between them, so headings, blank lines, plain

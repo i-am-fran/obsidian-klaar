@@ -7,6 +7,9 @@
 - New commands: **Toggle question** and **Toggle idea** switch a task (or every task in a selection) between open and `[?]` or `[I]`. Like the other toggles they can have a hotkey or go on the mobile toolbar, and they only show up while questions or ideas are turned on under Settings → Experimental.
 - On phones and tablets, **Review overdue tasks** has larger buttons that are easier to tap, paired by period (Today and Tomorrow, This week and Next week, This month and Next month), and the keyboard hints are hidden. On a phone it opens as a sheet at the bottom of the screen.
 - The **New task** button in the Klaar Table and Board now follows the placement setting too, so with "The top of the note" chosen a new task goes at the top of today's note. The setting is now called **New and moved tasks go at**.
+- **Sort tasks** and **Move done tasks to the bottom** now ask before changing the note, and say what will happen.
+- The open-note commands have new icons for the toolbar: a clock for today, a calendar for this week, and arrows for previous and next.
+- Settings descriptions are shorter.
 - Settings has a new **Support** section at the bottom, with buttons to send feedback by email and to buy me a coffee.
 
 ## 2026.11.3
