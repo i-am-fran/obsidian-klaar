@@ -63,7 +63,7 @@ Daily, weekly, monthly and yearly notes are on by default; quarterly is off. Tur
 
 ### Templates {#templates}
 
-Each period type can have its own template: any note in your vault, picked under Settings → Klaar → Templates. Whenever Klaar creates a note of that kind (from the calendar, when you send a task to a new week, or when you add a task from a base), the note starts with the template's text. Notes that already exist are never changed.
+Each period type can have its own template: any note in your vault, picked under Settings → Klaar → Period types, below the toggles. Whenever Klaar creates a note of that kind (from the calendar, when you send a task to a new week, or when you add a task from a base), the note starts with the template's text. Notes that already exist are never changed.
 
 Klaar fills in the same placeholders as Obsidian's core Templates plugin:
 

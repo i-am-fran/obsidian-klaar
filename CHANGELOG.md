@@ -2,7 +2,7 @@
 
 ## 2026.11.4
 
-- **Templates for new journal notes.** Under Settings → Templates, pick a note for each period type. When Klaar creates a day, week, month, quarter or year note, it starts from that template, with `{{title}}`, `{{date}}`, `{{date:FORMAT}}` and `{{time}}` filled in like Obsidian's core Templates. `{{date}}` is the first day of the period, so next week's note shows next week's Monday. Notes that already exist are never changed.
+- **Templates for new journal notes.** Under Settings → Period types, pick a note for each period type below its toggle. When Klaar creates a day, week, month, quarter or year note, it starts from that template, with `{{title}}`, `{{date}}`, `{{date:FORMAT}}` and `{{time}}` filled in like Obsidian's core Templates. `{{date}}` is the first day of the period, so next week's note shows next week's Monday. Notes that already exist are never changed.
 - New command: **Sort tasks** puts every task list in the note in order: in progress, next, to do, someday, questions, ideas, then done and cancelled at the bottom. Within each group, `#p1` comes before `#p2` and `#p3`. Subtasks move with their task, and each list under a heading is sorted on its own. It's also in the right-click menu and the note's ⋯ menu, and one undo puts everything back.
 - **Move done tasks to the bottom** no longer moves a task out of a code block opened with four backticks or `~~~`, or one that follows inline code at the start of a line.
 - New commands: **Toggle question** and **Toggle idea** switch a task (or every task in a selection) between open and `[?]` or `[I]`. Like the other toggles they can have a hotkey or go on the mobile toolbar, and they only show up while questions or ideas are turned on under Settings → Experimental.

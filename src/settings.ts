@@ -1,4 +1,4 @@
-import { App, Notice, PluginSettingTab, type Setting, type SettingDefinitionItem, type SettingDefinitionList } from 'obsidian';
+import { App, Notice, PluginSettingTab, type Setting, type SettingDefinition, type SettingDefinitionItem, type SettingDefinitionList } from 'obsidian';
 import { cleanFolder } from './core/periodPaths';
 import type { EnabledPeriods, PeriodKind } from './core/periods';
 import type { DateLabelStyle } from './core/dateLabels';
@@ -139,19 +139,18 @@ export class KlaarSettingTab extends PluginSettingTab {
 			{
 				type: 'group',
 				heading: 'Period types',
-				items: PERIOD_TOGGLES.map(({ kind, name }) => ({
-					name,
-					control: { type: 'toggle', key: `${PERIOD_KEY}${kind}` },
-				})),
-			},
-			{
-				type: 'group',
-				heading: 'Templates',
-				items: PERIOD_TOGGLES.filter(({ kind }) => this.plugin.settings.periods[kind]).map(({ kind, name }) => ({
-					name: `${name} note template`,
-					desc: kind === 'day' ? 'A new note starts from it. {{title}}, {{date}} and {{date:FORMAT}} are filled in.' : undefined,
-					control: { type: 'file', key: `${TEMPLATE_KEY}${kind}`, placeholder: 'Templates/Note.md', filter: (file) => file.extension === 'md' },
-				})),
+				items: [
+					...PERIOD_TOGGLES.map(({ kind, name }): SettingDefinition => ({
+						name,
+						control: { type: 'toggle', key: `${PERIOD_KEY}${kind}` },
+					})),
+					// Template pickers below the toggles, one per period type in use.
+					...PERIOD_TOGGLES.filter(({ kind }) => this.plugin.settings.periods[kind]).map(({ kind, name }): SettingDefinition => ({
+						name: `${name} note template`,
+						desc: kind === 'day' ? 'A new note starts from it. {{title}}, {{date}} and {{date:FORMAT}} are filled in.' : undefined,
+						control: { type: 'file', key: `${TEMPLATE_KEY}${kind}`, placeholder: 'Templates/Note.md', filter: (file) => file.extension === 'md' },
+					})),
+				],
 			},
 			{
 				type: 'group',
