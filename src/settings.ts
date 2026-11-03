@@ -1,4 +1,4 @@
-import { App, Notice, PluginSettingTab, type Setting, type SettingDefinition, type SettingDefinitionItem, type SettingDefinitionList } from 'obsidian';
+import { App, Notice, PluginSettingTab, type Setting, type TFile, type SettingDefinition, type SettingDefinitionItem, type SettingDefinitionList } from 'obsidian';
 import { cleanFolder } from './core/periodPaths';
 import type { EnabledPeriods, PeriodKind } from './core/periods';
 import type { DateLabelStyle } from './core/dateLabels';
@@ -140,17 +140,8 @@ export class KlaarSettingTab extends PluginSettingTab {
 				type: 'group',
 				heading: 'Period types',
 				items: [
-					...PERIOD_TOGGLES.map(({ kind, name }): SettingDefinition => ({
-						name,
-						control: { type: 'toggle', key: `${PERIOD_KEY}${kind}` },
-					})),
-					// Template pickers below the toggles, one per period type in use, introduced by a row of their own so
-					// each picker reads the same. The picker's own empty text says "No file selected".
+					...PERIOD_TOGGLES.flatMap(({ kind, name }) => this.periodRows(kind, name)),
 					{ name: 'Note templates', desc: 'A new journal note starts from its template, with {{title}}, {{date}} and {{date:FORMAT}} filled in.' },
-					...PERIOD_TOGGLES.filter(({ kind }) => this.plugin.settings.periods[kind]).map(({ kind, name }): SettingDefinition => ({
-						name: `${name} note template`,
-						control: { type: 'file', key: `${TEMPLATE_KEY}${kind}`, filter: (file) => file.extension === 'md' },
-					})),
 				],
 			},
 			{
@@ -190,6 +181,17 @@ export class KlaarSettingTab extends PluginSettingTab {
 				],
 			},
 		];
+	}
+
+	/** A period type's toggle, then its template picker while the type is on. The picker's own empty text says "No file selected". */
+	private periodRows(kind: PeriodKind, name: string): SettingDefinition[] {
+		const toggle: SettingDefinition = { name, control: { type: 'toggle', key: `${PERIOD_KEY}${kind}` } };
+		if (!this.plugin.settings.periods[kind]) return [toggle];
+		const template: SettingDefinition = {
+			name: `${name} note template`,
+			control: { type: 'file', key: `${TEMPLATE_KEY}${kind}`, filter: (file: TFile) => file.extension === 'md' },
+		};
+		return [toggle, template];
 	}
 
 	/**
