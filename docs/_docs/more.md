@@ -1,7 +1,7 @@
 ---
 title: More
 slug: more
-order: 9
+order: 8
 headings:
   - id: faq
     label: FAQ
@@ -22,6 +22,26 @@ To delete a task for good, click its text to open the note at that line, then de
 **Will there be a calendar view for Bases?**
 
 Not yet. Rather than design its own, Klaar will wait for Obsidian to release an official calendar view for Bases and then build on it. The Klaar Board was made the same way: it follows the look and behaviour of Obsidian's own board view, so it feels at home next to the rest of your vault. In the meantime, the calendar in the sidebar shows your scheduled tasks, and you can drag tasks from a Klaar Table or Board onto a day.
+
+**Will Klaar get recurring tasks?**
+
+No. A recurring task needs rules for when it comes back, what happens to the old one and what to do with missed ones, and none of that is plain Markdown. Klaar works more like a bullet journal: when something comes round again, you write it again. If it happens every week, put it in your weekly template, and every new week note starts with it.
+
+**What about start dates and deadlines?**
+
+Not for now, for the same reason: each one is another date to keep in sync and another rule about when a task shows up. A task has one date, the period you plan to do it in. Klaar may look at this again later.
+
+**Can I give a task a time of day?**
+
+No. Times lead to a day view with hours, task durations and reminders, and that's a different kind of app. Klaar plans by day, week, month and year. If something has to happen at 14:00, it belongs in your calendar app.
+
+**Is there a review for someday tasks, ideas and questions?**
+
+**Review overdue tasks** is the only guided review, because overdue tasks are the ones that pile up. For everything else, use a [Klaar Board](#board) by status: the Someday column (and Question and Idea, when they're turned on) shows what you've parked, and dragging a card to To do or Next brings it back. A [Klaar Table](#table) with Status set to Someday works too.
+
+**Will Klaar show stats, like tasks done per week?**
+
+No. A count of ticked tasks feels like progress but says little: what matters is whether the tasks were the right ones and moved you forward. Klaar shows you what's planned, and leaves the judging to you. Want to track habits? Use a habit tracker.
 
 ### Roadmap {#roadmap}
 

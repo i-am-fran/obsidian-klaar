@@ -9,7 +9,14 @@ headings:
     label: First steps
 ---
 
-Klaar is a small task manager that lives in your Obsidian journal notes. Tasks stay plain Markdown checkboxes in your own notes. Link one to a day, week, month, quarter or year, and it shows up in that period's journal note. Nothing is stored anywhere else.
+Klaar is a small task manager for Obsidian. Tasks stay plain Markdown checkboxes in any of your notes. Link one to a day, week, month, quarter or year, and it shows up in that period's journal note. Nothing is stored anywhere else.
+
+There are four ways to use it, and each builds on the one before:
+
+1. [Tasks anywhere](#tasks-anywhere): write tasks in any note and give them a date with `>`.
+2. [With journal notes](#journal-notes): each day, week and month note lists what's planned for it.
+3. [With Bases](#bases-views): a table or a board of the tasks in any base.
+4. [Catching up](#catching-up): send tasks on, and review what's overdue one key at a time.
 
 <video src="{{ '/assets/klaar-intro.mp4' | relative_url }}" poster="{{ '/assets/klaar-intro.jpg' | relative_url }}" controls playsinline preload="none" class="doc-section__media" aria-label="The two-minute Klaar intro: writing and scheduling tasks, the calendar, today's note, reviewing overdue tasks, the Bases table and board, and the commands"></video>
 

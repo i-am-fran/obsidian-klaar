@@ -7,8 +7,8 @@ collections:
     output: false
 
 title: "Klaar"
-tagline: "A small task manager that lives in your Obsidian journal notes. Write tasks as normal checkboxes and assign them to a day, a week, a month or a year."
-description: "Klaar is a small task manager for Obsidian journal notes: schedule plain Markdown checkboxes with > and see them in their day, week, month, quarter and year notes."
+tagline: "A small task manager for Obsidian. Write tasks as normal checkboxes in any note, give them a day, week, month or year, and they show up in your journal notes."
+description: "Klaar is a small task manager for Obsidian: write plain Markdown checkboxes in any note, schedule them with > and see them in their day, week, month, quarter and year notes."
 github_url: "https://github.com/i-am-fran/obsidian-klaar"
 author_url: "https://iamfran.com"
 author_label: "iamfran.com"

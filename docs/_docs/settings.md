@@ -1,7 +1,7 @@
 ---
 title: Settings
 slug: settings
-order: 7
+order: 6
 headings:
   - id: klaar-settings
     label: Klaar settings

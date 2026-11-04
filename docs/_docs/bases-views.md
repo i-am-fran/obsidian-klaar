@@ -1,7 +1,7 @@
 ---
 title: Bases views
 slug: bases-views
-order: 6
+order: 4
 headings:
   - id: add-view
     label: Adding a view
@@ -46,7 +46,7 @@ A table with the Task, Date and Note columns. Under **Configure view**:
 
 The default sort is by date, with priority tasks first within each date. Tick a task, click its text to open it at its line, use the calendar button to reschedule it, or drag the row onto the calendar.
 
-![A Klaar Table grouped by date, with the search bar, the task count, and Task, Date and Note columns]({{ '/assets/table.webp' | relative_url }}){: .doc-section__media}
+![A Klaar Table searched for ridely and grouped by note, showing 13 of 103 tasks with their priority pills, date chips and notes]({{ '/assets/table.webp' | relative_url }}){: .doc-section__media}
 
 ### Klaar Board {#board}
 
@@ -66,7 +66,7 @@ Drag a card to another column and Klaar rewrites just that task's line:
 
 Cancelled tasks don't show on the board. Also under **Configure view**: **Show done** (status board only), **Column width**, **Rows**, and the same filters (Tag included) and sort as the table.
 
-![A Klaar Board by status with To do, Next, In progress, Someday and Done columns, each card showing its date chip and note]({{ '/assets/board.webp' | relative_url }}){: .doc-section__media}
+![A Klaar Board by status, searched for ridely: To do, Next, In progress, Someday and Done columns, each card with its priority, date chip and note]({{ '/assets/board.webp' | relative_url }}){: .doc-section__media}
 
 ### Tag columns {#tag-columns}
 

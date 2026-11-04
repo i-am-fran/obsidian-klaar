@@ -19,15 +19,43 @@ sections:
 
 ## How it works {#how-it-works}
 
-Write a task anywhere in your vault, in a meeting note, a project note or today's note. Type `>` at the end of the line and pick a day, a week, a month or a year. Klaar adds a link to that period's note:
+There are four ways to use Klaar, and each builds on the one before. Start with the first and add the others when you want them.
+
+### 1. Tasks anywhere
+
+Write a task in any note: a meeting note, a project note, today's note. Type `>` at the end of the line and pick a day, a week, a month or a year. Klaar adds a link to that period's note, which reads as a small date chip:
 
 ```markdown
 - [ ] Send the quarterly report #p1 >[[2026-W43]]
 ```
 
-Open your week note and the task is there, along with what you planned for the month around it and for each day inside it. Today's note shows what's due today, what's still open this week and anything overdue. Tick a task there and it's ticked in the note where you wrote it.
+![A project note with tasks in progress, next, open, done and cancelled, each with a priority pill and a date chip: Thu 29 Oct in red, Today, Week 44, Week 45, Nov 2026]({{ '/assets/project-note.webp' | relative_url }}){: .showcase}
 
-Klaar is minimal on purpose. It doesn't write anything into your journal notes, and your tasks stay plain Markdown. If you stop using Klaar tomorrow, nothing breaks. It only reads the Markdown files in your vault, on your device, and never connects to the internet.
+[More about tasks anywhere]({{ '/docs.html#tasks-anywhere' | relative_url }}).
+
+### 2. With journal notes
+
+Open your week note and the task is there, along with what you planned for the month around it and for each day inside it. Today's note shows what's due today, what's still open this week and anything overdue. Tick a task there and it's ticked in the note where you wrote it. A calendar in the sidebar takes you between notes.
+
+![Today's note with Klaar: three tasks scheduled for today, grouped by note and heading, closed Scheduled this week and Overdue sections above the note's own schedule, and the calendar in the sidebar]({{ '/assets/day-note.webp' | relative_url }}){: .showcase}
+
+[More about journal notes]({{ '/docs.html#journal-notes' | relative_url }}).
+
+### 3. With Bases
+
+Klaar Table and Klaar Board show the tasks of any base. Search, filter and group them, and drag a card to Done, In progress, a priority or a date: Klaar changes just that line. A board by date puts every task without a date in its own column.
+
+![A Klaar Board by status, searched for ridely: To do, Next, In progress, Someday and Done columns, each card with its priority, date chip and note]({{ '/assets/board.webp' | relative_url }}){: .showcase}
+
+[More about the Bases views]({{ '/docs.html#bases-views' | relative_url }}).
+
+### 4. Catching up
+
+Send any task on from its ⋯ menu: a task in a journal note moves into the new day's or week's note, a task in a project note gets a new link. Back after a break, **Review overdue tasks** goes through what's overdue one task at a time, with a single key for each.
+
+![The Review overdue window on task 5 of 11, Button component with all states, overdue since Wed 28 Oct, with keys to send it to Today, Tomorrow, This week, Next week, This month or Next month, or to complete, park, cancel or skip it]({{ '/assets/review.webp' | relative_url }}){: .showcase}
+
+[More about catching up]({{ '/docs.html#catching-up' | relative_url }}).
 
 ***
 
@@ -35,11 +63,9 @@ Klaar is minimal on purpose. It doesn't write anything into your journal notes, 
 
 **Plan on different horizons.** Most things belong to a week, bigger ones to a month or a year. Each note shows the periods around and inside it, so nothing gets lost between notes.
 
-**Change plans in a second.** Type `>` again, drag the task onto a day in the calendar, or drag a card on a board.
-
-**See what still needs a date.** A Klaar Board by date puts every unscheduled task in its own column.
-
 **Part of Obsidian.** Plain checkboxes, ordinary tags like `#p1`, a calendar in the sidebar, and tables and boards in Bases instead of a query language.
+
+**Minimal on purpose.** Klaar doesn't write anything into your journal notes, and your tasks stay plain Markdown. If you stop using Klaar tomorrow, nothing breaks. It only reads the Markdown files in your vault, on your device, and never connects to the internet. No recurring tasks, times or stats either: the [FAQ]({{ '/docs.html#faq' | relative_url }}) says why.
 
 [Every feature, including the little ones]({{ '/docs.html#all-features' | relative_url }}).
 
@@ -51,11 +77,10 @@ Klaar is minimal on purpose. It doesn't write anything into your journal notes, 
 </div>
 
 <ul class="arrow-list">
-  <li><a class="arrow-card" href="{{ '/docs.html#scheduling' | relative_url }}"><span class="arrow-card__text"><span class="arrow-card__title">Scheduling</span><span class="arrow-card__desc">Type &gt; on a task and pick a day, week, month, quarter or year.</span></span>{% include arrow-icon.html %}</a></li>
-  <li><a class="arrow-card" href="{{ '/docs.html#journal-notes' | relative_url }}"><span class="arrow-card__text"><span class="arrow-card__title">Journal notes</span><span class="arrow-card__desc">What each day, week, month and year note shows.</span></span>{% include arrow-icon.html %}</a></li>
-  <li><a class="arrow-card" href="{{ '/docs.html#calendar' | relative_url }}"><span class="arrow-card__text"><span class="arrow-card__title">Calendar</span><span class="arrow-card__desc">A sidebar month view: open notes, drag tasks onto days.</span></span>{% include arrow-icon.html %}</a></li>
-  <li><a class="arrow-card" href="{{ '/docs.html#task-syntax' | relative_url }}"><span class="arrow-card__text"><span class="arrow-card__title">Task syntax</span><span class="arrow-card__desc">Markers, the done date, tags and priority, commands.</span></span>{% include arrow-icon.html %}</a></li>
+  <li><a class="arrow-card" href="{{ '/docs.html#tasks-anywhere' | relative_url }}"><span class="arrow-card__text"><span class="arrow-card__title">Tasks anywhere</span><span class="arrow-card__desc">Write tasks in any note and give them a date with &gt;.</span></span>{% include arrow-icon.html %}</a></li>
+  <li><a class="arrow-card" href="{{ '/docs.html#journal-notes' | relative_url }}"><span class="arrow-card__text"><span class="arrow-card__title">Journal notes</span><span class="arrow-card__desc">What each day, week, month and year note shows, and the calendar.</span></span>{% include arrow-icon.html %}</a></li>
   <li><a class="arrow-card" href="{{ '/docs.html#bases-views' | relative_url }}"><span class="arrow-card__text"><span class="arrow-card__title">Bases views</span><span class="arrow-card__desc">Klaar Table and Klaar Board for any base.</span></span>{% include arrow-icon.html %}</a></li>
+  <li><a class="arrow-card" href="{{ '/docs.html#catching-up' | relative_url }}"><span class="arrow-card__text"><span class="arrow-card__title">Catching up</span><span class="arrow-card__desc">Send tasks on and review what's overdue, one key each.</span></span>{% include arrow-icon.html %}</a></li>
   <li><a class="arrow-card" href="{{ '/docs.html#settings' | relative_url }}"><span class="arrow-card__text"><span class="arrow-card__title">Settings</span><span class="arrow-card__desc">Folder, period types, markers, tags and Style Settings.</span></span>{% include arrow-icon.html %}</a></li>
   <li><a class="arrow-card" href="{{ '/docs.html#all-features' | relative_url }}"><span class="arrow-card__text"><span class="arrow-card__title">All features</span><span class="arrow-card__desc">Every feature, including the little ones.</span></span>{% include arrow-icon.html %}</a></li>
   <li><a class="arrow-card" href="{{ '/docs.html#roadmap' | relative_url }}"><span class="arrow-card__text"><span class="arrow-card__title">Roadmap</span><span class="arrow-card__desc">What's planned next.</span></span>{% include arrow-icon.html %}</a></li>

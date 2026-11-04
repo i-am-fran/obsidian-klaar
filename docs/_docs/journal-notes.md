@@ -9,6 +9,12 @@ headings:
     label: What a note shows
   - id: working-in-a-note
     label: Working from a note
+  - id: calendar
+    label: The calendar
+  - id: calendar-markers
+    label: Calendar markers
+  - id: reschedule
+    label: Drag to reschedule
   - id: period-types
     label: Period types
   - id: templates
@@ -19,7 +25,7 @@ headings:
 
 Journal notes are your day, week, month, quarter and year notes. When you open one, Klaar shows the tasks due in it above the note's own text. Tasks cascade: a week note shows the month around it and the days inside it, so the bigger plans are there every time you plan.
 
-![A day note with Klaar: three tasks scheduled for the day, grouped by note and heading, a closed Scheduled this week section above the note's own text, and the calendar in the sidebar]({{ '/assets/day-note.webp' | relative_url }}){: .doc-section__media}
+![Today's note with Klaar: three tasks scheduled for today, grouped by note and heading, closed Scheduled this week and Overdue sections above the note's own schedule, and the calendar in the sidebar]({{ '/assets/day-note.webp' | relative_url }}){: .doc-section__media}
 
 ### Note names {#note-names}
 
@@ -48,7 +54,7 @@ Fold any section or group. Klaar remembers which sections you keep open, per kin
 Klaar never writes generated content into a note. It only changes a task line you acted on: ticking it, scheduling it, or changing its marker or priority.
 </aside>
 
-<!-- Screenshot: a week note with "Scheduled for this week", "Scheduled this month" and two day groups, one opened. Save as docs/assets/week-note.png -->
+![Week 45's note: Scheduled for this week and Scheduled this month closed, and the day 2026-11-04 open with its tasks grouped by note and heading, next to the calendar with week 45 selected]({{ '/assets/week-note.webp' | relative_url }}){: .doc-section__media}
 
 ### Working from a note {#working-in-a-note}
 
@@ -56,6 +62,33 @@ Klaar never writes generated content into a note. It only changes a task line yo
 - Click a task's text to open its note at that line. The line flashes so you can find it.
 - Click a note's name to open the note. The arrow next to it folds the group.
 - Cmd-click (Ctrl-click on Windows and Linux) opens a new tab.
+
+### The calendar {#calendar}
+
+A month view in the sidebar, with ISO week numbers. It's how you move between journal notes.
+
+![The Klaar calendar for November 2026 with week numbers, today (the 4th) highlighted, and rings, checks and dots under the days and weeks]({{ '/assets/calendar.webp' | relative_url }}){: .doc-section__media}
+
+The calendar opens in the right sidebar the first time Klaar runs. After that it stays wherever you put it, or closed if you close it. Bring it back with the **Open calendar** command or the calendar icon in the ribbon.
+
+- Click a day or a week number to open its journal note.
+- Click the month, year or quarter name at the top to open that note.
+- The arrows move between months; **Today** jumps back to the current month.
+- Cmd-click (Ctrl-click on Windows and Linux) opens the note in a new tab.
+
+### Calendar markers {#calendar-markers}
+
+Under a day or a week number:
+
+- A **ring**: open tasks are scheduled for it.
+- A **check**: it had tasks, and all of them are done.
+- A **dot**: its journal note exists.
+
+Cancelled and someday tasks don't count, and the markers follow as you tick tasks or create and delete notes.
+
+### Drag to reschedule {#reschedule}
+
+Drag a task from a journal note, a Klaar Table or a Klaar Board onto a day in the calendar. Klaar rewrites just that task's `>` link.
 
 ### Period types {#period-types}
 

@@ -1,23 +1,23 @@
 ---
 title: All features
 slug: all-features
-order: 8
+order: 7
 headings:
-  - id: features-scheduling
-    label: Scheduling
+  - id: features-anywhere
+    label: Tasks anywhere
   - id: features-journal-notes
     label: Journal notes
   - id: features-calendar
     label: Calendar
-  - id: features-tasks
-    label: Tasks
   - id: features-bases
     label: Bases views
+  - id: features-catching-up
+    label: Catching up
   - id: features-everywhere
     label: Everywhere
 ---
 
-### Scheduling {#features-scheduling}
+### Tasks anywhere {#features-anywhere}
 
 - `>` date picker on any task line
 - Today, Tomorrow and the next seven days by name
@@ -25,17 +25,22 @@ headings:
 - Type a full key, like `2026-W45`, to pick that exact period
 - **Schedule task…** from the command palette, the right-click menu or the note's ⋯ menu
 - **Move task to note…** moves a task and its subtasks to the end or top of another note
-- ⋯ menu on every task: Today, Tomorrow, This week, Next week, This month, Next month, Pick a date…, Move to note…, Someday, Cancel task
-- Tasks in journal notes move into the target note (created if missing); tasks in other notes get a link instead
-- **Send task to…** for the task under the cursor or a whole selection
-- **Review overdue tasks**: one task at a time, one key each, Backspace to undo
-- **Move open tasks to…** carries a journal note's unfinished tasks forward
-- Drag a task onto a calendar day to reschedule it; hold Alt (Option) to move it into that day's note
-- Tasks in a journal note belong to that note's period without a link
 - Date chips: Today, Tomorrow, Yesterday, `Fri 23 Oct`, `Week 43`, `Oct 2026`, `Q4 2026`, `2026`
 - Red chips for overdue tasks, accent chips for the current period
 - Hover a chip for the raw date, click it to open its note
 - Date chips can show the date as written instead
+- In progress `[/]`, next `[>]`, someday `[<]` and cancelled `[-]`; questions `[?]` and ideas `[I]` as an experimental option
+- Each extra marker can be turned off
+- Someday tasks leave the scheduled lists and the calendar
+- Done date stamp `(@done [[2026-10-23]])`, shown muted, as a chip or hidden
+- **Toggle in progress**, **Toggle next**, **Toggle someday**, **Toggle question**, **Toggle idea** (while those are on), **Toggle cancelled** and **Cycle priority** commands; **Cancel task** in the right-click menu
+- **Move done tasks to the bottom** gathers a note's done tasks under `## Done`, from the command palette or the right-click menu
+- **Sort tasks** orders each task list in a note by status, then priority, then date
+- Commands work on every task in a selection
+- Coloured tag pills in the editor, reading mode and Klaar's views
+- Tag roles: label, high, medium or low priority, in progress
+- Links, bold, italic, highlights and code render in task text
+- Subtasks are recognised
 
 ### Journal notes {#features-journal-notes}
 
@@ -54,6 +59,7 @@ headings:
 - Asks before creating a missing note
 - A template per period type for new notes
 - Nothing is written into your notes
+- Tasks in a journal note belong to that note's period without a link
 
 ### Calendar {#features-calendar}
 
@@ -66,21 +72,6 @@ headings:
 - **Open today's note**, **Open this week's note** (and month, quarter, year) commands, ready for your hotkeys
 - **Open previous day's note**, **Open next day's note** (and week, month, quarter, year), counting from the journal note you have open
 - Works with the keyboard
-
-### Tasks {#features-tasks}
-
-- In progress `[/]`, next `[>]`, someday `[<]` and cancelled `[-]`; questions `[?]` and ideas `[I]` as an experimental option
-- Each extra marker can be turned off
-- Someday tasks leave the scheduled lists and the calendar
-- Done date stamp `(@done [[2026-10-23]])`, shown muted, as a chip or hidden
-- **Toggle in progress**, **Toggle next**, **Toggle someday**, **Toggle question**, **Toggle idea** (while those are on), **Toggle cancelled** and **Cycle priority** commands; **Cancel task** in the right-click menu
-- **Move done tasks to the bottom** gathers a note's done tasks under `## Done`, from the command palette or the right-click menu
-- **Sort tasks** orders each task list in a note by status, then priority, then date
-- Commands work on every task in a selection
-- Coloured tag pills in the editor, reading mode and Klaar's views
-- Tag roles: label, high, medium or low priority, in progress
-- Links, bold, italic, highlights and code render in task text
-- Subtasks are recognised
 
 ### Bases views {#features-bases}
 
@@ -102,6 +93,15 @@ headings:
 - Long columns show the first 100 cards
 - Drag a card to change only its line
 - Drag rows and cards onto the calendar
+
+### Catching up {#features-catching-up}
+
+- ⋯ menu on every task: Today, Tomorrow, This week, Next week, This month, Next month, Pick a date…, Move to note…, Someday, Cancel task
+- Tasks in journal notes move into the target note (created if missing); tasks in other notes get a link instead
+- **Send task to…** for the task under the cursor or a whole selection
+- **Review overdue tasks**: one task at a time, one key each, Backspace to undo
+- **Move open tasks to…** carries a journal note's unfinished tasks forward
+- Drag a task onto a calendar day to reschedule it; hold Alt (Option) to move it into that day's note
 
 ### Everywhere {#features-everywhere}
 
