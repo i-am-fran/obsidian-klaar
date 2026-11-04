@@ -2,6 +2,7 @@ import type { EditorView } from '@codemirror/view';
 import { App, Keymap, MarkdownView, Notice, setIcon, type PaneType } from 'obsidian';
 import { todayIso } from '../core/dates';
 import { TASK_DRAG_MIME, encodeDragPayload } from '../core/dragPayload';
+import { parentLabel, parentOf, subtaskProgress } from '../core/subtasks';
 import { setChecked, taskMarker } from '../core/taskLine';
 import type { TaskRef } from '../core/tasks';
 import { editTask } from '../obsidian/editTask';
@@ -77,6 +78,33 @@ export function renderSourceLink(el: HTMLElement, app: App, ref: TaskRef): HTMLE
 		void openTaskLine(app, ref, Keymap.isModEvent(evt));
 	});
 	return link;
+}
+
+/**
+ * For a subtask: a muted "↳ parent" line naming the task it sits under; clicking it opens the parent's line (mod-click:
+ * new tab) without also opening the subtask. `noteTasks` are the tasks of the subtask's note. Nothing for a top-level task.
+ */
+export function renderParentLabel(el: HTMLElement, app: App, ref: TaskRef, noteTasks: readonly TaskRef[]): void {
+	const parent = parentOf(noteTasks, ref);
+	if (!parent) return;
+	const label = parentLabel(parent.text);
+	const line = el.createDiv({ cls: 'klaar-task-parent', attr: { 'aria-label': `Subtask of ${label}` } });
+	setIcon(line.createSpan({ cls: 'klaar-task-parent-icon' }), 'corner-down-right');
+	line.createSpan({ cls: 'klaar-task-parent-text', text: label });
+	line.addEventListener('click', (evt) => {
+		evt.stopPropagation();
+		void openTaskLine(app, parent, Keymap.isModEvent(evt));
+	});
+}
+
+/** For a task with subtasks: a "done/total" chip with a checklist icon. Nothing when it has none. */
+export function renderSubtaskProgress(el: HTMLElement, ref: TaskRef, noteTasks: readonly TaskRef[]): void {
+	const progress = subtaskProgress(noteTasks, ref);
+	if (!progress) return;
+	const chip = el.createSpan({ cls: 'klaar-subtask-progress', attr: { 'aria-label': `${progress.done} of ${progress.total} subtasks done` } });
+	chip.toggleClass('is-complete', progress.done === progress.total);
+	setIcon(chip.createSpan({ cls: 'klaar-subtask-progress-icon' }), 'list-checks');
+	chip.createSpan({ text: `${progress.done}/${progress.total}` });
 }
 
 /** "Task actions" button: opens the task's menu (send to a period, move to a note, someday, cancel). */

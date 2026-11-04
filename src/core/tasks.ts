@@ -37,6 +37,8 @@ export interface TaskRef {
 	heading: string | null;
 	/** Nested, at any depth, under another Klaar task. */
 	subtask: boolean;
+	/** Line of the nearest Klaar task above it in its list (same note), or null for a top-level task. */
+	parent: number | null;
 }
 
 /**
@@ -73,11 +75,15 @@ export function extractTasks(path: string, lines: string[], taskLines: number[],
 			tags,
 			heading: headingAt(headings, line),
 			subtask: false,
+			parent: null,
 		});
 	}
 	// Only Klaar tasks count as parents: a child of `[!]` or plain text stays top level, so hiding subtasks never hides it.
 	const taskAt = new Set(tasks.map((t) => t.line));
-	for (const task of tasks) task.subtask = hasTaskAbove(task.line, lines, parents, taskAt);
+	for (const task of tasks) {
+		task.parent = taskAbove(task.line, lines, parents, taskAt);
+		task.subtask = task.parent !== null;
+	}
 	return tasks;
 }
 
@@ -90,11 +96,11 @@ function indent(line: string | undefined): number {
  * Walks up the list. A real parent sits above its child and further out: the top items of a list starting on line 0
  * get parent `-0`, which reads as line 0, and the indent check tells them apart from that item's children.
  */
-function hasTaskAbove(line: number, lines: string[], parents: ReadonlyMap<number, number>, taskAt: Set<number>): boolean {
+function taskAbove(line: number, lines: string[], parents: ReadonlyMap<number, number>, taskAt: Set<number>): number | null {
 	for (let child = line, p = parents.get(line); p !== undefined && p >= 0 && p < child && indent(lines[p]) < indent(lines[child]); child = p, p = parents.get(p)) {
-		if (taskAt.has(p)) return true;
+		if (taskAt.has(p)) return p;
 	}
-	return false;
+	return null;
 }
 
 /** Finds the task line again after the note changed; null when missing or ambiguous. */

@@ -874,6 +874,60 @@ body {
 	min-width: 12em;
 }
 
+.klaar-col-task-line {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: var(--size-2-2) var(--size-4-2);
+}
+
+/* Subtasks: the parent's name above the task text (Klaar Table and Board). */
+.klaar-task-parent {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2-2);
+	min-width: 0;
+	color: var(--text-faint);
+	font-size: var(--font-ui-smaller);
+	cursor: var(--cursor-link, pointer);
+}
+
+.klaar-task-parent:hover {
+	color: var(--text-muted);
+}
+
+.klaar-task-parent-icon {
+	display: flex;
+	flex: none;
+	--icon-size: var(--icon-xs);
+}
+
+.klaar-task-parent-text {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* Tasks with subtasks: "done/total". */
+.klaar-subtask-progress {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--size-2-1);
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+.klaar-subtask-progress.is-complete {
+	color: var(--text-success, var(--color-green));
+}
+
+.klaar-subtask-progress-icon {
+	display: flex;
+	--icon-size: var(--icon-xs);
+}
+
 .klaar-col-date,
 .klaar-col-priority,
 .klaar-col-tags {

@@ -9,7 +9,7 @@ import type { TaskRef } from '../core/tasks';
 import type { KlaarSettings } from '../settings';
 import { renderScheduleChip } from '../ui/dateChips';
 import { renderTag, renderTaskText } from '../ui/tagHighlight';
-import { makeDraggable, makeOpenable, renderCheckbox, renderTaskMenuButton, renderSourceLink } from '../ui/taskRow';
+import { makeDraggable, makeOpenable, renderCheckbox, renderParentLabel, renderSubtaskProgress, renderTaskMenuButton, renderSourceLink } from '../ui/taskRow';
 import { filterOptions, sortOptions } from './labels';
 import { TaskBasesView, type TasksViewDeps } from './taskBasesView';
 
@@ -88,7 +88,11 @@ class TasksView extends TaskBasesView {
 			{ name: 'Task', render: (cell, task) => {
 				cell.addClass('klaar-col-task');
 				makeOpenable(cell, this.app, task);
-				renderTaskText(cell, withoutTags(task.text, inColumn), settings.tags, this.app, task.path);
+				const noteTasks = this.deps.index.forPath(task.path);
+				renderParentLabel(cell, this.app, task, noteTasks);
+				const line = cell.createDiv({ cls: 'klaar-col-task-line' });
+				renderTaskText(line.createSpan(), withoutTags(task.text, inColumn), settings.tags, this.app, task.path);
+				renderSubtaskProgress(line, task, noteTasks);
 			} },
 			{ name: 'Date', render: (cell, task) => {
 				cell.addClass('klaar-col-date');

@@ -64,11 +64,14 @@ describe('extractTasks', () => {
 		const parents = new Map([[0, -0], [1, 0], [2, 1], [3, 2], [4, -0]]);
 		const t = extractTasks('x.md', lines, [0, 1, 3, 4], null, [], [], false, undefined, parents);
 		expect(t.map(x => [x.text, x.subtask])).toEqual([['Parent', false], ['Child', true], ['Grandchild', true], ['Sibling', false]]);
+		expect(t.map(x => x.parent)).toEqual([null, 0, 1, null]);
 	});
 	test('only Klaar tasks are parents', () => {
 		const lines = ['- plain', '\t- [ ] A', '- [!] other', '\t- [ ] B'];
 		const parents = new Map([[0, -0], [1, 0], [2, -0], [3, 2]]);
-		expect(extractTasks('x.md', lines, [1, 2, 3], null, [], [], false, undefined, parents).map(x => x.subtask)).toEqual([false, false]);
+		const t = extractTasks('x.md', lines, [1, 2, 3], null, [], [], false, undefined, parents);
+		expect(t.map(x => x.subtask)).toEqual([false, false]);
+		expect(t.map(x => x.parent)).toEqual([null, null]);
 	});
 	test('no parents given: nothing is a subtask', () => {
 		expect(extractTasks('x.md', ['- [ ] A', '\t- [ ] B'], [0, 1], null).map(x => x.subtask)).toEqual([false, false]);

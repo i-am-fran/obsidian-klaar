@@ -12,7 +12,7 @@ import { renderScheduleChip } from '../ui/dateChips';
 import { openScheduleModal } from '../ui/scheduleModal';
 import { renderAccordion } from '../ui/accordion';
 import { renderTaskText } from '../ui/tagHighlight';
-import { makeDraggable, makeOpenable, renderCheckbox, renderTaskMenuButton, renderSourceLink } from '../ui/taskRow';
+import { makeDraggable, makeOpenable, renderCheckbox, renderParentLabel, renderSubtaskProgress, renderTaskMenuButton, renderSourceLink } from '../ui/taskRow';
 import { filterOptions, sortOptions } from './labels';
 import { TaskBasesView, type TasksViewDeps } from './taskBasesView';
 
@@ -113,11 +113,16 @@ class BoardView extends TaskBasesView {
 		});
 	}
 
-	/** One card: checkbox, text, schedule chip, note link, schedule button; draggable onto columns and the calendar. */
+	/**
+	 * One card: the parent's name for a subtask, checkbox, text, schedule chip, subtask count, note link, schedule button;
+	 * draggable onto columns and the calendar.
+	 */
 	private renderCard(parent: HTMLElement, task: TaskRef, settings: KlaarSettings): void {
 		const card = parent.createDiv({ cls: 'klaar-board-card' });
 		card.toggleClass('is-done', task.checked);
 		makeDraggable(card, task);
+		const noteTasks = this.deps.index.forPath(task.path);
+		renderParentLabel(card, this.app, task, noteTasks);
 		const top = card.createDiv({ cls: 'klaar-board-card-main' });
 		renderCheckbox(top, this.app, task, settings);
 		const text = top.createSpan({ cls: 'klaar-board-card-text' });
@@ -125,6 +130,7 @@ class BoardView extends TaskBasesView {
 		renderTaskText(text, task.text, settings.tags, this.app, task.path);
 		const meta = card.createDiv({ cls: 'klaar-board-card-meta' });
 		if (task.scheduleKey) meta.appendChild(renderScheduleChip(this.app, settings, task.scheduleKey, isOpen(task)));
+		renderSubtaskProgress(meta, task, noteTasks);
 		renderSourceLink(meta, this.app, task);
 		renderTaskMenuButton(meta, this.app, task, settings);
 	}
