@@ -1332,26 +1332,40 @@ body {
 }
 
 /*
- * On a phone the review is a card floating just above the home bar, inset from the edges with all its corners rounded
- * like the screen's (as Obsidian's floating toolbar), never taller than the screen; the buttons sit in thumb reach, tall
- * enough to tap. The targets pair up (today/tomorrow, this/next week, this/next month), one pair per row; picking a
- * date and the footer stay quiet.
+ * On a phone the review is a sheet docked to the bottom edge, full width with only its top corners rounded, like
+ * Obsidian's own phone menus and confirmations; never taller than the screen, its last buttons clear of the home bar.
+ * The buttons sit in thumb reach, tall enough to tap. The targets pair up (today/tomorrow, this/next week, this/next
+ * month), one pair per row; picking a date and the footer stay quiet.
  */
 .is-phone .klaar-review-container {
 	align-items: flex-end;
 }
 
 .is-phone .klaar-review {
-	--klaar-sheet-inset: var(--size-4-2);
-	--klaar-sheet-bottom: max(var(--klaar-sheet-inset), var(--safe-area-inset-bottom));
-	--modal-radius: var(--touch-radius-m);
+	--modal-radius: var(--touch-radius-s) var(--touch-radius-s) 0 0;
 	corner-shape: var(--corner-shape);
-	width: calc(100vw - 2 * var(--klaar-sheet-inset) - var(--safe-area-inset-left) - var(--safe-area-inset-right));
+	width: 100vw;
 	max-width: none;
-	max-height: calc(100vh - var(--safe-area-inset-top) - var(--klaar-sheet-bottom) - var(--klaar-sheet-inset));
-	margin: auto calc(var(--klaar-sheet-inset) + var(--safe-area-inset-right)) var(--klaar-sheet-bottom)
-		calc(var(--klaar-sheet-inset) + var(--safe-area-inset-left));
-	padding: var(--size-4-5) var(--size-4-5) var(--size-4-4);
+	max-height: calc(100vh - var(--safe-area-inset-top));
+	margin: auto 0 0;
+	padding: var(--size-4-2) calc(var(--size-4-5) + var(--safe-area-inset-right)) max(var(--size-4-4), var(--safe-area-inset-bottom))
+		calc(var(--size-4-5) + var(--safe-area-inset-left));
+	background-color: var(--menu-background);
+}
+
+/* Title and content share the sheet's side padding, so the title starts where the task and the button icons do. */
+.is-phone .klaar-review .modal-header,
+.is-phone .klaar-review .modal-content {
+	padding-inline: 0;
+}
+
+.is-phone .klaar-review .modal-title {
+	text-align: start;
+}
+
+/* Buttons stand out from the sheet the way Obsidian's menu rows do. */
+.is-mobile.theme-light .klaar-review {
+	--interactive-normal: var(--background-primary);
 }
 
 .is-mobile .klaar-review .klaar-review-text {
@@ -1372,7 +1386,7 @@ body {
 
 .is-mobile .klaar-review button.klaar-review-target,
 .is-mobile .klaar-review button.klaar-review-quiet {
-	justify-content: center;
+	justify-content: flex-start;
 	min-height: 48px;
 	padding: var(--size-4-2) var(--size-4-4);
 	border-radius: var(--touch-radius-s, var(--radius-m));
@@ -1383,7 +1397,13 @@ body {
 	background: var(--interactive-normal);
 }
 
+.is-mobile .klaar-review button.klaar-review-target:hover {
+	background: var(--interactive-hover);
+}
+
 .is-mobile .klaar-review .klaar-review-footer {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
 	gap: var(--size-4-2);
 }
 
@@ -1391,10 +1411,6 @@ body {
 	grid-column: 1 / -1;
 	background: transparent;
 	color: var(--text-muted);
-}
-
-.is-mobile .klaar-review button.klaar-review-quiet {
-	flex: 1 1 0;
 }
 
 .is-mobile .klaar-review button.klaar-review-undo {
