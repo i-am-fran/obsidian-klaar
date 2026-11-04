@@ -1093,9 +1093,24 @@ body {
 	font-size: var(--font-ui-smaller);
 }
 
+/*
+ * Footer: chips on the left, note link and ⋯ pinned together on the right. Only the note link takes the free space
+ * (two `margin-left: auto`s would split it and leave the link floating mid-card); it uses the footer's font so its
+ * text sits on the same centre line as the chips.
+ */
+.klaar-board-card-meta .klaar-task-source {
+	font-size: inherit;
+	line-height: var(--line-height-tight);
+}
+
 .klaar-board-card-meta .klaar-task-move {
+	flex: none;
 	margin-left: auto;
 	color: var(--text-faint);
+}
+
+.klaar-board-card-meta .klaar-task-source + .klaar-task-move {
+	margin-left: 0;
 }
 
 .klaar-board-card-meta .klaar-task-move:hover {
