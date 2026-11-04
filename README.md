@@ -1,3 +1,5 @@
+![Klaar for Obsidian](assets/logo/klaar-obsidian-banner.webp)
+
 # Klaar
 
 [![The two-minute Klaar intro: today's note with its scheduled and overdue sections next to the calendar. Click to watch it with sound](assets/video/klaar-intro.jpg)](assets/video/klaar-intro.mp4)
