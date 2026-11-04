@@ -82,7 +82,7 @@ export default class KlaarPlugin extends Plugin {
 		this.addCommand({
 			id: 'send-task',
 			name: 'Send task to…',
-			icon: 'calendar-arrow-right',
+			icon: 'forward',
 			editorCheckCallback: (checking, editor, ctx) => {
 				if (!ctx.file) return false;
 				const blocks = blocksForLines(this.editorLines(editor), this.selectedLines(editor), markersOf(this.settings));
@@ -94,7 +94,7 @@ export default class KlaarPlugin extends Plugin {
 		this.addCommand({
 			id: 'move-open-tasks',
 			name: 'Move open tasks to…',
-			icon: 'calendar-arrow-right',
+			icon: 'forward',
 			editorCheckCallback: (checking, editor, ctx) => this.moveOpenTasks(editor, ctx.file, checking),
 		});
 		this.addCommand({
@@ -162,7 +162,7 @@ export default class KlaarPlugin extends Plugin {
 				if (!(view instanceof MarkdownView) || view.file !== file) return;
 				if (this.moveOpenTasks(view.editor, view.file, true)) {
 					menu.addItem((item) =>
-						item.setTitle('Move open tasks to…').setIcon('calendar-arrow-right').onClick(() => this.moveOpenTasks(view.editor, view.file, false)),
+						item.setTitle('Move open tasks to…').setIcon('forward').onClick(() => this.moveOpenTasks(view.editor, view.file, false)),
 					);
 				}
 				if (this.moveDoneTasks(view.editor, true)) {
@@ -189,7 +189,7 @@ export default class KlaarPlugin extends Plugin {
 				const file = ctx.file;
 				if (file) {
 					menu.addItem((item) =>
-						item.setTitle('Send task to…').setIcon('calendar-arrow-right').onClick(() => {
+						item.setTitle('Send task to…').setIcon('forward').onClick(() => {
 							const blocks = blocksForLines(this.editorLines(editor), this.selectedLines(editor), markersOf(this.settings));
 							this.pickAndSend(editor, file, blocks);
 						}),

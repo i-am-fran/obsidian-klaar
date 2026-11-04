@@ -10,13 +10,20 @@ import type { KlaarSettings } from '../settings';
 import { openNoteModal } from './noteModal';
 import { openScheduleModal } from './scheduleModal';
 
-/** The quick "Send to" targets, by label, as the date picker names them. */
-const QUICK = ['Today', 'Tomorrow', 'This week', 'Next week', 'This month', 'Next month'];
+/** The quick "Send to" targets, by label as the date picker names them, with their icons. */
+const QUICK: Record<string, string> = {
+	Today: 'sun',
+	Tomorrow: 'sunrise',
+	'This week': 'calendar-range',
+	'Next week': 'calendar-plus',
+	'This month': 'calendar-days',
+	'Next month': 'calendar-plus-2',
+};
 
 /** The quick targets for today, leaving out period kinds turned off in settings. */
-export function quickTargets(settings: KlaarSettings): { label: string; key: string }[] {
+export function quickTargets(settings: KlaarSettings): { label: string; key: string; icon: string }[] {
 	const options = buildDateOptions(todayIso(), settings.periods);
-	return QUICK.flatMap((label) => options.filter((o) => o.label === label));
+	return Object.entries(QUICK).flatMap(([label, icon]) => options.filter((o) => o.label === label).map(({ key }) => ({ label, key, icon })));
 }
 
 /**
@@ -26,8 +33,8 @@ export function quickTargets(settings: KlaarSettings): { label: string; key: str
 export function showTaskMenu(evt: MouseEvent, app: App, ref: TaskRef, settings: KlaarSettings): void {
 	const menu = new Menu();
 	const send = (key: string) => void sendTaskWithNotice(app, settings, ref, key).catch(() => new Notice("Couldn't move the task."));
-	for (const { label, key } of quickTargets(settings)) {
-		menu.addItem((item) => item.setTitle(label).setIcon('calendar-arrow-right').onClick(() => send(key)));
+	for (const { label, key, icon } of quickTargets(settings)) {
+		menu.addItem((item) => item.setTitle(label).setIcon(icon).onClick(() => send(key)));
 	}
 	menu.addItem((item) => item.setTitle('Pick a date…').setIcon('calendar-search').onClick(() => openScheduleModal(app, settings.periods, send)));
 	menu.addSeparator();

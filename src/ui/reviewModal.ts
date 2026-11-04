@@ -24,15 +24,8 @@ function keyLabel(key: string): string {
 	return key === 'Enter' ? '↵' : key === 'Backspace' ? '⌫' : key === ' ' ? 'Space' : key.toUpperCase();
 }
 
-/** Keys and icons for the quick targets, by label. */
-const TARGETS: Record<string, { key: string; icon: string }> = {
-	Today: { key: 't', icon: 'sun' },
-	Tomorrow: { key: 'm', icon: 'sunrise' },
-	'This week': { key: 'w', icon: 'calendar-range' },
-	'Next week': { key: 'n', icon: 'calendar-plus' },
-	'This month': { key: 'o', icon: 'calendar-days' },
-	'Next month': { key: 'x', icon: 'calendar-plus-2' },
-};
+/** Keys for the quick targets, by label. */
+const TARGET_KEYS: Record<string, string> = { Today: 't', Tomorrow: 'm', 'This week': 'w', 'Next week': 'n', 'This month': 'o', 'Next month': 'x' };
 
 /**
  * Goes through the overdue tasks one at a time, oldest first; one key (or button) sends each to a period, completes,
@@ -51,10 +44,10 @@ class ReviewModal extends Modal {
 		const start = (t: TaskRef) => taskPeriod(t)?.start ?? '';
 		this.tasks = all.filter((t) => !t.subtask && isOverdue(t, today)).sort((a, b) => start(a).localeCompare(start(b)));
 		this.actions = [
-			...quickTargets(settings).map(({ label, key }) => ({
-				key: TARGETS[label]?.key ?? '',
+			...quickTargets(settings).map(({ label, key, icon }) => ({
+				key: TARGET_KEYS[label] ?? '',
 				label,
-				icon: TARGETS[label]?.icon ?? 'calendar',
+				icon,
 				run: (task: TaskRef) => sendTask(this.app, this.settings, task, key),
 			})),
 			{ key: 'd', label: 'Pick a date…', icon: 'calendar-search', run: () => 'pick' as const },
