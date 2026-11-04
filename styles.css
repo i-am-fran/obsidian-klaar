@@ -1181,11 +1181,8 @@ body {
 
 .klaar-review .klaar-review-label {
 	margin: 0 0 var(--size-4-1) var(--size-4-2);
-	color: var(--text-faint);
-	font-size: var(--font-ui-smaller);
-	font-weight: var(--font-semibold);
-	letter-spacing: 0.04em;
-	text-transform: uppercase;
+	color: var(--text-muted);
+	font-size: var(--font-ui-small);
 }
 
 .klaar-review .klaar-review-targets {
@@ -1196,8 +1193,8 @@ body {
 
 .klaar-review button.klaar-review-target,
 .klaar-review button.klaar-review-quiet {
-	justify-content: space-between;
-	gap: var(--size-4-3);
+	justify-content: flex-start;
+	gap: var(--size-4-2);
 	height: auto;
 	padding: var(--size-4-1) var(--size-4-2);
 	border: 0;
@@ -1214,6 +1211,18 @@ body {
 .klaar-review button.klaar-review-quiet:hover {
 	background: var(--background-modifier-hover);
 	color: var(--text-normal);
+}
+
+.klaar-review .klaar-review-icon {
+	display: flex;
+	color: var(--text-muted);
+	--icon-size: var(--icon-s);
+	--icon-stroke: var(--icon-s-stroke-width);
+}
+
+.klaar-review .klaar-review-name {
+	flex: 1 1 auto;
+	text-align: start;
 }
 
 .klaar-review button:focus:not(:focus-visible) {
@@ -1254,17 +1263,26 @@ body {
 }
 
 /*
- * On a phone the review is a bottom sheet with the buttons in thumb reach, tall enough to tap. The targets pair up
- * (today/tomorrow, this/next week, this/next month), one pair per row; picking a date and the footer stay quiet.
+ * On a phone the review is a card floating just above the home bar, inset from the edges with all its corners rounded
+ * like the screen's (as Obsidian's floating toolbar), never taller than the screen; the buttons sit in thumb reach, tall
+ * enough to tap. The targets pair up (today/tomorrow, this/next week, this/next month), one pair per row; picking a
+ * date and the footer stay quiet.
  */
 .is-phone .klaar-review-container {
 	align-items: flex-end;
 }
 
 .is-phone .klaar-review {
-	--modal-radius: var(--touch-radius-s) var(--touch-radius-s) 0 0;
-	margin-top: auto;
-	padding-bottom: var(--safe-area-inset-bottom);
+	--klaar-sheet-inset: var(--size-4-2);
+	--klaar-sheet-bottom: max(var(--klaar-sheet-inset), var(--safe-area-inset-bottom));
+	--modal-radius: var(--touch-radius-m);
+	corner-shape: var(--corner-shape);
+	width: calc(100vw - 2 * var(--klaar-sheet-inset) - var(--safe-area-inset-left) - var(--safe-area-inset-right));
+	max-width: none;
+	max-height: calc(100vh - var(--safe-area-inset-top) - var(--klaar-sheet-bottom) - var(--klaar-sheet-inset));
+	margin: auto calc(var(--klaar-sheet-inset) + var(--safe-area-inset-right)) var(--klaar-sheet-bottom)
+		calc(var(--klaar-sheet-inset) + var(--safe-area-inset-left));
+	padding: var(--size-4-5) var(--size-4-5) var(--size-4-4);
 }
 
 .is-mobile .klaar-review .klaar-review-text {
@@ -1312,6 +1330,10 @@ body {
 
 .is-mobile .klaar-review button.klaar-review-undo {
 	margin-left: 0;
+}
+
+.is-mobile .klaar-review .klaar-review-name {
+	flex: 0 1 auto;
 }
 
 /* No keyboard to press them with. */

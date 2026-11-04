@@ -70,6 +70,7 @@ A notice says where the task went and has an Undo button. From the editor, ordin
 | O | This month |
 | X | Next month |
 | D | Pick a date… |
+| Space | Complete |
 | S | Someday |
 | C | Cancel task |
 | Enter | Skip |

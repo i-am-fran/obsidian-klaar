@@ -1,8 +1,8 @@
-import { App, Modal, Notice } from 'obsidian';
+import { App, Modal, Notice, setIcon } from 'obsidian';
 import { scheduleLabel } from '../core/dateLabels';
 import { todayIso } from '../core/dates';
 import { isOverdue, taskPeriod } from '../core/query';
-import { toggleCancelled, toggleSomeday } from '../core/taskLine';
+import { setChecked, toggleCancelled, toggleSomeday } from '../core/taskLine';
 import type { TaskRef } from '../core/tasks';
 import { rewriteTask, sendTask, undoSend, type SendRecord } from '../obsidian/moveTask';
 import type { KlaarSettings } from '../settings';
@@ -13,22 +13,30 @@ import { quickTargets } from './taskMenu';
 interface Action {
 	key: string;
 	label: string;
+	icon: string;
 	run: (task: TaskRef) => Promise<SendRecord | null> | 'skip' | 'pick';
 }
 
-/** Actions shown as plain text under the targets: someday, cancel, skip. */
-const SECONDARY = new Set(['s', 'c', 'Enter']);
+/** Actions shown as plain text under the targets: complete, someday, cancel, skip. */
+const SECONDARY = new Set([' ', 's', 'c', 'Enter']);
 
 function keyLabel(key: string): string {
-	return key === 'Enter' ? '↵' : key === 'Backspace' ? '⌫' : key.toUpperCase();
+	return key === 'Enter' ? '↵' : key === 'Backspace' ? '⌫' : key === ' ' ? 'Space' : key.toUpperCase();
 }
 
-/** Keys for the quick targets, by label. */
-const TARGET_KEYS: Record<string, string> = { Today: 't', Tomorrow: 'm', 'This week': 'w', 'Next week': 'n', 'This month': 'o', 'Next month': 'x' };
+/** Keys and icons for the quick targets, by label. */
+const TARGETS: Record<string, { key: string; icon: string }> = {
+	Today: { key: 't', icon: 'sun' },
+	Tomorrow: { key: 'm', icon: 'sunrise' },
+	'This week': { key: 'w', icon: 'calendar-range' },
+	'Next week': { key: 'n', icon: 'calendar-plus' },
+	'This month': { key: 'o', icon: 'calendar-days' },
+	'Next month': { key: 'x', icon: 'calendar-plus-2' },
+};
 
 /**
- * Goes through the overdue tasks one at a time, oldest first; one key (or button) sends each to a period, parks or
- * cancels it, or skips it. Backspace undoes the last one. Closing keeps what was done.
+ * Goes through the overdue tasks one at a time, oldest first; one key (or button) sends each to a period, completes,
+ * parks or cancels it, or skips it. Backspace undoes the last one. Closing keeps what was done.
  */
 class ReviewModal extends Modal {
 	private readonly tasks: TaskRef[];
@@ -44,14 +52,23 @@ class ReviewModal extends Modal {
 		this.tasks = all.filter((t) => !t.subtask && isOverdue(t, today)).sort((a, b) => start(a).localeCompare(start(b)));
 		this.actions = [
 			...quickTargets(settings).map(({ label, key }) => ({
-				key: TARGET_KEYS[label] ?? '',
+				key: TARGETS[label]?.key ?? '',
 				label,
+				icon: TARGETS[label]?.icon ?? 'calendar',
 				run: (task: TaskRef) => sendTask(this.app, this.settings, task, key),
 			})),
-			{ key: 'd', label: 'Pick a date…', run: () => 'pick' as const },
-			...(settings.somedayMarker ? [{ key: 's', label: 'Someday', run: (task: TaskRef) => rewriteTask(this.app, task, toggleSomeday) }] : []),
-			{ key: 'c', label: 'Cancel task', run: (task: TaskRef) => rewriteTask(this.app, task, toggleCancelled) },
-			{ key: 'Enter', label: 'Skip', run: () => 'skip' as const },
+			{ key: 'd', label: 'Pick a date…', icon: 'calendar-search', run: () => 'pick' as const },
+			{
+				key: ' ',
+				label: 'Complete',
+				icon: 'circle-check',
+				run: (task: TaskRef) => rewriteTask(this.app, task, (line) => setChecked(line, true, todayIso(), this.settings.stampDone)),
+			},
+			...(settings.somedayMarker
+				? [{ key: 's', label: 'Someday', icon: 'archive', run: (task: TaskRef) => rewriteTask(this.app, task, toggleSomeday) }]
+				: []),
+			{ key: 'c', label: 'Cancel task', icon: 'circle-slash', run: (task: TaskRef) => rewriteTask(this.app, task, toggleCancelled) },
+			{ key: 'Enter', label: 'Skip', icon: 'skip-forward', run: () => 'skip' as const },
 		];
 	}
 
@@ -110,20 +127,24 @@ class ReviewModal extends Modal {
 	}
 
 	private renderAction(parent: HTMLElement, action: Action, cls: string): void {
-		const button = parent.createEl('button', { cls });
-		button.createSpan({ text: action.label });
-		button.createEl('kbd', { text: keyLabel(action.key) });
+		const button = this.renderButton(parent, action, cls);
 		button.addEventListener('click', () => void this.apply(action));
+	}
+
+	/** A button: icon, label, then the key that does the same. */
+	private renderButton(parent: HTMLElement, action: Pick<Action, 'key' | 'label' | 'icon'>, cls: string): HTMLButtonElement {
+		const button = parent.createEl('button', { cls });
+		setIcon(button.createSpan({ cls: 'klaar-review-icon' }), action.icon);
+		button.createSpan({ cls: 'klaar-review-name', text: action.label });
+		button.createEl('kbd', { text: keyLabel(action.key) });
+		return button;
 	}
 
 	private renderFooter(el: HTMLElement, actions: Action[]): void {
 		const footer = el.createDiv({ cls: 'klaar-review-footer' });
 		for (const action of actions) this.renderAction(footer, action, 'klaar-review-quiet');
 		if (this.history.length === 0) return;
-		const undo: Action = { key: 'Backspace', label: 'Undo', run: () => 'skip' };
-		const button = footer.createEl('button', { cls: 'klaar-review-quiet klaar-review-undo' });
-		button.createSpan({ text: undo.label });
-		button.createEl('kbd', { text: keyLabel(undo.key) });
+		const button = this.renderButton(footer, { key: 'Backspace', label: 'Undo', icon: 'undo-2' }, 'klaar-review-quiet klaar-review-undo');
 		button.addEventListener('click', () => void this.undo());
 	}
 
