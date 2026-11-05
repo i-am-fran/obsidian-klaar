@@ -42,7 +42,7 @@ class ReviewModal extends Modal {
 		super(app);
 		const today = todayIso();
 		const start = (t: TaskRef) => taskPeriod(t)?.start ?? '';
-		this.tasks = all.filter((t) => !t.subtask && isOverdue(t, today)).sort((a, b) => start(a).localeCompare(start(b)));
+		this.tasks = all.filter((t) => t.parent === null && isOverdue(t, today)).sort((a, b) => start(a).localeCompare(start(b)));
 		this.actions = [
 			...quickTargets(settings).map(({ label, key, icon }) => ({
 				key: TARGET_KEYS[label] ?? '',

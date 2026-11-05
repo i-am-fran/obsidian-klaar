@@ -3,12 +3,12 @@ import { parentOf, parentLabel, subtaskProgress } from '../../src/core/subtasks'
 import type { TaskRef } from '../../src/core/tasks';
 
 function task(line: number, text: string, extra: Partial<TaskRef> = {}): TaskRef {
-	return { path: 'a.md', line, raw: `- [ ] ${text}`, checked: false, cancelled: false, someday: false, question: false, idea: false, next: false, text, scheduleKey: null, explicit: false, doneDate: null, inProgress: false, priority: 0, tags: [], heading: null, subtask: extra.parent !== undefined && extra.parent !== null, parent: null, ...extra };
+	return { path: 'a.md', line, raw: `- [ ] ${text}`, checked: false, cancelled: false, someday: false, question: false, idea: false, next: false, text, scheduleKey: null, explicit: false, doneDate: null, inProgress: false, priority: 0, tags: [], heading: null, parent: null, ...extra };
 }
 
 describe('parentOf', () => {
 	const parent = task(0, 'Release');
-	const child = task(1, 'Review', { parent: 0, subtask: true });
+	const child = task(1, 'Review', { parent: 0 });
 	test('finds the parent task in the same note', () => {
 		expect(parentOf([parent, child], child)).toBe(parent);
 	});
@@ -49,6 +49,10 @@ describe('subtaskProgress', () => {
 describe('parentLabel', () => {
 	test('drops tags and squeezes spaces', () => {
 		expect(parentLabel('Release  new version #p1 #klaar')).toBe('Release new version');
+	});
+	test('shows markdown as plain text: links by their label, styles and code without their marks', () => {
+		expect(parentLabel('Fix [[Klaar]] **sorting** in `taskSort`')).toBe('Fix Klaar sorting in taskSort');
+		expect(parentLabel('Read [[Plan|the plan]] and [docs](https://x.y) ~~now~~')).toBe('Read the plan and docs now');
 	});
 	test('a parent that is only tags falls back to the raw text', () => {
 		expect(parentLabel('#p1')).toBe('#p1');

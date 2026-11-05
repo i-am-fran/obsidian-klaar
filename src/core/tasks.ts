@@ -35,9 +35,10 @@ export interface TaskRef {
 	tags: string[];
 	/** Nearest heading above the task, if any. */
 	heading: string | null;
-	/** Nested, at any depth, under another Klaar task. */
-	subtask: boolean;
-	/** Line of the nearest Klaar task above it in its list (same note), or null for a top-level task. */
+	/**
+	 * Line of the nearest Klaar task above it in its list (same note), or null for a top-level task. A task with a
+	 * parent is a subtask, nested at any depth under another Klaar task.
+	 */
 	parent: number | null;
 }
 
@@ -74,16 +75,12 @@ export function extractTasks(path: string, lines: string[], taskLines: number[],
 			priority: meaning.priority,
 			tags,
 			heading: headingAt(headings, line),
-			subtask: false,
 			parent: null,
 		});
 	}
 	// Only Klaar tasks count as parents: a child of `[!]` or plain text stays top level, so hiding subtasks never hides it.
 	const taskAt = new Set(tasks.map((t) => t.line));
-	for (const task of tasks) {
-		task.parent = taskAbove(task.line, lines, parents, taskAt);
-		task.subtask = task.parent !== null;
-	}
+	for (const task of tasks) task.parent = taskAbove(task.line, lines, parents, taskAt);
 	return tasks;
 }
 

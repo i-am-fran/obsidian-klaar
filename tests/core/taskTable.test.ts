@@ -5,7 +5,7 @@ import type { StatusFilter, TableState, WhenFilter } from '../../src/core/taskTa
 import type { TaskRef } from '../../src/core/tasks';
 
 function task(text: string, scheduleKey: string | null, extra: Partial<TaskRef> = {}): TaskRef {
-	return { path: 'Other.md', line: 0, raw: `- [ ] ${text}`, checked: false, cancelled: false, someday: false, question: false, idea: false, next: false, text, scheduleKey, explicit: true, doneDate: null, inProgress: false, priority: 0, tags: [], heading: null, subtask: false, parent: null, ...extra };
+	return { path: 'Other.md', line: 0, raw: `- [ ] ${text}`, checked: false, cancelled: false, someday: false, question: false, idea: false, next: false, text, scheduleKey, explicit: true, doneDate: null, inProgress: false, priority: 0, tags: [], heading: null, parent: null, ...extra };
 }
 
 const today = '2026-10-21';
@@ -210,7 +210,7 @@ describe('groupTasks', () => {
 
 describe('filterTasks subtasks', () => {
 	const parent = task('parent', null);
-	const child = task('child', null, { subtask: true });
+	const child = task('child', null, { parent: 0 });
 	const run = (subtasks: boolean) => filterTasks([parent, child], { ...DEFAULT_TABLE_STATE, subtasks }, '', today, () => 'Other').map(t => t.text);
 	test('shown by default', () => expect(run(true)).toEqual(['parent', 'child']));
 	test('hidden when switched off', () => expect(run(false)).toEqual(['parent']));

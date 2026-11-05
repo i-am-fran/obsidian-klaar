@@ -4,7 +4,7 @@ import { newlyChecked, newlyUnchecked } from '../../src/core/newlyChecked';
 
 function task(line: number, text: string, checked: boolean, doneDate: string | null = null, cancelled = false): TaskRef {
 	const mark = checked ? 'x' : cancelled ? '-' : ' ';
-	return { path: 'a.md', line, raw: `- [${mark}] ${text}`, checked, cancelled, someday: false, question: false, idea: false, next: false, text, scheduleKey: null, explicit: false, doneDate, inProgress: false, priority: 0, tags: [], heading: null, subtask: false, parent: null };
+	return { path: 'a.md', line, raw: `- [${mark}] ${text}`, checked, cancelled, someday: false, question: false, idea: false, next: false, text, scheduleKey: null, explicit: false, doneDate, inProgress: false, priority: 0, tags: [], heading: null, parent: null };
 }
 
 describe('newlyChecked', () => {

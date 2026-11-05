@@ -1363,8 +1363,11 @@ body {
 	text-align: start;
 }
 
-/* Buttons stand out from the sheet the way Obsidian's menu rows do. */
-.is-mobile.theme-light .klaar-review {
+/*
+ * Buttons stand out from the sheet the way Obsidian's menu rows do. Phone only: a tablet's review keeps the modal's
+ * own background, which is this colour, so its buttons would vanish into it.
+ */
+.is-phone.theme-light .klaar-review {
 	--interactive-normal: var(--background-primary);
 }
 

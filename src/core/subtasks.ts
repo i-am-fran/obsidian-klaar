@@ -1,4 +1,4 @@
-import { withoutTags } from './taskFields';
+import { parseInline, type InlineNode } from './inlineMarkdown';
 import type { TaskRef } from './tasks';
 
 /** The task `task` sits under, among `tasks` (usually its note's tasks); null for a top-level task. */
@@ -17,7 +17,16 @@ export function subtaskProgress(tasks: readonly TaskRef[], task: TaskRef): { don
 	return { done: children.filter((t) => t.checked).length, total: children.length };
 }
 
-/** The parent's text as a short label: without tags, unless that leaves nothing. */
+/**
+ * The parent's text as a short plain label: links by their label, styles and code without their marks, no tags; the
+ * raw text when that leaves nothing.
+ */
 export function parentLabel(text: string): string {
-	return withoutTags(text, () => true) || text.trim();
+	return plain(parseInline(text)).replace(/\s+/g, ' ').trim() || text.trim();
+}
+
+function plain(nodes: InlineNode[]): string {
+	return nodes
+		.map((n) => ('text' in n ? n.text : 'code' in n ? n.code : 'label' in n ? n.label : 'children' in n ? plain(n.children) : ''))
+		.join('');
 }

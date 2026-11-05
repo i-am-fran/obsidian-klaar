@@ -63,18 +63,16 @@ describe('extractTasks', () => {
 		const lines = ['- [ ] Parent', '\t- [ ] Child', '\t\t- note', '\t\t\t- [ ] Grandchild', '- [ ] Sibling'];
 		const parents = new Map([[0, -0], [1, 0], [2, 1], [3, 2], [4, -0]]);
 		const t = extractTasks('x.md', lines, [0, 1, 3, 4], null, [], [], false, undefined, parents);
-		expect(t.map(x => [x.text, x.subtask])).toEqual([['Parent', false], ['Child', true], ['Grandchild', true], ['Sibling', false]]);
-		expect(t.map(x => x.parent)).toEqual([null, 0, 1, null]);
+		expect(t.map(x => [x.text, x.parent])).toEqual([['Parent', null], ['Child', 0], ['Grandchild', 1], ['Sibling', null]]);
 	});
 	test('only Klaar tasks are parents', () => {
 		const lines = ['- plain', '\t- [ ] A', '- [!] other', '\t- [ ] B'];
 		const parents = new Map([[0, -0], [1, 0], [2, -0], [3, 2]]);
 		const t = extractTasks('x.md', lines, [1, 2, 3], null, [], [], false, undefined, parents);
-		expect(t.map(x => x.subtask)).toEqual([false, false]);
 		expect(t.map(x => x.parent)).toEqual([null, null]);
 	});
 	test('no parents given: nothing is a subtask', () => {
-		expect(extractTasks('x.md', ['- [ ] A', '\t- [ ] B'], [0, 1], null).map(x => x.subtask)).toEqual([false, false]);
+		expect(extractTasks('x.md', ['- [ ] A', '\t- [ ] B'], [0, 1], null).map(x => x.parent)).toEqual([null, null]);
 	});
 	test('skips listed lines that are not tasks or are out of range', () => {
 		expect(extractTasks('x.md', ['plain', '- [ ] A'], [0, 1, 9], null).map(x => x.line)).toEqual([1]);

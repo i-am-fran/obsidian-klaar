@@ -1,16 +1,20 @@
 # Changelog
 
-## 2026.11.4
+## 2026.11.5
 
 - **Subtasks are easier to tell apart in the Klaar Table and Board.** A subtask shows the task it belongs to in small grey text above its own, like "↳ Release new version"; click it to open that task. A task with subtasks shows how many are done, like "1/2", which turns green when all are done. Cancelled subtasks don't count. Subtasks still sit in the column for their own status, and **Show subtasks** in Configure view still hides them.
 - On Klaar Board cards, the note name now sits on the right next to the ⋯ button, the same size as the date and subtask count. Before, it could float in the middle of the card.
+- **Review overdue tasks** can complete a task: press Space (or tap Complete) to tick it, with the done stamp if that's on. Every button now has an icon, and the "Send to" label is quieter.
+- The ⋯ menu's Today, Tomorrow, week and month entries have their own icons (the same as in Review overdue), and **Send task to…** and **Move open tasks to…** have an icon again. Before, these showed none.
+- On a phone, **Review overdue tasks** is now a sheet along the bottom edge, like Obsidian's own menus, always fits on the screen, and its Send to buttons stand out more from the background. On phones and tablets each button's icon sits at its left edge, so the icons line up in a column.
+
+## 2026.11.4
+
 - **Templates for new journal notes.** Under Settings → Period types, pick a template note below each period type's toggle. When Klaar creates a day, week, month, quarter or year note, it starts from that template, with `{{title}}`, `{{date}}`, `{{date:FORMAT}}` and `{{time}}` filled in like Obsidian's core Templates. `{{date}}` is the first day of the period, so next week's note shows next week's Monday. Notes that already exist are never changed.
 - New command: **Sort tasks** puts every task list in the note in order: in progress, next, to do, someday, questions, ideas, then done and cancelled at the bottom. Within each group, `#p1` comes before `#p2` and `#p3`, then tasks with the earliest date come first and undated ones last. Subtasks move with their task, and each list under a heading is sorted on its own. It's also in the right-click menu and the note's ⋯ menu, and one undo puts everything back.
 - **Move done tasks to the bottom** no longer moves a task out of a code block opened with four backticks or `~~~`, or one that follows inline code at the start of a line.
 - New commands: **Toggle question** and **Toggle idea** switch a task (or every task in a selection) between open and `[?]` or `[I]`. On a plain line or bullet they turn it into a question or idea task. Like the other toggles they can have a hotkey or go on the mobile toolbar, and they only show up while questions or ideas are turned on under Settings → Experimental.
-- **Review overdue tasks** can complete a task: press Space (or tap Complete) to tick it, with the done stamp if that's on. Every button now has an icon, and the "Send to" label is quieter.
-- The ⋯ menu's Today, Tomorrow, week and month entries have their own icons (the same as in Review overdue), and **Send task to…** and **Move open tasks to…** have an icon again. Before, these showed none.
-- On phones and tablets, **Review overdue tasks** has larger buttons that are easier to tap, paired by period (Today and Tomorrow, This week and Next week, This month and Next month), and the keyboard hints are hidden. On a phone it's a sheet along the bottom of the screen, like Obsidian's own menus, and always fits on the screen. Each button's icon sits at its left edge, so the icons line up in a column, and the Send to buttons stand out more from the background.
+- On phones and tablets, **Review overdue tasks** has larger buttons that are easier to tap, paired by period (Today and Tomorrow, This week and Next week, This month and Next month), and the keyboard hints are hidden. On a phone it opens as a sheet at the bottom of the screen.
 - The **New task** button in the Klaar Table and Board now follows the placement setting too, so with "The top of the note" chosen a new task goes at the top of today's note. The setting is now called **New and moved tasks go at**.
 - **Sort tasks** and **Move done tasks to the bottom** now ask before changing the note, and say what will happen.
 - The open-note commands have new icons for the toolbar: a clock for today, a calendar for this week, and arrows for previous and next.

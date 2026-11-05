@@ -172,7 +172,7 @@ export function matchesSearch(t: TaskRef, query: string, noteName: string): bool
 
 export function filterTasks(tasks: TaskRef[], state: TableState, query: string, today: IsoDate, noteName: (path: string) => string): TaskRef[] {
 	return tasks.filter(t =>
-		(state.subtasks || !t.subtask) &&
+		(state.subtasks || t.parent === null) &&
 		matchesStatus(t, state.status) &&
 		matchesWhen(t, state.when, today) &&
 		matchesMarker(t, state.marker) &&
