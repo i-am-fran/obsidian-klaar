@@ -2,11 +2,11 @@
 
 ## 2026.11.5
 
+- **Complete tasks from Review overdue.** Until now the review could only send, park or cancel a task. Now press Space (or tap Complete) to tick it, with the done stamp if that's on, and Backspace undoes it like any other step. Every button in the review also has an icon now, and the "Send to" label is quieter.
 - **Subtasks are easier to tell apart in the Klaar Table and Board.** A subtask shows the task it belongs to in small grey text above its own, like "↳ Release new version"; click it to open that task. A task with subtasks shows how many are done, like "1/2", which turns green when all are done. Cancelled subtasks don't count. Subtasks still sit in the column for their own status, and **Show subtasks** in Configure view still hides them.
-- On Klaar Board cards, the note name now sits on the right next to the ⋯ button, the same size as the date and subtask count. Before, it could float in the middle of the card.
-- **Review overdue tasks** can complete a task: press Space (or tap Complete) to tick it, with the done stamp if that's on. Every button now has an icon, and the "Send to" label is quieter.
-- The ⋯ menu's Today, Tomorrow, week and month entries have their own icons (the same as in Review overdue), and **Send task to…** and **Move open tasks to…** have an icon again. Before, these showed none.
 - On a phone, **Review overdue tasks** is now a sheet along the bottom edge, like Obsidian's own menus, always fits on the screen, and its Send to buttons stand out more from the background. On phones and tablets each button's icon sits at its left edge, so the icons line up in a column.
+- The ⋯ menu's Today, Tomorrow, week and month entries have their own icons (the same as in Review overdue), and **Send task to…** and **Move open tasks to…** now have an icon. Since 2026.11.1 these showed none.
+- On Klaar Board cards, the note name now sits on the right next to the ⋯ button, the same size as the date and subtask count. Before, it could float in the middle of the card.
 
 ## 2026.11.4
 
